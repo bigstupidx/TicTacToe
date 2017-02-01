@@ -22,8 +22,14 @@ public class BluetoothEventListener : MonoBehaviour {
 
         foundDevicePanel = Resources.Load("Prefabs/Bluetooth/FoundDevicePanel") as GameObject;
 
+        // Call the update function
         if (isServer) InvokeRepeating("SendClientLastSign", 0f, 0.2f);
     }
+
+    /// <summary>
+    /// What the latest border's bluetooth ID is that we displayed
+    /// </summary>
+    private int lastBorderID = 0;
 
     /// <summary>
     /// Whether the person is in game or not
@@ -54,6 +60,9 @@ public class BluetoothEventListener : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Where the client thinks last sign was palced
+    /// </summary>
     private int[] lastSignPlaced = new int[] { int.MaxValue, int.MaxValue };
 
 
@@ -87,10 +96,29 @@ public class BluetoothEventListener : MonoBehaviour {
     }
 
     /// <summary>
-    /// Sends client last sign's pos. Called every half a second or so
+    /// Last placed border's data
+    /// </summary>
+    private Border.BorderStorageLogic lastBorder;
+
+    /// <summary>
+    /// Should be called from BluetoothTTTGameLogic when a new border has been placed 
+    /// </summary>
+    public void SetLastBorder(Border.BorderStorageLogic lastBorder) {
+        this.lastBorder = lastBorder;
+        lastBorderID++;
+    }
+
+    /// <summary>
+    /// All in all an update function for clientCalled every half a second or so
+    /// 
+    /// Sends client last sign's pos
+    /// Also send last border's id
+    /// Also send whose turn it is
     /// </summary>
     private void SendClientLastSign() {
-        Bluetooth.Instance().Send(BluetoothMessageStrings.WHERE_LAST_PLACED + "#" + GameLogic.LastSignPlaced[0] + "#" + GameLogic.LastSignPlaced[1] + "#" + GameLogic.LastType.ToString());
+        Bluetooth.Instance().Send(BluetoothMessageStrings.WHERE_LAST_PLACED + "#" + GameLogic.LastSignPlaced[0] + "#" + GameLogic.LastSignPlaced[1] + "#" + GameLogic.LastType.ToString()
+            + "|||" + BluetoothMessageStrings.LAST_BORDER_ID + "#" + lastBorderID
+            + "|||" + BluetoothMessageStrings.TURN_OF + "#" + GameLogic.WhoseTurn.ToString() );
     }
 
     /// <summary>
@@ -113,17 +141,13 @@ public class BluetoothEventListener : MonoBehaviour {
     /// <summary>
     /// Event for the end of the search devices and there is zero device
     /// </summary>
-    void FoundZeroDeviceEvent() {
-        Debug.Log("FoundZeroDeviceEvent");
-        Bluetooth.Instance().showMessage("FoundZeroDeviceEvent");
-    }
+    void FoundZeroDeviceEvent() { }
 
     /// <summary>
     /// Event for the end of the current search
     /// </summary>
     void ScanFinishEvent() {
         GameObject.Find("LoadImage").GetComponent<LoadImage>().StopLoading();
-        Bluetooth.Instance().showMessage("ScanFinishEvent");
     }
 
     /// <summary>
@@ -193,8 +217,6 @@ public class BluetoothEventListener : MonoBehaviour {
                 }
                 break;
         }
-        Debug.Log(state);
-        Bluetooth.Instance().showMessage("Connection state " + state);
     }
 
     /// <summary>
@@ -221,19 +243,22 @@ public class BluetoothEventListener : MonoBehaviour {
             if (isServer) {
 
                 switch (splitMessage[0]) {
-                    case "CLIENTREADY":
+                    case "CLIENTREADY": // client sends he is ready
                         isClientReady = bool.Parse(splitMessage[1]);
                         CheckAllReady();
                         break;
-                    case "TRYPLACEAT":
+                    case "TRYPLACEAT": // client is trying to place at pos
                         Vector2 pos = new Vector2(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]));
 
                         // Is it's not server's turn try placing at pos
                         if (!GameLogic.IsItServersTurn())
                             GameLogic.WantToPlaceAt(pos);
                         break;
-                    case "WHOSETURN":
+                    case "WHOSETURN": // Client is asking for whose turn it is
                         Bluetooth.Instance().Send(BluetoothMessageStrings.TURN_OF + "#" + gameLogic.WhoseTurn.ToString());
+                        break;
+                    case "SMB": // Client is asking for latest border data
+                        Bluetooth.Instance().Send(BluetoothMessageStrings.ADD_BORDER + "#" + lastBorder.ToString() + "#" + lastBorderID);
                         break;
                 }
 
@@ -242,11 +267,11 @@ public class BluetoothEventListener : MonoBehaviour {
             } else {
 
                 switch (splitMessage[0]) {
-                    case "STARTGAME":
+                    case "STARTGAME": // Server sends that the game has been started
                         // Switch scenes
                         FindObjectOfType<ScaneManager>().GoToScene("ClientBluetoothGame");
                         break;
-                    case "WLP":
+                    case "WLP": // Server sends where last sign has been placed
                         int[] lastPos = new int[] {
                             int.Parse(splitMessage[1]),
                             int.Parse(splitMessage[2])
@@ -263,13 +288,23 @@ public class BluetoothEventListener : MonoBehaviour {
                         }
 
                         break;
-                    case "TURNOF":
+                    case "LBI": // Server sends what the last border's bluetooth id is                 
+                        // The server has a newer border placed
+                        if (lastBorderID != int.Parse(splitMessage[1])) {
+                            Bluetooth.Instance().Send(BluetoothMessageStrings.SEND_ME_BORDER);
+                        }
+
+                        break;
+                    case "TURNOF": // Server sends whose turn it is
                         Cell.CellOcc whoseTurn = (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), splitMessage[1]);
                         
                         ClientUIInScript.UpdateImage(whoseTurn);
 
                         break;
-                    case "ADDBORDER":
+                    case "ADDBORDER": // Server sends border data
+                        // set lates bluetooth border id
+                        lastBorderID = int.Parse(splitMessage[splitMessage.Length - 1]);
+
                         // Get data and add a border locally
                         int countOfPoints = int.Parse(splitMessage[1]);
                         int[,] points = new int[countOfPoints, 2];
@@ -294,7 +329,7 @@ public class BluetoothEventListener : MonoBehaviour {
                         BluetoothClientBorder.AddBorderPoints(points, winLine, c);
 
                         break;
-                    case "JPT":
+                    case "JPT": // Server sends to jump to this pos because new game has been started
                         Vector3 jumpTo = new Vector3(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]));
 
                         Camera.main.transform.DOMove(jumpTo, 0.5f);
@@ -325,7 +360,7 @@ public class BluetoothMessageStrings {
 
     /// <summary>
     /// Sent by server to client to add a border
-    /// ID numberOfPoint win1X win1Y win2X win2Y point1X point1Y point2X point2Y.... colorOfBorderR colorOfBorderG colorOfBorderB
+    /// ID numberOfPoint win1X win1Y win2X win2Y point1X point1Y point2X point2Y.... colorOfBorderR colorOfBorderG colorOfBorderB bluetoothID
     /// </summary>
     public static readonly string ADD_BORDER = "ADDBORDER";
 
@@ -334,6 +369,12 @@ public class BluetoothMessageStrings {
     /// ID whereX whereY serverTypeSign
     /// </summary>
     public static readonly string WHERE_LAST_PLACED = "WLP";
+
+    /// <summary>
+    /// Sent by server to client what last border's bluetooth ID is
+    /// ID borderID
+    /// </summary>
+    public static readonly string LAST_BORDER_ID = "LBI";
 
     /// <summary>
     /// Sent by server to client to jump to a location with camera where sign has been placed
@@ -361,4 +402,10 @@ public class BluetoothMessageStrings {
     /// ID
     /// </summary>
     public static readonly string WHOSE_TURN = "WHOSETURN";
+
+    /// <summary>
+    /// Sent by client to server when it asks for the lates border
+    /// ID
+    /// </summary>
+    public static readonly string SEND_ME_BORDER = "SMB";
 }

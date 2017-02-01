@@ -313,5 +313,18 @@ public class Border : MonoBehaviour {
             middlePos[0] = (minPos[0] + maxPos[0]) / 2;
             middlePos[1] = (minPos[1] + maxPos[1]) / 2;
         }
+
+        /// <summary>
+        /// Returns it ready for bluetooth use
+        /// </summary>
+        public override string ToString() {
+            string s = points.GetLength(0).ToString() + "#" +
+            winLinePoints[0, 0].ToString() + "#" + winLinePoints[0, 1].ToString() + "#" + winLinePoints[1, 0].ToString() + "#" + winLinePoints[1, 1].ToString() + "#";
+            for (int i = 0; i < points.GetLength(0); i++)
+                s += points[i, 0].ToString() + "#" + points[i, 1].ToString() + "#";
+            s += color.r.ToString() + "#" + color.g.ToString() + "#" + color.b.ToString();
+
+            return s;
+        }
     }
 }

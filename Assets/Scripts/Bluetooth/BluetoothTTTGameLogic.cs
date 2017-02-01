@@ -18,16 +18,16 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
         get { return ((BluetoothGrid) grid).LastSignType; }
     }
 
+    private BluetoothEventListener bluetoothEventListener;
+
     public override void Start() {
         grid = FindObjectOfType<BluetoothGrid>();
+        bluetoothEventListener = FindObjectOfType<BluetoothEventListener>();
     }
 
     public override void NextTurn(int[] gridPos, out bool won) {
         bool didWin;
         base.NextTurn(gridPos, out didWin);
-
-        // Send whose turn it is
-        Bluetooth.Instance().Send(BluetoothMessageStrings.TURN_OF + "#" + WhoseTurn.ToString());
 
         won = didWin;
     }
@@ -35,13 +35,7 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     public override void AddBorderToGame(int[,] points, float[,] winLinePoints, Color color) {
         base.AddBorderToGame(points, winLinePoints, color);
 
-        string s = BluetoothMessageStrings.ADD_BORDER + "#" + points.GetLength(0).ToString() + "#" +
-            winLinePoints[0, 0].ToString() + "#" + winLinePoints[0, 1].ToString() + "#" + winLinePoints[1, 0].ToString() + "#" + winLinePoints[1, 1].ToString() + "#";
-        for (int i = 0; i < points.GetLength(0); i++)
-            s += points[i, 0].ToString() + "#" + points[i, 1].ToString() + "#";
-        s += color.r.ToString() + "#" + color.g.ToString() + "#" + color.b.ToString();
-
-        Bluetooth.Instance().Send(s);
+        bluetoothEventListener.SetLastBorder(new Border.BorderStorageLogic(points, winLinePoints, color));
     }
 
     public override void StartNewGame(int[] gridPos) {

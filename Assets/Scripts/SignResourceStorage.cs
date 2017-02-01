@@ -8,18 +8,6 @@ public class SignResourceStorage : MonoBehaviour {
     private static Sprite oSprite;
     private static Sprite xSprite;
 
-    private static GameObject oFireworkPrefab;
-    private static GameObject xFireworkPrefab;
-
-    private static ParticleSystem oFireworkInstance;
-    public static ParticleSystem OFirework {
-        get { return oFireworkInstance; }
-    }
-    private static ParticleSystem xFireworkInstance;
-    public static ParticleSystem XFirework {
-        get { return xFireworkInstance; }
-    }
-
 
     void Awake () {
         // Get sprites from multiple sprite stuff
@@ -28,21 +16,6 @@ public class SignResourceStorage : MonoBehaviour {
 
         allSprites = Resources.LoadAll<Sprite>("Textures/OAnimation");
         oSprite = allSprites[allSprites.Length - 1];
-
-        // Fireworks
-        oFireworkPrefab = Resources.Load<GameObject>("Prefabs/Fireworks/FireworkBlue");
-        xFireworkPrefab = Resources.Load<GameObject>("Prefabs/Fireworks/FireworkRed");
-
-        oFireworkInstance = Instantiate(oFireworkPrefab).GetComponent<ParticleSystem>();
-        xFireworkInstance = Instantiate(xFireworkPrefab).GetComponent<ParticleSystem>();
-    }
-
-    /// <summary>
-    /// Play firework of type at pos
-    /// </summary>
-    public static void PlayFireworkAt(Vector2 pos, Cell.CellOcc type) {
-        GetFireworkRelatedTo(type).transform.position = pos;
-        GetFireworkRelatedTo(type).Play();
     }
 
     /// <summary>
@@ -56,38 +29,6 @@ public class SignResourceStorage : MonoBehaviour {
                 return xSprite;
             case Cell.CellOcc.O:
                 return oSprite;
-            default:
-                return null;
-        }
-    }
-
-    /// <summary>
-    /// Return firework prefab related to the cellocc
-    /// </summary>
-    /// <param name="cellType"></param>
-    /// <returns>may return null</returns>
-    public static GameObject GetFireworkPrefabRelatedTo(Cell.CellOcc cellType) {
-        switch (cellType) {
-            case Cell.CellOcc.X:
-                return xFireworkPrefab;
-            case Cell.CellOcc.O:
-                return oFireworkPrefab;
-            default:
-                return null;
-        }
-    }
-
-    /// <summary>
-    /// Return firework particle system related to the cellocc
-    /// </summary>
-    /// <param name="cellType"></param>
-    /// <returns>may return null</returns>
-    public static ParticleSystem GetFireworkRelatedTo(Cell.CellOcc cellType) {
-        switch (cellType) {
-            case Cell.CellOcc.X:
-                return xFireworkInstance;
-            case Cell.CellOcc.O:
-                return oFireworkInstance;
             default:
                 return null;
         }

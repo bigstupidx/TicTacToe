@@ -85,10 +85,17 @@ public class AnimatedLineRenderer : MonoBehaviour {
 
     private void Update() {
         if (drawParticleSystem != null)
-            if (queue.Count == 0) {
+            if (queue.Count == 0 && current.ElapsedSeconds >= current.TotalSeconds) {
                 drawParticleSystem.Stop();
             } else {
                 drawParticleSystem.Play();
+
+                // Set animation of particle system
+                var col = drawParticleSystem.colorOverLifetime;
+
+                Gradient gradient = new Gradient();
+                gradient.SetKeys(new GradientColorKey[] { new GradientColorKey(lineRenderer.startColor, 0.8f), new GradientColorKey(Color.white, 1f) }, new GradientAlphaKey[] { new GradientAlphaKey(1f, .5f), new GradientAlphaKey(0.1f, 1f) });
+                col.color = gradient;
             }
 
         ProcessCurrent();
