@@ -20,5 +20,12 @@ public class BackButton : MonoBehaviour {
             }
         });
     }
+
+    void Update() {
+        // Works on Android as back button
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            buttonScript.onClick.Invoke();
+        }
+    }
 	
 }

@@ -24,9 +24,6 @@ public class TTTGameLogic : MonoBehaviour {
         }
     }
 
-    protected void Awake() {
-    }
-
     public virtual void Start() {
         // It needs to be in start because we create the gridmanager object in start and so
         // in Execution Order i've set it so this comes after that
@@ -79,6 +76,14 @@ public class TTTGameLogic : MonoBehaviour {
     /// </summary>
     public void SetPreviousTurn() {
         PreviousPerson();
+    }
+
+    /// <summary>
+    /// Current game of tic tac toe will be restarted
+    /// Without reverting the sign because wedon't know what to revert to so just fuck it
+    /// </summary>
+    public void RestartCurrentGame() {
+        gameStarted = false;
     }
 
     /// <summary>

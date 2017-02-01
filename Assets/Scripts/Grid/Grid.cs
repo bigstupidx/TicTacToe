@@ -28,15 +28,12 @@ public class Grid : MonoBehaviour {
     // Used for stopping game, it stores where the last sign has been placed
     protected int[] previousGridPos;
 
-    // Where the current game's first sign has been placed
-    protected int[] firstSignPos;
-
     // Number of signs in current game
     protected int numberOfSignsInGame = 0;
 
     protected Dictionary<int[], Partion> partions = new Dictionary<int[], Partion>(new IntegerArrayComparer());
     protected List<int[]> shownPartions = new List<int[]>();
-    
+
     // Stores the signs which will be stored in the file
     protected List<SignStoreInFile> fileList = new List<SignStoreInFile>();
 
@@ -123,7 +120,7 @@ public class Grid : MonoBehaviour {
     /// Removes the sign we last placed
     /// </summary>
     public void RemoveLastSign() {
-        if (numberOfSignsInGame <= 1) return; // Only remove if we placed two sings already
+        if (numberOfSignsInGame < 1) return; // Only remove if we placed two sings already
 
         // Remove sign
         CellHolder cellHolder = GetCellHolderAtGridPos(previousGridPos);
@@ -133,6 +130,15 @@ public class Grid : MonoBehaviour {
 
         // Revert back to previous turn in gamelogic
         gameLogic.SetPreviousTurn();
+
+        // The order of these are very crucial
+        // We just strated a game so we want to restart it
+        if (numberOfSignsInGame == 1) {
+            gameLogic.RestartCurrentGame();
+            previousGridPos = null;
+        }
+        
+        numberOfSignsInGame--;
     }
 
     public void SetCameraToPreviousSign() {

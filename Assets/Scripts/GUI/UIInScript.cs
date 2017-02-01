@@ -39,6 +39,8 @@ public class UIInScript : MonoBehaviour {
         // Play a little animation
         DOTween.Sequence()
             .Append(cursorSign.rectTransform.DOScale(1.2f, 0.5f))
-            .Append(cursorSign.rectTransform.DOScale(1f, 0.1f));
+            .Append(cursorSign.rectTransform.DOScale(1f, 0.1f))
+            .OnComplete(new TweenCallback(() => {
+            }));
     }
 }

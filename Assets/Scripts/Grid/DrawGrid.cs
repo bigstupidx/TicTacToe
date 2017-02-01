@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class DrawGrid : MonoBehaviour {
 
     // How many more lines to draw an each side of the rectangle
     protected const int GRID_BOUND = 10;
-    protected const float lineWidth = .05f;
+    protected const float lineWidth = .04f;
     protected const string GRIDMANAGER_PREFAB_PATH = "Prefabs/GridManager";
 
     public GameObject lineObject;
