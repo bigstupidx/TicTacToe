@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 /// <summary>
 /// Contains function used for both client and server
@@ -95,7 +96,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartClient() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            Bluetooth.Instance().EnableBluetooth();
+            bluetoothEnabledImage.GetComponent<DOTweenAnimation>().DOPlay();
         }
 
         // prefab
@@ -143,7 +144,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartServer() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            Bluetooth.Instance().EnableBluetooth();
+            bluetoothEnabledImage.GetComponent<DOTweenAnimation>().DOPlay();
         }
 
         // Make server gameobject and get script

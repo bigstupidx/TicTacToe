@@ -49,7 +49,7 @@ public class GridClickHandler : MonoBehaviour {
             // Change the orthographic size based on the change in distance between the touches.
             Camera.main.orthographicSize += deltaMagnitudeDiff * zoomSpeed;
 
-            // Make sure the orthographic size stays between the given numbersí
+            // Make sure the orthographic size stays between the given numbers
             Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minOrthSize, maxOrthSize);
         } else if (Input.touchCount == 1 && !zooming) {
             Touch touch = new Touch();

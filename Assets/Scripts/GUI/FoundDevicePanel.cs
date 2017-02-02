@@ -10,7 +10,7 @@ public class FoundDevicePanel : MonoBehaviour {
 
     private UnityEvent clickEvent;
 
-    private Text nameText, macText;
+    private Text nameText;
     private EventTrigger imageTrigger;
     private string connectionAddress;
 
@@ -20,14 +20,12 @@ public class FoundDevicePanel : MonoBehaviour {
         connectionManager = FindObjectOfType<BluetoothConnectionManager>();
 
         nameText = transform.GetChild(0).GetComponent<Text>();
-        macText = transform.GetChild(1).GetComponent<Text>();
 
         imageTrigger = GetComponent<EventTrigger>();
     }
     
 	public void SetNameAndMac(string name, string mac, string connectionAddress) {
         nameText.text = name;
-        macText.text = mac;
         this.connectionAddress = connectionAddress;
         
         imageTrigger.triggers.Clear(); // Clear in case we set it's stuff the second time
@@ -41,7 +39,6 @@ public class FoundDevicePanel : MonoBehaviour {
 
     public void DestroyIt() {
         Destroy(nameText.gameObject);
-        Destroy(macText.gameObject);
         Destroy(imageTrigger.gameObject);
         Destroy(gameObject);
     }

@@ -11,10 +11,10 @@ public class SignResourceStorage : MonoBehaviour {
 
     void Awake () {
         // Get sprites from multiple sprite stuff
-        Sprite[] allSprites = Resources.LoadAll<Sprite>("Textures/XAnimation");
+        Sprite[] allSprites = Resources.LoadAll<Sprite>("Textures/Animation/X/Xanimation0");
         xSprite = allSprites[allSprites.Length - 1];
 
-        allSprites = Resources.LoadAll<Sprite>("Textures/OAnimation");
+        allSprites = Resources.LoadAll<Sprite>("Textures/Animation/O/OAnimation0");
         oSprite = allSprites[allSprites.Length - 1];
     }
 

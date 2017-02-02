@@ -1,19 +1,19 @@
 fileFormatVersion: 2
-guid: 892d4d52b02150640bdad3aa7447196e
-timeCreated: 1482406412
+guid: 42e139a3b7c346b4b89f95ab158a468b
+timeCreated: 1486034777
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: XAnimation_0
-    21300002: XAnimation_1
-    21300004: XAnimation_2
-    21300006: XAnimation_3
-    21300008: XAnimation_4
-    21300010: XAnimation_5
-    21300012: XAnimation_6
-    21300014: XAnimation_7
-    21300016: XAnimation_8
-    21300018: XAnimation_9
+    21300000: XAnimation1_0
+    21300002: XAnimation1_1
+    21300004: XAnimation1_2
+    21300006: XAnimation1_3
+    21300008: XAnimation1_4
+    21300010: XAnimation1_5
+    21300012: XAnimation1_6
+    21300014: XAnimation1_7
+    21300016: XAnimation1_8
+    21300018: XAnimation1_9
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -50,7 +50,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 128
+  spritePixelsToUnits: 256
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -88,132 +88,132 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: XAnimation_0
+      name: XAnimation1_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 128
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_1
+      name: XAnimation1_1
       rect:
         serializedVersion: 2
-        x: 129
-        y: 128
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        x: 256
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_2
+      name: XAnimation1_2
       rect:
         serializedVersion: 2
-        x: 258
-        y: 128
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        x: 512
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_3
+      name: XAnimation1_3
       rect:
         serializedVersion: 2
-        x: 387
-        y: 128
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        x: 768
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_4
+      name: XAnimation1_4
       rect:
         serializedVersion: 2
-        x: 516
-        y: 128
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        x: 1024
+        y: 256
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_5
+      name: XAnimation1_5
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_6
+      name: XAnimation1_6
       rect:
         serializedVersion: 2
-        x: 129
+        x: 256
         y: 0
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_7
+      name: XAnimation1_7
       rect:
         serializedVersion: 2
-        x: 258
+        x: 512
         y: 0
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_8
+      name: XAnimation1_8
       rect:
         serializedVersion: 2
-        x: 387
+        x: 768
         y: 0
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: XAnimation_9
+      name: XAnimation1_9
       rect:
         serializedVersion: 2
-        x: 516
+        x: 1024
         y: 0
-        width: 129.6
-        height: 128
-      alignment: 3
-      pivot: {x: 1, y: 1}
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

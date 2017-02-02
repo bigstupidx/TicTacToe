@@ -59,7 +59,9 @@ public class CellHolder {
 
             sprR.enabled = true;
 
-            cellGameObject.transform.position = new Vector2(worldPos[0], worldPos[1]);
+            // Subtract five because the center is the pivot (because we want to rotate it to give it better look)
+            cellGameObject.transform.position = new Vector2(worldPos[0] - 0.5f, worldPos[1] - 0.5f);
+            cellGameObject.transform.eulerAngles = new Vector3(0, 0, Random.Range(0f, 10f) - 5f);
         } else {
             return null;
         }
