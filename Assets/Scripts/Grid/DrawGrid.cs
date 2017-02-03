@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
+using DG.Tweening;
 
 public class DrawGrid : MonoBehaviour {
+
+    /// <summary>
+    /// If true disables clickhandler on gridmanager
+    /// </summary>
+    public bool DisableClickHandler = false;
 
     // How many more lines to draw an each side of the rectangle
     protected const int GRID_BOUND = 10;
@@ -18,6 +24,8 @@ public class DrawGrid : MonoBehaviour {
         // Init grid
         gridManager = Instantiate(Resources.Load(GRIDMANAGER_PREFAB_PATH) as GameObject);
         gridManager.name = "GridManager";
+
+        if (DisableClickHandler) gridManager.GetComponent<GridClickHandler>().enabled = false;
 
         gridParent = new GameObject("Grid");
         gridParent.transform.parent = gridManager.transform;
@@ -65,7 +73,8 @@ public class DrawGrid : MonoBehaviour {
 
         line.transform.parent = gridParent.transform;
         line.transform.position = (start + end) / 2;
-        
-        line.transform.localScale = scale;
+
+        line.transform.DOScale(new Vector3(scale.x == lineWidth ? lineWidth : 0, scale.y == lineWidth ? lineWidth : 0), 0f);
+        line.transform.DOScale(scale, 2f);
     }
 }

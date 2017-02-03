@@ -96,7 +96,9 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartClient() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            bluetoothEnabledImage.GetComponent<DOTweenAnimation>().DOPlay();
+            bluetoothEnabledImage.transform.DOShakePosition(1f, 1f, 3, 5f);
+            bluetoothEnabledImage.transform.DOShakeRotation(1f, 60f, 4, 5f, true);
+            return;
         }
 
         // prefab
@@ -144,7 +146,9 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartServer() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            bluetoothEnabledImage.GetComponent<DOTweenAnimation>().DOPlay();
+            bluetoothEnabledImage.transform.DOShakePosition(1f, 1f, 3, 5f);
+            bluetoothEnabledImage.transform.DOShakeRotation(1f, 60f, 4, 5f, true);
+            return;
         }
 
         // Make server gameobject and get script
