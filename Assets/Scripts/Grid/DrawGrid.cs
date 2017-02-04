@@ -20,10 +20,16 @@ public class DrawGrid : MonoBehaviour {
     public int gridWidth;
     public int gridHeight;
 
+    protected PreferencesScript preferences;
+    protected GridLightDarkMode lightDark;
+
     public virtual void Start() {
+        preferences = FindObjectOfType<PreferencesScript>();
+
         // Init grid
         gridManager = Instantiate(Resources.Load(GRIDMANAGER_PREFAB_PATH) as GameObject);
         gridManager.name = "GridManager";
+        lightDark = gridManager.GetComponent<GridLightDarkMode>();
 
         if (DisableClickHandler) gridManager.GetComponent<GridClickHandler>().enabled = false;
 
@@ -76,5 +82,8 @@ public class DrawGrid : MonoBehaviour {
 
         line.transform.DOScale(new Vector3(scale.x == lineWidth ? lineWidth : 0, scale.y == lineWidth ? lineWidth : 0), 0f);
         line.transform.DOScale(scale, 2f);
+
+        // Set color based on dark or light color mode
+        line.GetComponent<SpriteRenderer>().color = lightDark.GetCorrespondingColor(preferences.currentMode);
     }
 }

@@ -4,6 +4,8 @@ using UnityEngine.UI;
 public class BluetoothClientUIInScript : UIInScript {
 
     private new void Start() {
+        base.Start();
+
         cursorSign = GameObject.Find("CurrentImage").GetComponent<Image>();
     }
     private new void Update() { }
@@ -13,7 +15,7 @@ public class BluetoothClientUIInScript : UIInScript {
 
         cursorSign.sprite = SignResourceStorage.GetSpriteRelatedTo(newType);
 
-        PlaySpriteUpdateAnimation();
+        PlayCursorSpriteUpdateAnimation();
     }
 
 }

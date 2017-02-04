@@ -4,6 +4,8 @@ using DG.Tweening;
 
 public class BluetoothEventListener : MonoBehaviour {
 
+    public static float JUMP_TIME_PER_ONE = 0.05f;
+
     public bool isServer = false;
     private bool isReady = false;
     public bool Ready {
@@ -20,10 +22,20 @@ public class BluetoothEventListener : MonoBehaviour {
     void Start() {
         DontDestroyOnLoad(gameObject);
 
-        foundDevicePanel = Resources.Load("Prefabs/Bluetooth/FoundDevicePanel") as GameObject;
+        LoadResources();
 
         // Call the update function
         if (isServer) InvokeRepeating("SendClientLastSign", 0f, 0.2f);
+    }
+
+    void OnApplicationPause(bool paused) {
+        if (!paused) {
+            LoadResources();
+        }
+    }
+
+    private void LoadResources() {
+        foundDevicePanel = Resources.Load("Prefabs/Bluetooth/FoundDevicePanel") as GameObject;
     }
 
     /// <summary>
@@ -116,6 +128,7 @@ public class BluetoothEventListener : MonoBehaviour {
     /// Also send whose turn it is
     /// </summary>
     private void SendClientLastSign() {
+        if (Bluetooth.Instance().IsConnected() && isInGame)
         Bluetooth.Instance().Send(BluetoothMessageStrings.WHERE_LAST_PLACED + "#" + GameLogic.LastSignPlaced[0] + "#" + GameLogic.LastSignPlaced[1] + "#" + GameLogic.LastType.ToString()
             + "|||" + BluetoothMessageStrings.LAST_BORDER_ID + "#" + lastBorderID
             + "|||" + BluetoothMessageStrings.TURN_OF + "#" + GameLogic.WhoseTurn.ToString() );
@@ -235,7 +248,6 @@ public class BluetoothEventListener : MonoBehaviour {
         string[] differentMessages = readMessage.Split(new string[] { "|||" }, StringSplitOptions.None);
 
         for (int i = 0; i < differentMessages.Length - 1; i++) {
-            Debug.Log("readMessage " + differentMessages[i]);
             string[] splitMessage = differentMessages[i].Split('#');
 
             // SERVER SERVER SERVER SERVER SERVER SERVER SERVER SERVER SERVER SERVER
@@ -258,6 +270,7 @@ public class BluetoothEventListener : MonoBehaviour {
                         Bluetooth.Instance().Send(BluetoothMessageStrings.TURN_OF + "#" + gameLogic.WhoseTurn.ToString());
                         break;
                     case "SMB": // Client is asking for latest border data
+                        Debug.Log("readMessage " + differentMessages[i]);
                         Bluetooth.Instance().Send(BluetoothMessageStrings.ADD_BORDER + "#" + lastBorder.ToString() + "#" + lastBorderID);
                         break;
                 }
@@ -302,6 +315,7 @@ public class BluetoothEventListener : MonoBehaviour {
 
                         break;
                     case "ADDBORDER": // Server sends border data
+                        Debug.Log("readMessage " + differentMessages[i]);
                         // set lates bluetooth border id
                         lastBorderID = int.Parse(splitMessage[splitMessage.Length - 1]);
 
@@ -330,9 +344,9 @@ public class BluetoothEventListener : MonoBehaviour {
 
                         break;
                     case "JPT": // Server sends to jump to this pos because new game has been started
-                        Vector3 jumpTo = new Vector3(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]));
+                        Vector3 jumpTo = new Vector3(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]), Camera.main.transform.position.z);
 
-                        Camera.main.transform.DOMove(jumpTo, 0.5f);
+                        Camera.main.transform.DOMove(jumpTo, Vector2.Distance(Camera.main.transform.position, jumpTo) * JUMP_TIME_PER_ONE);
 
                         break;
                 }

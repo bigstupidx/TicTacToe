@@ -3,7 +3,7 @@
     public new void Start() {
         base.Start();
 
-        InvokeRepeating("UpdateBordersShown", 0f, 0.3f);
+        // InvokeRepeating("UpdateBordersShown", 0f, 0.3f);
     }
 
     public new static void WriteBordersToFile() { }

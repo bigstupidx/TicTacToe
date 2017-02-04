@@ -59,7 +59,8 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     }
 
     public void JumpCameraTo(int[] pos) {
-        Camera.main.transform.DOMove(new Vector3(pos[0], pos[1]), 0.5f);
+        Vector3 jumpTo = new Vector3(pos[0], pos[1], Camera.main.transform.position.z);
+        Camera.main.transform.DOMove(jumpTo, Vector2.Distance(Camera.main.transform.position, jumpTo) * BluetoothEventListener.JUMP_TIME_PER_ONE);
     }
 	
 }

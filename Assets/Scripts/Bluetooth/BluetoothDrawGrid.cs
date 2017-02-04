@@ -1,15 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BluetoothDrawGrid : DrawGrid {
 
     protected new const string GRIDMANAGER_PREFAB_PATH = "Prefabs/Bluetooth/GridManager";
 
     public override void Start() {
+        preferences = FindObjectOfType<PreferencesScript>();
+
         // Init grid
         gridManager = Instantiate(Resources.Load(GRIDMANAGER_PREFAB_PATH) as GameObject);
         gridManager.name = "GridManager";
+        lightDark = gridManager.GetComponent<GridLightDarkMode>();
 
         gridParent = new GameObject("Grid");
         gridParent.transform.parent = gridManager.transform;

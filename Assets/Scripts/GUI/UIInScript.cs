@@ -3,12 +3,12 @@ using UnityEngine.UI;
 using DG.Tweening;
 
 public class UIInScript : MonoBehaviour {
-
     protected TTTGameLogic gameLogic;
 
     // Cursorsign
     [SerializeField]
     protected Image cursorSign;
+
 
     // For some unknown reason we always start with X. So in order to update it first we need to set it to O
     public Cell.CellOcc currentlyDisplayed = Cell.CellOcc.O;
@@ -23,7 +23,7 @@ public class UIInScript : MonoBehaviour {
             currentlyDisplayed = gameLogic.WhoseTurn;
 
             UpdateSprite();
-            PlaySpriteUpdateAnimation();
+            PlayCursorSpriteUpdateAnimation();
         }
 	}
 
@@ -35,7 +35,7 @@ public class UIInScript : MonoBehaviour {
         cursorSign.sprite = TTTGameLogic.GetCurrentSprite();
     }
 
-    protected void PlaySpriteUpdateAnimation() {
+    protected void PlayCursorSpriteUpdateAnimation() {
         // Play a little animation
         DOTween.Sequence()
             .Append(cursorSign.rectTransform.DOScale(1.2f, 0.5f))

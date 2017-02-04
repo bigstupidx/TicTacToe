@@ -11,16 +11,26 @@ public class CellPooling : MonoBehaviour {
     private static GameObject parentObject;
 
     void Start() {
-        cellPrefab = Resources.Load(CELL_PREFAB_PATH) as GameObject;
+        LoadResources();
 
         parentObject = gameObject;
     }
-    
+
+    private void LoadResources() {
+        cellPrefab = Resources.Load(CELL_PREFAB_PATH) as GameObject;
+    }
+
+    void OnApplicationPause(bool paused) {
+        if (!paused) {
+            LoadResources();
+        }
+    }
+
     /// <summary>
     /// Returns a new cell from the pool
     /// </summary>
     /// <returns></returns>
-	public static GameObject GetCell() {
+    public static GameObject GetCell() {
         GameObject spawnedCell;
 
         // If we have an objet in the pool

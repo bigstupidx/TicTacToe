@@ -25,12 +25,22 @@ public class Border : MonoBehaviour {
 
         FILE_PATH = Application.persistentDataPath + "/Borders.txt";
 
-        borderPrefab = Resources.Load("Prefabs/Wall") as GameObject;
+        LoadResources();
 
         bordersParent = new GameObject("Borders");
         bordersParent.transform.parent = transform;
         bordersPoolingParent = new GameObject("BordersCellPooling");
         bordersPoolingParent.transform.parent = bordersParent.transform;
+    }
+
+    void OnApplicationPause(bool paused) {
+        if (!paused) {
+            LoadResources();
+        }
+    }
+
+    void LoadResources() {
+        borderPrefab = Resources.Load("Prefabs/Wall") as GameObject;
     }
 
     /// <summary>

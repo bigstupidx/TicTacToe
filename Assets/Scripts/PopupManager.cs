@@ -20,7 +20,17 @@ public class PopupManager : MonoBehaviour {
     void Awake() {
         DontDestroyOnLoad(gameObject);
 
+        LoadResources();
+    }
+
+    private void LoadResources() {
         popupPrefab = Resources.Load<GameObject>("Prefabs/GUI/PopupPanel");
+    }
+
+    void OnApplicationPause(bool paused) {
+        if (!paused) {
+            LoadResources();
+        }
     }
 
     /// <summary>

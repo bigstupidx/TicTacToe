@@ -18,11 +18,8 @@ public class MenuCameraMovement : MonoBehaviour {
 	void Start () {
         myCamera = GetComponent<Camera>();
         MoveCameraToNewRandPos();
-
-
-        doneGamePrefabs = new GameObject[numberOfDoneGamePrefabs];
-        for (int i = 0; i < numberOfDoneGamePrefabs; i++)
-            doneGamePrefabs[i] = Resources.Load("Prefabs/DoneGames/DoneGame" + i) as GameObject;
+        
+        LoadResources();
 
         doneGamesStorage = FindObjectOfType<DoneGamesStorageMenu>();
         // We opened game first time so we need the calcculatio nadn we need a new storage object
@@ -35,6 +32,18 @@ public class MenuCameraMovement : MonoBehaviour {
 
         PlaceDoneGames();
 	}
+
+    void OnApplicationPause(bool paused) {
+        if (!paused) {
+            LoadResources();
+        }
+    }
+
+    private void LoadResources() {
+        doneGamePrefabs = new GameObject[numberOfDoneGamePrefabs];
+        for (int i = 0; i < numberOfDoneGamePrefabs; i++)
+            doneGamePrefabs[i] = Resources.Load("Prefabs/DoneGames/DoneGame" + i) as GameObject;
+    }
 
     private int[] possibleRotation = new int[] {
         0, 90, 180, 270
