@@ -6,7 +6,7 @@ public class MenuCameraMovement : MonoBehaviour {
     /// <summary>
     /// Spawn radius of gamedones
     /// </summary>
-    private const int radius = 30;
+    private const int radius = 10;
     /// <summary>
     /// How many time the camera takes to move one tile
     /// </summary>
@@ -64,7 +64,7 @@ public class MenuCameraMovement : MonoBehaviour {
 
         DontDestroyOnLoad(doneGameParent);
 
-        float areaMultiplier = 1.7f;
+        float areaMultiplier = 2.5f;
 
         int xAt;
         int yAt = (int) (-radius * areaMultiplier);

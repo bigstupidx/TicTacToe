@@ -1,13 +1,24 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using DG.Tweening;
 
 /// <summary>
 /// First child should be x and the second should be o color
 /// </summary>
 public class SetColorThemeUI : MonoBehaviour {
 
-    public string colorThemeName;
+    private const float CLICK_ANIM_TIME = 0.3f;
 
+    public string colorThemeName;
     private PreferencesScript.ColorTheme currentTheme;
+
+    private RectTransform rectTransform;
+    private Image image;
+    private EventTrigger eventTrigger;
+
+    private ColorThemesUIHandler colorThemesHandler;
+    private PreferencesScript preferences;
     
 	void Awake () {
         // We need to to this in awake because in start which lightdark to use will be set
@@ -24,5 +35,29 @@ public class SetColorThemeUI : MonoBehaviour {
 
         oDL.lightModeColor = currentTheme.oColorLight;
         oDL.darkModeColor = currentTheme.oColorDark;
+
+        // Fields
+        image = GetComponent<Image>();
+        rectTransform = GetComponent<RectTransform>();
+        eventTrigger = gameObject.AddComponent<EventTrigger>();
+        colorThemesHandler = transform.parent.GetComponent<ColorThemesUIHandler>();
+        preferences = FindObjectOfType<PreferencesScript>();
+    }
+
+    void Start() {
+        // Add trigger
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        entry.callback.AddListener((eventData) => {
+            // Reset all button's color first
+            colorThemesHandler.ResetColorsOfButtons();
+            // Set color theme
+            preferences.ChangeToColorTheme(currentTheme, colorThemeName);
+            DOTween.Sequence()
+                .Append(rectTransform.DOScale(0.8f, CLICK_ANIM_TIME / 2f))
+                .Append(rectTransform.DOScale(1f, CLICK_ANIM_TIME / 2f))
+                .Insert(0, image.DOColor(new Color(0.32941f, 0.43137f, 0.47843f), CLICK_ANIM_TIME / 2f));
+        });
+        eventTrigger.triggers.Add(entry);
     }
 }

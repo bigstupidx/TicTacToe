@@ -9,6 +9,7 @@ public class PreferencesScript : MonoBehaviour {
     // ______________________Color mode variables_________________________________
 
     private const string COLOR_MODE = "ColorMode";
+    private const string THEME_MODE = "ThemeMode";
 
     public ColorMode currentMode;
 
@@ -29,19 +30,30 @@ public class PreferencesScript : MonoBehaviour {
     // _______________________Which colors are chosen in colormode____________________________
     private ColorTheme currentTheme;
 
+    /// <summary>
+    /// Delegate used for theme changes
+    /// </summary>
+    public delegate void OnThemeChange(ColorTheme newTheme, float time);
+    /// <summary>
+    /// Subscribe to get notification when theme changes
+    /// When we subscribe to this we can be sure that the color in SignResourceScript has already been changed
+    /// </summary>
+    public static OnThemeChange ThemeChangeEvent;
+
     private void Start() {
 
         DontDestroyOnLoad(gameObject);
 
         // If first use
-        if (PlayerPrefs.GetString(FIRST_USE) == "") {
+        if (PlayerPrefs.GetString(FIRST_USE) == "IMBEINUSEDJUSTLIKEINREALLIFE") {
             PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
-            PlayerPrefs.SetString(FIRST_USE, "IMBEINUSEDJUSTLIKEINREALLIFE");
+            PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
+            PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDE");
         }
         
         // Color mode
         currentMode = (ColorMode) Enum.Parse(typeof(ColorMode), PlayerPrefs.GetString(COLOR_MODE));
-        currentTheme = ColorThemes.DefaultTheme;
+        currentTheme = ColorThemes.GetTheme(PlayerPrefs.GetString(THEME_MODE));
         UpdateSignResourceStrgColors();
     }
 
@@ -51,8 +63,16 @@ public class PreferencesScript : MonoBehaviour {
         currentMode = mode;
         PlayerPrefs.SetString(COLOR_MODE, currentMode.ToString());
 
-        UpdateSignResourceStrgColors();
-        ColorChangeEvent(mode, changeDuration);
+        UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
+        ColorChangeEvent(mode, changeDuration); // Call delaegateategateggatagegatge
+    }
+
+    public void ChangeToColorTheme(ColorTheme newTheme, string nameOfTheme) {
+        currentTheme = newTheme;
+        PlayerPrefs.SetString(THEME_MODE, nameOfTheme + "Theme");
+
+        UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
+        ThemeChangeEvent(newTheme, changeDuration);// Call delaegateategateggasdasdsfeewedscxycasaatagegatge
     }
 	
     private void UpdateSignResourceStrgColors() {

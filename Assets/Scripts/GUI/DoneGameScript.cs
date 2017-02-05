@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 
 public class DoneGameScript : MonoBehaviour {
 
@@ -10,33 +11,54 @@ public class DoneGameScript : MonoBehaviour {
     public Cell.CellOcc winType;
 
     private GameObject signParent;
+
+    private SpriteRenderer[] childrenSR;
     
 	void Start () {
-        UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
-
         signParent = transform.FindChild("Signs").gameObject;
+        childrenSR = signParent.GetComponentsInChildren<SpriteRenderer>();
+
+        UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
         UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, 0f);
     }
 
     void OnEnable() {
         PreferencesScript.ColorChangeEvent += ChangeToColorMode;
+        PreferencesScript.ThemeChangeEvent += ChangeToColorTheme;
     }
 
     void OnDisable() {
         PreferencesScript.ColorChangeEvent -= ChangeToColorMode;
+        PreferencesScript.ThemeChangeEvent -= ChangeToColorTheme;
     }
 
     public void ChangeToColorMode(PreferencesScript.ColorMode colorMode, float time) {
-        UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time);
+        StartCoroutine(UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time, Random.Range(0f, 0.5f)));
+        //UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time);
         UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
+    }
+
+    public void ChangeToColorTheme(PreferencesScript.ColorTheme theme, float time) {
+        ChangeToColorMode(PreferencesScript.ColorMode.LIGHT, time);
+    }
+
+    /// <summary>
+    /// Updates  the signs' color in this domegame after delay
+    /// </summary>
+    IEnumerator UpdateSignsColor(Color xColor, Color oColor, float time, float delayTime) {
+        yield return new WaitForSeconds(delayTime);
+
+        foreach (SpriteRenderer sr in childrenSR) {
+            sr.color = sr.name.StartsWith("X") ? xColor : oColor;
+        }
     }
 
     /// <summary>
     /// Updates the signs' color in this domegame
     /// </summary>
     public void UpdateSignsColor(Color xColor, Color oColor, float time) {
-        foreach (Transform child in signParent.transform) {
-            child.GetComponent<SpriteRenderer>().DOColor(child.name.StartsWith("X") ? xColor : oColor, time);
+        foreach (SpriteRenderer sr in childrenSR) {
+            sr.color = sr.name.StartsWith("X") ? xColor : oColor;
         }
     }
 
