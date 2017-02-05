@@ -17,8 +17,12 @@ public class PreferencesScript : MonoBehaviour {
     /// How long tha changing animation should take
     /// </summary>
     private const float changeDuration = 0.5f;
-    
 
+    /// <summary>
+    /// Delegate used for color changes
+    /// </summary>
+    public delegate void OnColorChange(ColorMode mode, float time);
+    public OnColorChange ColorChangeEvent;
 
     private void Start() {
 
@@ -40,25 +44,7 @@ public class PreferencesScript : MonoBehaviour {
         currentMode = mode;
         PlayerPrefs.SetString(COLOR_MODE, currentMode.ToString());
 
-        // In order: 
-        // Change camera
-        // Change grid
-        // Change UI
-        switch (mode) {
-            case ColorMode.DARK:
-                Camera.main.GetComponent<CamColorModeToPrefs>().ToDarkMode(changeDuration);
-                FindObjectOfType<GridLightDarkMode>().ToDarkMode(changeDuration);
-                FindObjectOfType<ChangeUIAccordingToColorMode>().ChangeToDarkMode(changeDuration);
-                break;
-            case ColorMode.LIGHT:
-                Camera.main.GetComponent<CamColorModeToPrefs>().ToLightMode(changeDuration);
-                FindObjectOfType<GridLightDarkMode>().ToLightMode(changeDuration);
-                FindObjectOfType<ChangeUIAccordingToColorMode>().ChangeToLightMode(changeDuration);
-                break;
-            default:
-                Debug.Log("PROBLEMO");
-                break;
-        }
+        ColorChangeEvent(mode, changeDuration);
     }
 	
     public enum ColorMode {

@@ -21,8 +21,16 @@ public class CamColorModeToPrefs : MonoBehaviour {
         preferences = FindObjectOfType<PreferencesScript>();
         myCamera = GetComponent<Camera>();
 
+        // Susbcribe to event
+        preferences.ColorChangeEvent += ToMode;
+
         ToMode(preferences.currentMode, 0);
 	}
+
+    void OnDestroy() {
+        // Unsubscribe from color event
+        preferences.ColorChangeEvent -= ToMode;
+    }
 
     public void ToDarkMode(float time) {
         myCamera.DOColor(darkBackgroundColor, time);

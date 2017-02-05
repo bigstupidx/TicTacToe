@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 public class BluetoothGrid : Grid {
 
     public int[] LastSignPos {
@@ -11,12 +10,9 @@ public class BluetoothGrid : Grid {
         get { return lastSignType; }
     }
 
-    private BluetoothEventListener bluetoothScript;
-
     protected override void Awake() {
         base.Awake();
-
-        bluetoothScript = FindObjectOfType<BluetoothEventListener>();
+        
         gameLogic = FindObjectOfType<BluetoothTTTGameLogic>();
     }
 

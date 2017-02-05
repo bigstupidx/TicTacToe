@@ -11,10 +11,13 @@ public class DrawGrid : MonoBehaviour {
     // How many more lines to draw an each side of the rectangle
     protected const int GRID_BOUND = 10;
     protected const float lineWidth = .04f;
-    protected const string GRIDMANAGER_PREFAB_PATH = "Prefabs/GridManager";
+    protected string GRIDMANAGER_PREFAB_PATH = "Prefabs/GridManager";
 
     public GameObject lineObject;
-    protected GameObject gridParent;
+    /// <summary>
+    /// Optional. If we set it the gridmanager's parent will be this
+    /// </summary>
+    public Transform gridManagerParent;
     protected GameObject gridManager;
 
     public int gridWidth;
@@ -31,10 +34,12 @@ public class DrawGrid : MonoBehaviour {
         gridManager.name = "GridManager";
         lightDark = gridManager.GetComponent<GridLightDarkMode>();
 
-        if (DisableClickHandler) gridManager.GetComponent<GridClickHandler>().enabled = false;
+        // We want to set a parent to gridmanager
+        if (gridManagerParent != null) {
+            gridManager.transform.parent = gridManagerParent;
+        }
 
-        gridParent = new GameObject("Grid");
-        gridParent.transform.parent = gridManager.transform;
+        if (DisableClickHandler) gridManager.GetComponent<GridClickHandler>().enabled = false;
 
         // Grid attributes
         gridHeight = (int) Camera.main.orthographicSize * 2 + 3;
@@ -51,7 +56,7 @@ public class DrawGrid : MonoBehaviour {
         newPos.y -= newPos.y - (int) newPos.y;
         newPos.z = transform.position.z;
 
-        gridParent.transform.position = newPos;
+        gridManager.transform.position = newPos;
     }
 
     // Draws out lines
@@ -75,9 +80,8 @@ public class DrawGrid : MonoBehaviour {
 
     // Simply draws a line with instantiating an object
     protected void DrawLine(Vector3 start, Vector3 end, Vector3 scale) {
-        GameObject line = Instantiate(lineObject, new Vector3(), Quaternion.identity) as GameObject;
-
-        line.transform.parent = gridParent.transform;
+        GameObject line = Instantiate(lineObject, gridManager.transform) as GameObject;
+        
         line.transform.position = (start + end) / 2;
 
         line.transform.DOScale(new Vector3(scale.x == lineWidth ? lineWidth : 0, scale.y == lineWidth ? lineWidth : 0), 0f);

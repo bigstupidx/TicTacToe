@@ -5,16 +5,35 @@ public class GridLightDarkMode : MonoBehaviour {
 
     public Color lightModeColor = new Color(0.88627f, 0.88627f, 0.88627f);
     public Color darkModeColor = new Color(0.25882f, 0.25882f, 0.25882f);
+
+    void Start() {
+        FindObjectOfType<PreferencesScript>().ColorChangeEvent += ToMode;
+    }
+
+    void OnDestroy() {
+        FindObjectOfType<PreferencesScript>().ColorChangeEvent -= ToMode;
+    }
     
     public void ToLightMode(float time) {
-        foreach (Transform transform in transform.GetChild(0)) {
+        foreach (Transform transform in transform) {
             transform.GetComponent<SpriteRenderer>().DOColor(lightModeColor, time);
         }
     }
 
     public void ToDarkMode(float time) {
-        foreach (Transform transform in transform.GetChild(0)) {
+        foreach (Transform transform in transform) {
             transform.GetComponent<SpriteRenderer>().DOColor(darkModeColor, time);
+        }
+    }
+
+    public void ToMode(PreferencesScript.ColorMode mode, float time) {
+        switch (mode) {
+            case PreferencesScript.ColorMode.LIGHT:
+                ToLightMode(time);
+                break;
+            case PreferencesScript.ColorMode.DARK:
+                ToDarkMode(time);
+                break;
         }
     }
 

@@ -47,19 +47,23 @@ public class CellHolder {
             cellGameObject = CellPooling.GetCell();
             // TODO remove spriterenderer if bluetooth rendering still not working on client side
             SpriteRenderer sprR = cellGameObject.GetComponent<SpriteRenderer>();
+            sprR.sortingLayerName = "Signs" + cellType.ToString(); // Set sorting layer for dynamic batching
             if (Grid.cellParent != null) { 
                 cellGameObject.transform.parent = Grid.cellParent.transform;
             }
             sprR.enabled = false;
 
+            // Set cell type both for animation and data storage purposes
             cell = cellGameObject.GetComponent<Cell>();
             cell.cellType = cellType;
+
+            // Animation
             if (animate) cell.TriggerDraw();
             else cell.TriggerIdle();
 
             sprR.enabled = true;
 
-            // Subtract five because the center is the pivot (because we want to rotate it to give it better look)
+            // Subtract .five because the center is the pivot (because we want to rotate it to give it better look)
             cellGameObject.transform.position = new Vector2(worldPos[0] - 0.5f + Random.Range(0f, 0.08f) - 0.04f, worldPos[1] - 0.5f + Random.Range(0f, 0.08f) - 0.04f);
             cellGameObject.transform.eulerAngles = new Vector3(0, 0, Random.Range(0f, 10f) - 5f);
         } else {

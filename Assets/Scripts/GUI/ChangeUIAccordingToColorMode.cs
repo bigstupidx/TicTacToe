@@ -21,6 +21,12 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
 
     void Start() {
         ChangeToMode(FindObjectOfType<PreferencesScript>().currentMode, 0);
+
+        FindObjectOfType<PreferencesScript>().ColorChangeEvent += ChangeToMode;
+    }
+
+    void OnDestroy() {
+        FindObjectOfType<PreferencesScript>().ColorChangeEvent -= ChangeToMode;
     }
 
     /// <summary>
