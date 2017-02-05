@@ -1,5 +1,4 @@
-﻿using UnityEngine.Events;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -10,8 +9,6 @@ using DG.Tweening;
 public class FoundDevicePanel : MonoBehaviour {
 
     private const float clickAnimDuration = 0.45f;
-
-    private UnityEvent clickEvent;
 
     private Text nameText;
     private EventTrigger imageTrigger;

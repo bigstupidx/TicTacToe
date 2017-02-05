@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Collections.Generic;
 
 public class ChangeUIAccordingToColorMode : MonoBehaviour {
 
@@ -11,17 +12,28 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
 
     /// <summary>
     /// Which images we want to update according to color mode
-    /// Eery object need to have a DarkLightColor script otherwise it will use the default ones above
+    /// Eery object has to have a DarkLightColor script
     /// </summary>
-    [SerializeField]
-    protected Image[] updateToColorModesImg;
-
-    [SerializeField]
-    protected Text[] updateToColorModesTxt;
+    protected List<Image> updateToColorModesImg = new List<Image>();
+    
+    protected List<Text> updateToColorModesTxt = new List<Text>();
 
     void Start() {
-        ChangeToMode(FindObjectOfType<PreferencesScript>().currentMode, 0);
+        // Add every image that has a darklightcolor component
+        foreach (Image img in FindObjectsOfType<Image>()) {
+            if (img.GetComponent<DarkLightColor>() != null) {
+                updateToColorModesImg.Add(img);
+            }
+        }
 
+        // Add every text that has a darklightcolor component
+        foreach (Text txt in FindObjectsOfType<Text>()) {
+            if (txt.GetComponent<DarkLightColor>() != null) {
+                updateToColorModesTxt.Add(txt);
+            }
+        }
+
+        ChangeToMode(FindObjectOfType<PreferencesScript>().currentMode, 0);
         PreferencesScript.ColorChangeEvent += ChangeToMode;
     }
 
