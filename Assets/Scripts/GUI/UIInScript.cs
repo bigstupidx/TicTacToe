@@ -7,15 +7,16 @@ public class UIInScript : MonoBehaviour {
 
     // Cursorsign
     [SerializeField]
-    protected Image cursorSign;
+    protected Image currentSign;
 
-
-    // For some unknown reason we always start with X. So in order to update it first we need to set it to O
-    public Cell.CellOcc currentlyDisplayed = Cell.CellOcc.O;
-	
     protected void Start() {
         gameLogic = FindObjectOfType<TTTGameLogic>();
+        currentlyDisplayed = Cell.CellOcc.BLOCKED;
     }
+
+
+    // Set it to BLOCKED so we always update it at first
+    protected Cell.CellOcc currentlyDisplayed = Cell.CellOcc.BLOCKED;
 
 	protected void Update () {
         // We are not displaying the correct sprite on screen
@@ -32,14 +33,15 @@ public class UIInScript : MonoBehaviour {
     /// </summary>
     protected void UpdateSprite() {
         // Updates the sign next to the cursor
-        cursorSign.sprite = TTTGameLogic.GetCurrentSprite();
+        currentSign.sprite = gameLogic.GetCurrentSprite();
+        currentSign.color = SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn);
     }
 
     protected void PlayCursorSpriteUpdateAnimation() {
         // Play a little animation
         DOTween.Sequence()
-            .Append(cursorSign.rectTransform.DOScale(1.2f, 0.5f))
-            .Append(cursorSign.rectTransform.DOScale(1f, 0.1f))
+            .Append(currentSign.rectTransform.DOScale(1.2f, 0.5f))
+            .Append(currentSign.rectTransform.DOScale(1f, 0.1f))
             .OnComplete(new TweenCallback(() => {
             }));
     }

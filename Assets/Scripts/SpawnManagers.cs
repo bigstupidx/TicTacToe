@@ -11,6 +11,9 @@ public class SpawnManagers : MonoBehaviour {
     public GameObject preferencesManagerPrefab;
     public string preferencesManagerName = "PreferencesManager";
 
+    public GameObject signResourceStrgPrefab;
+    public string signResourceStorageName = "SignResourceStorage";
+
 	void Awake () {
         // Needed for when we return to menu dont make another one of the managers
         if (GameObject.Find(sceneManagerName) == null) { 
@@ -26,6 +29,11 @@ public class SpawnManagers : MonoBehaviour {
         if (GameObject.Find(preferencesManagerName) == null) {
             GameObject preferencesManager = Instantiate(preferencesManagerPrefab) as GameObject;
             preferencesManager.name = preferencesManagerName;
+        }
+
+        if (GameObject.Find(signResourceStorageName) == null) {
+            GameObject signResourceStrg = Instantiate(signResourceStrgPrefab) as GameObject;
+            signResourceStrg.name = signResourceStorageName;
         }
 
         Destroy(gameObject);

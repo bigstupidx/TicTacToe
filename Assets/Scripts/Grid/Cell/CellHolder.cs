@@ -48,6 +48,8 @@ public class CellHolder {
             // TODO remove spriterenderer if bluetooth rendering still not working on client side
             SpriteRenderer sprR = cellGameObject.GetComponent<SpriteRenderer>();
             sprR.sortingLayerName = "Signs" + cellType.ToString(); // Set sorting layer for dynamic batching
+            sprR.color = SignResourceStorage.GetColorRelatedTo(cellType);
+
             if (Grid.cellParent != null) { 
                 cellGameObject.transform.parent = Grid.cellParent.transform;
             }

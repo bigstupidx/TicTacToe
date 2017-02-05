@@ -59,7 +59,7 @@ public class Border : MonoBehaviour {
 
         // Order of data
         // Line 1: Count of borders
-        // Others 1: CountOfBorderPoints borderPoint1x borderPoint 1y borderPoint 2x ... colorOfBorderR colorOfBorderG colorOfBorderB
+        // Others 1: CountOfBorderPoints borderPoint1x borderPoint 1y borderPoint 2x ... winType
         // Others 2: winLineStartX winLineStartY winLineEndX winLineEndY
         // Other 1 and two repeats countOfBorders times 
         string s = "";
@@ -69,8 +69,8 @@ public class Border : MonoBehaviour {
                 s += bordersNotShown[k].Points[i, 0] + " ";
                 s += bordersNotShown[k].Points[i, 1] + (i == bordersNotShown[k].Points.Length - 1 ? "" : " ");
             }
-            
-            lines[1 + k * 2] = s + bordersNotShown[k].Color.r + " " + bordersNotShown[k].Color.g + " " + bordersNotShown[k].Color.b;
+
+            lines[1 + k * 2] = s + bordersNotShown[k].WinType.ToString(); ;
             lines[2 + k * 2] = bordersNotShown[k].WinLinePoints[0, 0] + " " + bordersNotShown[k].WinLinePoints[0, 1] + " " + bordersNotShown[k].WinLinePoints[1, 0] + " " + bordersNotShown[k].WinLinePoints[1, 1];
         }
 
@@ -109,12 +109,8 @@ public class Border : MonoBehaviour {
                     s += line[at] + " " + line[at + 1] + " ";
                     at += 2;
                 }
-
-                Color c = new Color(
-                    float.Parse(line[line.Length - 3]),
-                    float.Parse(line[line.Length - 2]),
-                    float.Parse(line[line.Length - 1])
-                );
+                
+                Cell.CellOcc winType = (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), line[line.Length - 1]);
 
                 line = lines[2 + 2 * i].Split(' ');
                 float[,] winLinePoints = new float[2, 2];
@@ -122,7 +118,7 @@ public class Border : MonoBehaviour {
                     for (int j = 0; j < winLinePoints.GetLength(1); j++)
                         winLinePoints[k, j] = float.Parse(line[k * 2 + j]);
                 
-                bordersNotShown.Add(new BorderStorageLogic(points, winLinePoints, c));
+                bordersNotShown.Add(new BorderStorageLogic(points, winLinePoints, winType));
             }
         } catch (Exception e) {
             Debug.LogError(e.Message);
@@ -161,8 +157,8 @@ public class Border : MonoBehaviour {
         }
     }
 
-    public static void AddBorderPoints(int[,] points, float[,] winLinePoints, Color color) {
-        BorderStorageLogic b = new BorderStorageLogic(points, winLinePoints, color);
+    public static void AddBorderPoints(int[,] points, float[,] winLinePoints, Cell.CellOcc winType) {
+        BorderStorageLogic b = new BorderStorageLogic(points, winLinePoints, winType);
 
         bordersNotShown.Add(b);
         MoveToShown(bordersNotShown.Count - 1);
@@ -243,11 +239,11 @@ public class Border : MonoBehaviour {
                 lr.SetPosition(i, bsl.GetPosAt(i));
         }
 
-        lr.material.SetColor("_EmissionColor", bsl.Color);
+        lr.material.SetColor("_EmissionColor", SignResourceStorage.GetColorRelatedTo(bsl.WinType));
 
         // Set color
-        lr.startColor = bsl.Color;
-        lr.endColor = bsl.Color;
+        lr.startColor = SignResourceStorage.GetColorRelatedTo(bsl.WinType);
+        lr.endColor = SignResourceStorage.GetColorRelatedTo(bsl.WinType);
 
         // Win Line Animation
         AnimatedLineRenderer winLineRenderer = borderObject.transform.GetChild(0).gameObject.GetComponent<AnimatedLineRenderer>();
@@ -260,9 +256,9 @@ public class Border : MonoBehaviour {
     }
 
     public struct BorderStorageLogic {
-        private Color color;
-        public Color Color {
-            get { return color; }
+        private Cell.CellOcc winType;
+        public Cell.CellOcc WinType {
+            get { return winType; }
         }
 
         private int[,] points;
@@ -289,14 +285,14 @@ public class Border : MonoBehaviour {
         private int[] middlePos;
         public int[] MiddlePos { get { return middlePos; } }
 
-        public BorderStorageLogic(int[,] points, float[,] winLinePoints, Color color) {
+        public BorderStorageLogic(int[,] points, float[,] winLinePoints, Cell.CellOcc winType) {
             minPos = new int[2];
             minPos[0] = int.MaxValue; minPos[1] = int.MaxValue;
             maxPos = new int[2];
             maxPos[0] = int.MinValue; maxPos[1] = int.MinValue;
             middlePos = new int[2];
 
-            this.color = color;
+            this.winType = winType;
 
             this.winLinePoints = winLinePoints;
 
@@ -332,7 +328,7 @@ public class Border : MonoBehaviour {
             winLinePoints[0, 0].ToString() + "#" + winLinePoints[0, 1].ToString() + "#" + winLinePoints[1, 0].ToString() + "#" + winLinePoints[1, 1].ToString() + "#";
             for (int i = 0; i < points.GetLength(0); i++)
                 s += points[i, 0].ToString() + "#" + points[i, 1].ToString() + "#";
-            s += color.r.ToString() + "#" + color.g.ToString() + "#" + color.b.ToString();
+            s += winType.ToString();
 
             return s;
         }

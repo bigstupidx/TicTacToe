@@ -28,6 +28,9 @@ public class TTTGameLogic : MonoBehaviour {
         // It needs to be in start because we create the gridmanager object in start and so
         // in Execution Order i've set it so this comes after that
         grid = FindObjectOfType<Grid>();
+
+        // Set whoseturn to a random one
+        whoseTurn = Random.Range(0, 2) == 0 ? Cell.CellOcc.X : Cell.CellOcc.O;
     }
 
     /// <summary>
@@ -105,15 +108,16 @@ public class TTTGameLogic : MonoBehaviour {
     protected void DrawBorderToGame(GameWonData cellWon) {
         int[,] points = cellWon.GetShapePoints();
         float[,] winLinePoints = cellWon.GetWinLinePoints();
-        AddBorderToGame(points, winLinePoints, SignResourceStorage.GetColorRelatedTo(cellWon.winType));
+
+        AddBorderToGame(points, winLinePoints, cellWon.winType);
     }
 
     /// <summary>
     /// Add border points in Border class
     /// </summary>
     /// <param name="points">The points</param>
-    public virtual void AddBorderToGame(int[,] points, float[,] winLinePoints, Color color) {
-        Border.AddBorderPoints(points, winLinePoints, color);
+    public virtual void AddBorderToGame(int[,] points, float[,] winLinePoints, Cell.CellOcc winType) {
+        Border.AddBorderPoints(points, winLinePoints, winType);
     }
 
     /// <summary>
@@ -130,7 +134,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// Returns the current sprite of whoseturn
     /// </summary>
     /// <returns>May return null in case of apocalypse</returns>
-    public static Sprite GetCurrentSprite() {
+    public Sprite GetCurrentSprite() {
         return SignResourceStorage.GetSpriteRelatedTo(whoseTurn);
     }
 

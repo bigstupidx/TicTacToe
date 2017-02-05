@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class SaveLoadGame : MonoBehaviour {
 
@@ -21,10 +18,6 @@ public class SaveLoadGame : MonoBehaviour {
     void OnApplicationPause(bool pause) {
         if (pause) {
             WriteEverything();
-            if (false) {
-                System.IO.File.WriteAllText(grid.FILE_PATH, "0");
-                System.IO.File.WriteAllText(Border.FILE_PATH, "0");
-            }
         }
     }
 

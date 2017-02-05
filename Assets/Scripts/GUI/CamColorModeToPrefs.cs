@@ -22,14 +22,14 @@ public class CamColorModeToPrefs : MonoBehaviour {
         myCamera = GetComponent<Camera>();
 
         // Susbcribe to event
-        preferences.ColorChangeEvent += ToMode;
+        PreferencesScript.ColorChangeEvent += ToMode;
 
         ToMode(preferences.currentMode, 0);
 	}
 
     void OnDestroy() {
         // Unsubscribe from color event
-        preferences.ColorChangeEvent -= ToMode;
+        PreferencesScript.ColorChangeEvent -= ToMode;
     }
 
     public void ToDarkMode(float time) {

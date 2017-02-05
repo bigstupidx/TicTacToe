@@ -7,11 +7,11 @@ public class GridLightDarkMode : MonoBehaviour {
     public Color darkModeColor = new Color(0.25882f, 0.25882f, 0.25882f);
 
     void Start() {
-        FindObjectOfType<PreferencesScript>().ColorChangeEvent += ToMode;
+        PreferencesScript.ColorChangeEvent += ToMode;
     }
 
     void OnDestroy() {
-        FindObjectOfType<PreferencesScript>().ColorChangeEvent -= ToMode;
+        PreferencesScript.ColorChangeEvent -= ToMode;
     }
     
     public void ToLightMode(float time) {

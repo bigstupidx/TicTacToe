@@ -32,10 +32,10 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
         won = didWin;
     }
 
-    public override void AddBorderToGame(int[,] points, float[,] winLinePoints, Color color) {
-        base.AddBorderToGame(points, winLinePoints, color);
+    public override void AddBorderToGame(int[,] points, float[,] winLinePoints, Cell.CellOcc winType) {
+        base.AddBorderToGame(points, winLinePoints, winType);
 
-        bluetoothEventListener.SetLastBorder(new Border.BorderStorageLogic(points, winLinePoints, color));
+        bluetoothEventListener.SetLastBorder(new Border.BorderStorageLogic(points, winLinePoints, winType));
     }
 
     public override void StartNewGame(int[] gridPos) {

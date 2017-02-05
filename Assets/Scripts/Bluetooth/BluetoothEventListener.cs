@@ -333,14 +333,10 @@ public class BluetoothEventListener : MonoBehaviour {
                         winLine[0, 1] = float.Parse(splitMessage[3]);
                         winLine[1, 0] = float.Parse(splitMessage[4]);
                         winLine[1, 1] = float.Parse(splitMessage[5]);
+                        
+                        Cell.CellOcc winType = (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), splitMessage[6 + countOfPoints * 2]);
 
-                        Color c = new Color(
-                            float.Parse(splitMessage[6 + countOfPoints * 2]),
-                            float.Parse(splitMessage[6 + countOfPoints * 2 + 1]),
-                            float.Parse(splitMessage[6 + countOfPoints * 2 + 2])
-                        );
-
-                        BluetoothClientBorder.AddBorderPoints(points, winLine, c);
+                        BluetoothClientBorder.AddBorderPoints(points, winLine, winType);
 
                         break;
                     case "JPT": // Server sends to jump to this pos because new game has been started
@@ -374,7 +370,7 @@ public class BluetoothMessageStrings {
 
     /// <summary>
     /// Sent by server to client to add a border
-    /// ID numberOfPoint win1X win1Y win2X win2Y point1X point1Y point2X point2Y.... colorOfBorderR colorOfBorderG colorOfBorderB bluetoothID
+    /// ID numberOfPoint win1X win1Y win2X win2Y point1X point1Y point2X point2Y.... winType bluetoothID
     /// </summary>
     public static readonly string ADD_BORDER = "ADDBORDER";
 

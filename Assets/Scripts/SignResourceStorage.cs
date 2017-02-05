@@ -2,8 +2,8 @@
 
 public class SignResourceStorage : MonoBehaviour {
     
-    protected static Color oColor = Color.blue;
-    protected static Color xColor = Color.red;
+    public static Color oColor = Color.blue;
+    public static Color xColor = Color.red;
 
     private static Sprite oSprite;
     private static Sprite xSprite;
@@ -11,6 +11,7 @@ public class SignResourceStorage : MonoBehaviour {
 
     void Awake () {
         LoadResources();
+        DontDestroyOnLoad(gameObject);
     }
 
     void OnApplicationPause(bool paused) {
@@ -54,6 +55,14 @@ public class SignResourceStorage : MonoBehaviour {
         }
 
         return Color.white;
+    }
+
+    /// <summary>
+    /// Changes colors of signs to the given color mode
+    /// </summary>
+    public static void ChangeToColorMode(Color xColorNew, Color oColorNew) {
+        xColor = xColorNew;
+        oColor = oColorNew;
     }
 
 }
