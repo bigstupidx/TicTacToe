@@ -24,6 +24,8 @@ public class BluetoothEventListener : MonoBehaviour {
 
         LoadResources();
 
+        bluetoothConnectionManager = FindObjectOfType<BluetoothConnectionManager>();
+
         // Call the update function
         if (isServer) InvokeRepeating("SendClientLastSign", 0f, 0.2f);
     }
@@ -47,6 +49,8 @@ public class BluetoothEventListener : MonoBehaviour {
     /// Whether the person is in game or not
     /// </summary>
     private bool isInGame = false;
+
+    private BluetoothConnectionManager bluetoothConnectionManager;
 
 
     //----------------------------
@@ -213,7 +217,7 @@ public class BluetoothEventListener : MonoBehaviour {
         switch (state) {
             case "STATE_CONNECTED":
                 // Go to lobby
-                FindObjectOfType<BluetoothConnectionManager>().GoToLobby(Bluetooth.Instance().GetDeviceConnectedName());
+                bluetoothConnectionManager.GoToLobby(Bluetooth.Instance().GetDeviceConnectedName());
                 isInGame = true;
                 break;
             case "STATE_CONNECTING":
@@ -222,6 +226,7 @@ public class BluetoothEventListener : MonoBehaviour {
                 // We are not in game, so most likely in lobby
                 if (!isInGame) {
                     PopupManager.PopUp("Couldn't connect!", "OK");
+                    bluetoothConnectionManager.NotConnectingAnymore();
                 } else { 
                     // We are in game
                     PopupManager.PopUp("Lost connection!\n Going back to menu", "OK", () => {
@@ -312,7 +317,6 @@ public class BluetoothEventListener : MonoBehaviour {
                         Cell.CellOcc whoseTurn = (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), splitMessage[1]);
                         
                         ClientUIInScript.UpdateImage(whoseTurn);
-
                         break;
                     case "ADDBORDER": // Server sends border data
                         Debug.Log("readMessage " + differentMessages[i]);
@@ -348,11 +352,31 @@ public class BluetoothEventListener : MonoBehaviour {
                 }
 
             }
+
+            // BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH
+            // BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH
+            switch (splitMessage[0]) {
+                case "SMSG":
+                    if (bool.Parse(splitMessage[1])) { // It is emoji
+                        BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(splitMessage[2]));
+                    } else { // It is not emoji
+                        BluetoothMessageManager.ShowTextMessage(splitMessage[2]);
+                    }
+                    break;
+            }
         }
     }
 }
 
-public class BluetoothMessageStrings {
+public static class BluetoothMessageStrings {
+
+    //_________________________________ S -> C || C -> S ___________________________
+    /// <summary>
+    /// Sent by both client and server and it simply sends a message then displays it
+    /// ID isEmoji message
+    /// If it is emoji then the message is the emoji's variable name in EmojiSprite
+    /// </summary>
+    public static readonly string SEND_MESSAGE = "SMSG";
 
     //________________________________ S -> C __________________________________
 

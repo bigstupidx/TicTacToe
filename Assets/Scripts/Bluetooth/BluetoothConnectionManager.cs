@@ -27,6 +27,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public GameObject clientPanel;
     public GameObject lobbyPanel;
     public Image bluetoothEnabledImage;
+    public Image serverConnectPanel;
     public Text bluetoothNameText;
 
     // Prefabs for server and client
@@ -36,6 +37,12 @@ public class BluetoothConnectionManager : MonoBehaviour {
     // Storing server or client prefab
     private GameObject bluetoothObject;
     private BluetoothEventListener bluetoothScript;
+
+    // For switching between states of bluetooth icon
+    private DarkLightColor bluetoothColors;
+
+    // Prefs
+    private PreferencesScript preferences;
 
     void Start() {
         // Log if something has been missed in unity explorer
@@ -47,6 +54,9 @@ public class BluetoothConnectionManager : MonoBehaviour {
         if (!lobbyPanel) Debug.Log("Lobby panel missing!");
 
         InitGUI();
+
+        preferences = FindObjectOfType<PreferencesScript>();
+        bluetoothColors = bluetoothEnabledImage.GetComponent<DarkLightColor>();
 
         //TODO find out why we can't connect
         // Disable bluetooth because we can't connect to anything otherwise
@@ -138,6 +148,14 @@ public class BluetoothConnectionManager : MonoBehaviour {
     /// <param name="address"></param>
     public void ConnectTo(string address) {
         Bluetooth.Instance().Connect(address);
+        serverConnectPanel.rectTransform.DOMoveY(-500, 0.3f);
+    }
+
+    /// <summary>
+    /// When connection failed and we want the connectin... panel to retract
+    /// </summary>
+    public void NotConnectingAnymore() {
+        serverConnectPanel.rectTransform.DOMoveY(-584f, 0.3f);
     }
 
     /// <summary>
@@ -206,7 +224,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
         if (Bluetooth.Instance().IsEnabled()) {
             bluetoothEnabledImage.color = new Color(0.055f, 0.2265f, 0.5549f);
         } else {
-            bluetoothEnabledImage.color = Color.black;
+            bluetoothEnabledImage.color = bluetoothColors.GetColorOfMode(preferences.currentMode);
         }
     }
 	

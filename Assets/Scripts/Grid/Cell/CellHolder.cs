@@ -35,7 +35,8 @@ public class CellHolder {
     public bool IsFull() {
         return cell != null;
     }
-    
+
+    private float[] possibleRotation = new float[] { 0f, 90f, 180f, 270f };
     /// <summary>
     /// Creates a new cell in this holder of type celltype
     /// </summary>
@@ -67,7 +68,7 @@ public class CellHolder {
 
             // Subtract .five because the center is the pivot (because we want to rotate it to give it better look)
             cellGameObject.transform.position = new Vector2(worldPos[0] - 0.5f + Random.Range(0f, 0.08f) - 0.04f, worldPos[1] - 0.5f + Random.Range(0f, 0.08f) - 0.04f);
-            cellGameObject.transform.eulerAngles = new Vector3(0, 0, Random.Range(0f, 10f) - 5f);
+            cellGameObject.transform.eulerAngles = new Vector3(0, 0, Random.Range(0f, 10f) - 5f + possibleRotation[Random.Range(0, possibleRotation.Length)]);
         } else {
             return null;
         }

@@ -15,7 +15,14 @@ public static class ColorThemes {
         = new PreferencesScript.ColorTheme(new Color(1f, 0.18824f, 0f), new Color(0f, 0.69804f, 0.4549f), new Color(1f, 0.75686f, 0.01569f), new Color(0.01569f, 0.18431f, 1f));
 
     public static PreferencesScript.ColorTheme GetTheme(string name) {
-        return (PreferencesScript.ColorTheme) typeof(ColorThemes).GetField(name).GetValue(null);
+        switch (name) {
+            case "DefaultTheme": return DefaultTheme;
+            case "DefaultAltTheme": return DefaultAltTheme;
+            case "AltAltTheme": return AltAltTheme;
+            case "AAAltTheme": return AAAltTheme;
+        }
+
+        return DefaultTheme;
     }
 
 }

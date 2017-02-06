@@ -13,22 +13,25 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     /// <summary>
     /// Which images we want to update according to color mode
     /// Eery object has to have a DarkLightColor script
+    /// You can add stuf to this as well it will change them too
     /// </summary>
+    [SerializeField]
     protected List<Image> updateToColorModesImg = new List<Image>();
-    
+
+    [SerializeField]
     protected List<Text> updateToColorModesTxt = new List<Text>();
 
     void Start() {
         // Add every image that has a darklightcolor component
         foreach (Image img in FindObjectsOfType<Image>()) {
-            if (img.GetComponent<DarkLightColor>() != null) {
+            if (img.GetComponent<DarkLightColor>() != null && !updateToColorModesImg.Contains(img)) {
                 updateToColorModesImg.Add(img);
             }
         }
 
         // Add every text that has a darklightcolor component
         foreach (Text txt in FindObjectsOfType<Text>()) {
-            if (txt.GetComponent<DarkLightColor>() != null) {
+            if (txt.GetComponent<DarkLightColor>() != null && !updateToColorModesTxt.Contains(txt)) {
                 updateToColorModesTxt.Add(txt);
             }
         }
