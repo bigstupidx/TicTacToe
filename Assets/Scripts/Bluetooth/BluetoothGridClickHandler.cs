@@ -1,14 +1,26 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BluetoothGridClickHandler : GridClickHandler {
+
+    protected MessagePicker messagePicker;
     
 	public override void Start () {
         gameLogic = FindObjectOfType<BluetoothTTTGameLogic>();
+        messagePicker = FindObjectOfType<MessagePicker>();
 
         fingerMoveMin = Camera.main.pixelHeight * 0.01f;
     }
 
+    public override void Update() {
+        if (!messagePicker.IsDragging)
+            base.Update();
+    }
+
     public override void ClickedAt(Vector2 clickPos) {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         // We are on client side
         if (gameLogic == null) {
             int[] pos = Grid.GetCellInGridPos(clickPos);
