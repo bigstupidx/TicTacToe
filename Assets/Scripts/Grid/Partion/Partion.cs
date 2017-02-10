@@ -48,6 +48,12 @@ public class Partion {
     /// <returns>whether the sign could be placed or not</returns>
     public bool PlaceSign(int[] pos, Cell.CellOcc cellType, bool disabled = false) {
         hasSign.Add(pos);
+        // If we want to create it disabled dont make an object at first just store a celltemplate
+        if (disabled) {
+            cells[pos[0], pos[1]].StoreTemplate(cellType, cells[pos[0], pos[1]].GetRandomPosBasedOnWorldPos());
+            return true;
+        }
+
         Cell c = cells[pos[0], pos[1]].NewCell(cellType);
         // Couldn't create cell for some reason
         if (c == null) {
@@ -55,9 +61,6 @@ public class Partion {
         }
 
         // At this point the cell was surely created
-        // If we want to create it disabled then disable it
-        if (disabled)
-            cells[pos[0], pos[1]].Disable();
 
         return true;
     }

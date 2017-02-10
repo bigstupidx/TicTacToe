@@ -3,6 +3,13 @@ using DG.Tweening;
 
 public class BluetoothTTTGameLogic : TTTGameLogic {
 
+    private int xScore = 0;
+    public int XScore { get { return xScore; } }
+    private int oScore = 0;
+    public int OScore { get { return oScore; } }
+
+    private ScoringScript scoring;
+
     /// <summary>
     /// Which type the server uses
     /// </summary>
@@ -23,11 +30,21 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     public override void Start() {
         grid = FindObjectOfType<BluetoothGrid>();
         bluetoothEventListener = FindObjectOfType<BluetoothEventListener>();
+
+        scoring = FindObjectOfType<ScoringScript>();
     }
 
-    public override void NextTurn(int[] gridPos, out bool won) {
-        bool didWin;
+    public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {
+        Cell.CellOcc didWin;
         base.NextTurn(gridPos, out didWin);
+
+        if (didWin == Cell.CellOcc.X) {
+            xScore++;
+            scoring.SetScore(xScore, oScore);
+        } else if (didWin == Cell.CellOcc.O) {
+            oScore++;
+            scoring.SetScore(xScore, oScore);
+        }
 
         won = didWin;
     }

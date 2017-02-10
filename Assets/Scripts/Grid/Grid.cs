@@ -141,7 +141,8 @@ public class Grid : MonoBehaviour {
         if (!cellHolder.IsFull()) return false; // Return if we don't have a sign there
 
         // At this point we surely are going to remove the sign
-        SignWasRemoved(previousGridPos);
+        if (SignWasRemoved != null)
+            SignWasRemoved(previousGridPos);
 
         cellHolder.RemoveCurrentCellWithoutStoring();
 
@@ -287,7 +288,8 @@ public class Grid : MonoBehaviour {
             numberOfSignsInGame++;
             removeCount = 0; // Reset removecount to be able to remove sign again
 
-            SignWasPlaced(gridPos, cellType);
+            if (SignWasPlaced != null)
+                SignWasPlaced(gridPos, cellType);
         }
         return couldBePlaced;
     }

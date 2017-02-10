@@ -82,7 +82,15 @@ public class BluetoothEventListener : MonoBehaviour {
     private int[] lastSignPlaced = new int[] { int.MaxValue, int.MaxValue };
     private int[] secondToLastSignPlaced = new int[] { int.MaxValue, int.MaxValue };
 
-    bool removePending = false;
+    private ScoringScript scoring;
+    private ScoringScript Scoring {
+        get {
+            if (scoring == null) FindObjectOfType<ScoringScript>();
+
+            return scoring;
+        }
+    }
+
 
 
     //----------------------------
@@ -168,7 +176,16 @@ public class BluetoothEventListener : MonoBehaviour {
                 // Whose turn it is
                 BluetoothMessageStrings.TURN_OF,
                 "#",
-                GameLogic.WhoseTurn.ToString()
+                GameLogic.WhoseTurn.ToString(),
+
+                "|||",
+
+                // The score
+                BluetoothMessageStrings.SEND_MESSAGE,
+                "#",
+                GameLogic.XScore.ToString(),
+                "#",
+                GameLogic.OScore.ToString()
             });
 
             Bluetooth.Instance().Send(sent);
@@ -388,6 +405,12 @@ public class BluetoothEventListener : MonoBehaviour {
                         Camera.main.transform.DOMove(jumpTo, Vector2.Distance(Camera.main.transform.position, jumpTo) * JUMP_TIME_PER_ONE);
 
                         break;
+                    case "SSCR":
+                        int xScore = int.Parse(splitMessage[1]);
+                        int oScore = int.Parse(splitMessage[2]);
+
+                        Scoring.SetScore(xScore, oScore);
+                        break;
                 }
 
             }
@@ -454,6 +477,12 @@ public static class BluetoothMessageStrings {
     /// ID whereX whereY
     /// </summary>
     public static readonly string JUMP_TO = "JPT";
+
+    /// <summary>
+    /// Sent by server to client and it sends the current score
+    /// ID scoreX scoreO
+    /// </summary>
+    public static readonly string SEND_SCORE = "SSCR";
 
 
     //___________________________ C -> S _________________________________

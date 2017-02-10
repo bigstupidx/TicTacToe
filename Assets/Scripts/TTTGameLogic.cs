@@ -47,7 +47,7 @@ public class TTTGameLogic : MonoBehaviour {
 
             // Only if the sign could be placed can the new turn come
             if (grid.PlaceSign(gridPos, WhoseTurn)) {
-                bool b;
+                Cell.CellOcc b;
                 NextTurn(gridPos, out b);
             }
         }
@@ -57,7 +57,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// Sets the whoseturn correctly and handles winning condition
     /// </summary>
     /// <param name="gridPos">Where the previous sign has been placed</param>
-	public virtual void NextTurn(int[] gridPos, out bool won) {
+	public virtual void NextTurn(int[] gridPos, out Cell.CellOcc won) {
         NextPerson();
 
         // Check whether someone has won
@@ -71,7 +71,7 @@ public class TTTGameLogic : MonoBehaviour {
             StartCoroutine("DrawBorderToGame", cellWon);
         }
 
-        won = cellWon.gameWon;
+        won = cellWon.winType;
     }
 
     /// <summary>

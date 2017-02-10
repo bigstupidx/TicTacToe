@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class CellHolder {
 
@@ -14,6 +13,18 @@ public class CellHolder {
     private int[] worldPos;
     public int[] WorldPos {
         get { return worldPos;  }
+    }
+    /// <summary>
+    /// Used for placing the sign. It applies this amount of randomness
+    /// </summary>
+    public Vector2 GetRandomPosBasedOnWorldPos() {
+        return new Vector2(worldPos[0] - 0.5f + Random.Range(0f, 0.08f) - 0.04f, worldPos[1] - 0.5f + Random.Range(0f, 0.08f) - 0.04f);
+    }
+    /// <summary>
+    /// Used for placing the sign. It applies this amount of random angles
+    /// </summary>
+    public Vector3 GetRandomAngles() {
+        return new Vector3(0, 0, Random.Range(0f, 10f) - 5f + possibleRotation[Random.Range(0, possibleRotation.Length)]);
     }
 
     // Holds the previous cell's template
@@ -64,8 +75,8 @@ public class CellHolder {
             else cell.TriggerIdle();
 
             // Subtract .five because the center is the pivot (because we want to rotate it to give it better look)
-            cellGameObject.transform.position = new Vector2(worldPos[0] - 0.5f + Random.Range(0f, 0.08f) - 0.04f, worldPos[1] - 0.5f + Random.Range(0f, 0.08f) - 0.04f);
-            cellGameObject.transform.eulerAngles = new Vector3(0, 0, Random.Range(0f, 10f) - 5f + possibleRotation[Random.Range(0, possibleRotation.Length)]);
+            cellGameObject.transform.position = GetRandomPosBasedOnWorldPos();
+            cellGameObject.transform.eulerAngles = GetRandomAngles();
         } else {
             return null;
         }
@@ -81,6 +92,12 @@ public class CellHolder {
         if (cell != null) {
             prevCellTemplate = cell.GetCellTemplate();
         }
+    }
+
+    public void StoreTemplate(Cell.CellOcc type, Vector2 position) {
+        prevCellTemplate = new CellTemplate();
+        prevCellTemplate.cellOcc = type;
+        prevCellTemplate.cellPosition = position;
     }
     
     /// <summary>
@@ -111,7 +128,9 @@ public class CellHolder {
         // We have a template
         if (prevCellTemplate != null) {
             NewCell(prevCellTemplate.cellOcc, false);
-            cell.UpdateAttributes(prevCellTemplate);
+            cell.cellType = prevCellTemplate.cellOcc;
+            cellGameObject.transform.position = GetRandomPosBasedOnWorldPos();
+            cellGameObject.transform.eulerAngles = GetRandomAngles();
         }
     }
 

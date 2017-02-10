@@ -16,7 +16,8 @@ public class BluetoothClientUIInScript : UIInScript {
         currentSign.sprite = SignResourceStorage.GetSpriteRelatedTo(newType);
         currentSign.color = SignResourceStorage.GetColorRelatedTo(newType);
 
-        PlayCursorSpriteUpdateAnimation();
+        if (newType != currentlyDisplayed)
+            PlayCursorSpriteUpdateAnimation();
     }
 
 }
