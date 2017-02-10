@@ -78,16 +78,43 @@ public class BluetoothMessageManager : MonoBehaviour {
 }
 
 public static class EmojiSprites {
-    public static Sprite smilingEmoji;
+    private static string[] emojiPaths = new string[] {
+        "smilingEmoji",
+        "angryEmoji",
+        "bananaEmoji",
+        "clownEmoji",
+        "deathEmoji",
+        "fightmeEmoji",
+        "fireworkEmojy",
+        "fistBumpEmoji",
+        "muscleEmoji",
+        "ohnoEmoji",
+        "okEmoji",
+        "scaredEmoji",
+        "sleepingEmoji",
+        "sunglassesEmoji",
+        "thatpEmoji",
+        "thinkingEmoji",
+        "trophyEmoji",
+        "unicornEmoji",
+        "upsidedownEmoji",
+        "cryingEmoji"
+    };
+
+    public static Dictionary<string, Sprite> emojis;
 
     static EmojiSprites() {
-        smilingEmoji = Resources.Load<Sprite>("Textures/GUI/Emojis/smilingEmoji");
+        emojis = new Dictionary<string, Sprite>();
+
+        string path = "Textures/GUI/Emojis";
+
+        foreach (string s in emojiPaths)
+            emojis.Add(s, Resources.Load<Sprite>(path + s));
     }
 
     public static Sprite GetEmoji(string name) {
-        switch (name) {
-            case "smilingEmoji": return smilingEmoji;
-        }
-        return smilingEmoji;
+        Sprite emoji;
+        emojis.TryGetValue(name, out emoji);
+        return emoji;
     }
 }
