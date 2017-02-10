@@ -13,7 +13,7 @@ public class LoadImage : MonoBehaviour {
 	
 	void Update () {
 		if (loading) {
-            transform.Rotate(0, 0, 2f);
+            transform.Rotate(0, 0, -2f);
         }
 	}
 
@@ -24,7 +24,7 @@ public class LoadImage : MonoBehaviour {
 
     public void StartLoading() {
         loading = true;
-        image.DOColor(Color.grey, 0.2f);
+        image.DOColor(new Color(0.21569f, 0.27843f, 0.3098f), 0.2f);
         
     }
     public void StopLoading() {

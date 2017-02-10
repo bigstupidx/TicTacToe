@@ -39,11 +39,11 @@ public class MessagePicker : MonoBehaviour {
         lineRenderer = GetComponent<LineRenderer>();
         rectTransform = GetComponent<RectTransform>();
 
-        fullPanelImage = transform.GetChild(0).GetComponent<Image>();
+        fullPanelImage = GameObject.Find("FullPanel").GetComponent<Image>();
         fullPanelImage.gameObject.SetActive(false);
         // Set to full screen
-        fullPanelImage.GetComponent<RectTransform>().sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
-        fullPanelImage.GetComponent<RectTransform>().position = new Vector2(+Camera.main.pixelWidth / 2f, +Camera.main.pixelHeight / 2f);
+        /* fullPanelImage.GetComponent<RectTransform>().sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
+        fullPanelImage.GetComponent<RectTransform>().position = new Vector2(+Camera.main.pixelWidth / 2f, +Camera.main.pixelHeight / 2f); */
 
         // Set radius to correct size
         textCircleRadius *= canvasHeight;
@@ -96,7 +96,7 @@ public class MessagePicker : MonoBehaviour {
     }
 
     void Update() {
-        if (isDragging) {
+        if (isDragging && lineRenderer.enabled) {
             // Update line renderer
             dragEnd = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
             dragEnd.z = -5; // So it is not obstructed by anything
@@ -115,6 +115,7 @@ public class MessagePicker : MonoBehaviour {
         dragStart.z = -5;
 
         lineRenderer.SetPosition(0, dragStart);
+        lineRenderer.enabled = true;
 
         // Show messages with tweening
         for (int i = 0; i < messages.Length; i++) {
@@ -129,15 +130,13 @@ public class MessagePicker : MonoBehaviour {
     /// Called from eventtrigger in unity editor
     /// </summary>
     public void EndDrag() {
-        isDragging = false;
-
         // Reset linerenderer
         lineRenderer.SetPosition(0, new Vector3());
         lineRenderer.SetPosition(1, new Vector3());
+        lineRenderer.enabled = false;
         
         // Get radian of our swipe
         float rad = Mathf.Atan2(dragEnd.y - dragStart.y, dragEnd.x - dragStart.x);
-        Debug.Log(rad * Mathf.Rad2Deg);
         
         // Se wich message we wanted by going through the messages and comparing this rad to the start and end rad stored in messages
         foreach (MessagePickerMessage mpm in messages) {
@@ -155,6 +154,7 @@ public class MessagePicker : MonoBehaviour {
         }
         fullPanelImage.DOFade(0f, MSG_SHOW_ANIMATION).OnComplete(new TweenCallback(() => {
             fullPanelImage.gameObject.SetActive(false);
+            isDragging = false;
         }));
     }
 	

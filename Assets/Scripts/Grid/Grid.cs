@@ -27,6 +27,8 @@ public class Grid : MonoBehaviour {
 
     // Used for stopping game, it stores where the last sign has been placed
     protected int[] previousGridPos;
+    protected int[] secondToPreviousGridPos;
+    protected int removeCount = 0;
 
     // Number of signs in current game
     protected int numberOfSignsInGame = 0;
@@ -117,14 +119,21 @@ public class Grid : MonoBehaviour {
     }
 
     /// <summary>
+    /// This is called from the ui
+    /// </summary>
+    public void RemoveLastSignUI() {
+        RemoveLastSign();
+    }
+
+    /// <summary>
     /// Removes the sign we last placed
     /// </summary>
-    public void RemoveLastSign() {
-        if (numberOfSignsInGame < 1) return; // Only remove if we placed two sings already
+    public virtual bool RemoveLastSign() {
+        if (numberOfSignsInGame < 1 || removeCount > 0) return false; // Only remove if we placed two signs already
 
         // Remove sign
         CellHolder cellHolder = GetCellHolderAtGridPos(previousGridPos);
-        if (!cellHolder.IsFull()) return; // Return if we don't have a sign there
+        if (!cellHolder.IsFull()) return false; // Return if we don't have a sign there
 
         cellHolder.RemoveCurrentCellWithoutStoring();
 
@@ -136,12 +145,18 @@ public class Grid : MonoBehaviour {
         if (numberOfSignsInGame == 1) {
             gameLogic.RestartCurrentGame();
             previousGridPos = null;
+        } else {
+            previousGridPos[0] = secondToPreviousGridPos[0]; previousGridPos[1] = secondToPreviousGridPos[1];
         }
         
         numberOfSignsInGame--;
+        removeCount++;
+        
+
+        return true;
     }
 
-    public void SetCameraToPreviousSign() {
+    public virtual void SetCameraToPreviousSign() {
         if (previousGridPos != null)
             Camera.main.transform.DOMove(new Vector3(previousGridPos[0], previousGridPos[1], Camera.main.transform.position.z), 1f, false);
     }
@@ -257,10 +272,12 @@ public class Grid : MonoBehaviour {
         // We need to place the sign in the partion
         bool couldBePlaced = currP.PlaceSign(localPos, cellType, disabled);
         if (couldBePlaced && !disabled) { // If we could place the sign store it's gridPos
+            if (previousGridPos != null) secondToPreviousGridPos = new int[] { previousGridPos[0], previousGridPos[1] };
             previousGridPos = new int[] { gridPos[0], gridPos[1] };
 
             // Increase amount of cells in game
             numberOfSignsInGame++;
+            removeCount = 0; // Reset removecount to be able to remove sign again
         }
         return couldBePlaced;
     }
@@ -369,7 +386,7 @@ public class Grid : MonoBehaviour {
                     int count = 1; // Used to determine whether someone has won: if after the loop it is WIN_CONDITION someone has won
 
                     // Go till we found end in this direction or founf out that someone has won
-                    for (int j = 1; j < WIN_CONDITION; j++) {
+                    for (int j = 1; j < WIN_CONDITION && count < WIN_CONDITION; j++) {
                         CellHolder ch = GetCellHolderRelativeTo(gridPos, i * j, k * j);
 
                         // ch is null  
@@ -385,7 +402,7 @@ public class Grid : MonoBehaviour {
                     }
 
                     // We need to go in the other direction as well
-                    for (int j = 1; j < WIN_CONDITION; j++) {
+                    for (int j = 1; j < WIN_CONDITION && count < WIN_CONDITION; j++) {
                         CellHolder ch = GetCellHolderRelativeTo(gridPos, -i * j, -k * j);
 
                         // ch is null  

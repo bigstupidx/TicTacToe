@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class ClientCellStorage : MonoBehaviour {
 
@@ -10,6 +11,9 @@ public class ClientCellStorage : MonoBehaviour {
 
     private List<CellHolder> visibleCells;
     private List<CellHolder> notVisibleCells;
+
+    public int[] lastRemovedSign = new int[1];
+    public int[] lastSign;
 
 	void Start () {
         visibleCells = new List<CellHolder>();
@@ -56,9 +60,16 @@ public class ClientCellStorage : MonoBehaviour {
     /// Add type cell at gridPos in world units locally
     /// </summary>
     public void PlaceCellAt(int[] gridPos, Cell.CellOcc type) {
+        Debug.Log("Sign placed at " + gridPos[0] + " " + gridPos[1]);
         CellHolder ch = new CellHolder(gridPos);
         ch.NewCell(type);
         visibleCells.Add(ch);
+        lastSign = new int[2] { gridPos[0], gridPos[1] };
+    }
+
+    public void GoToPreviousSign() {
+        if (lastSign != null)
+            Camera.main.transform.DOMove(new Vector3(lastSign[0], lastSign[1], Camera.main.transform.position.z), 1f, false);
     }
 
     /// <summary>

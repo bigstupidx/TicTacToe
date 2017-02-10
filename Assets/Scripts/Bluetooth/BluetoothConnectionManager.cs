@@ -148,14 +148,14 @@ public class BluetoothConnectionManager : MonoBehaviour {
     /// <param name="address"></param>
     public void ConnectTo(string address) {
         Bluetooth.Instance().Connect(address);
-        serverConnectPanel.rectTransform.DOLocalMoveY(-500, 0.3f);
+        serverConnectPanel.rectTransform.DOMoveY(37.5f, 0.3f);
     }
 
     /// <summary>
     /// When connection failed and we want the connectin... panel to retract
     /// </summary>
     public void NotConnectingAnymore() {
-        serverConnectPanel.rectTransform.DOLocalMoveY(-584f, 0.3f);
+        serverConnectPanel.rectTransform.DOMoveY(-43.5f, 0.3f);
     }
 
     /// <summary>

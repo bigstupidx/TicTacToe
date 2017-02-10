@@ -13,7 +13,7 @@ public class BluetoothMessageManager : MonoBehaviour {
     private static GameObject messageSpawnerObject;
     private static GameObject messagePrefab;
 
-    private static float messageHeight;
+    private static float messageHeight = -1;
 
     private static List<RectTransform> messages = new List<RectTransform>();
 
@@ -21,15 +21,22 @@ public class BluetoothMessageManager : MonoBehaviour {
         preferences = GameObject.FindObjectOfType<PreferencesScript>();
 
         messageSpawnerObject = GameObject.FindWithTag("BluetoothMessageSpawner");
-        messagePrefab = Resources.Load<GameObject>("Prefabs/Bluetooth/Message");
-
-        messageHeight = messagePrefab.GetComponent<RectTransform>().rect.height;
+        messagePrefab = Resources.Load<GameObject>("Prefabs/Bluetooth/Messaging/Message");
     }
 
     /// <summary>
     /// Make new message
     /// </summary>
     private static GameObject InstantiateMessage(bool ownMessage) {
+        // Make new message and it goes directly to 0 0
+        GameObject go = GameObject.Instantiate(messagePrefab);
+        go.transform.SetParent(messageSpawnerObject.transform, false);
+
+        // If we don't know the size of the message yet store it
+        if (messageHeight == -1) {
+            messageHeight = go.GetComponent<RectTransform>().rect.height;
+        }
+
         // Move every message down
         for (int i = messages.Count - 1; i >= 0; i--) {
             if (messages[i] == null) { // it has been destroyed
@@ -39,9 +46,6 @@ public class BluetoothMessageManager : MonoBehaviour {
             }
         }
 
-        // Make new message and it goes directly to 0 0
-        GameObject go = GameObject.Instantiate(messagePrefab);
-        go.transform.SetParent(messageSpawnerObject.transform, false);
         
         go.GetComponent<BluetoothMessage>().Appear(ownMessage);
 

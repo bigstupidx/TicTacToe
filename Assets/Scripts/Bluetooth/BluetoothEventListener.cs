@@ -80,6 +80,9 @@ public class BluetoothEventListener : MonoBehaviour {
     /// Where the client thinks last sign was palced
     /// </summary>
     private int[] lastSignPlaced = new int[] { int.MaxValue, int.MaxValue };
+    private int[] secondToLastSignPlaced = new int[] { int.MaxValue, int.MaxValue };
+
+    bool removePending = false;
 
 
     //----------------------------
@@ -111,6 +114,15 @@ public class BluetoothEventListener : MonoBehaviour {
         }
     }
 
+    private BluetoothGrid grid;
+    private BluetoothGrid Grid {
+        get {
+            if (grid == null) grid = FindObjectOfType<BluetoothGrid>();
+
+            return grid;
+        }
+    }
+
     /// <summary>
     /// Last placed border's data
     /// </summary>
@@ -132,10 +144,35 @@ public class BluetoothEventListener : MonoBehaviour {
     /// Also send whose turn it is
     /// </summary>
     private void SendClientLastSign() {
-        if (Bluetooth.Instance().IsConnected() && isInGame)
-        Bluetooth.Instance().Send(BluetoothMessageStrings.WHERE_LAST_PLACED + "#" + GameLogic.LastSignPlaced[0] + "#" + GameLogic.LastSignPlaced[1] + "#" + GameLogic.LastType.ToString()
-            + "|||" + BluetoothMessageStrings.LAST_BORDER_ID + "#" + lastBorderID
-            + "|||" + BluetoothMessageStrings.TURN_OF + "#" + GameLogic.WhoseTurn.ToString() );
+        if (Bluetooth.Instance().IsConnected() && isInGame) {
+            // Most efficent way of concatting string
+            string sent = String.Join("", new string[] {
+                // last placed sign
+                BluetoothMessageStrings.WHERE_LAST_PLACED,
+                "#",
+                GameLogic.LastSignPlaced[0].ToString(),
+                "#",
+                GameLogic.LastSignPlaced[1].ToString(),
+                "#",
+                GameLogic.LastType.ToString(),
+
+                "|||",
+
+                // Last placed border
+                BluetoothMessageStrings.LAST_BORDER_ID.ToString(),
+                "#",
+                lastBorderID.ToString(),
+
+                "|||",
+
+                // Whose turn it is
+                BluetoothMessageStrings.TURN_OF,
+                "#",
+                GameLogic.WhoseTurn.ToString()
+            });
+
+            Bluetooth.Instance().Send(sent);
+        }
     }
 
     /// <summary>
@@ -242,7 +279,6 @@ public class BluetoothEventListener : MonoBehaviour {
     /// </summary>
     /// <param name="writeMessage"></param>
     void DoneSendingEvent(string writeMessage) {
-        Debug.Log("writeMessage " + writeMessage);
     }
 
     /// <summary>
@@ -275,13 +311,17 @@ public class BluetoothEventListener : MonoBehaviour {
                         Bluetooth.Instance().Send(BluetoothMessageStrings.TURN_OF + "#" + gameLogic.WhoseTurn.ToString());
                         break;
                     case "SMB": // Client is asking for latest border data
-                        Debug.Log("readMessage " + differentMessages[i]);
                         Bluetooth.Instance().Send(BluetoothMessageStrings.ADD_BORDER + "#" + lastBorder.ToString() + "#" + lastBorderID);
+                        break;
+                    case "RLS": // Client is asking to remove last sign placed
+                        if (gameLogic.IsItServersTurn()) { // only do it if it is server's turn because we know then that the client placed last
+                            Grid.RemoveLastSign();
+                        }
                         break;
                 }
 
-                // CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT
-                // CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT
+            // CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT
+            // CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT CLIENT
             } else {
 
                 switch (splitMessage[0]) {
@@ -295,8 +335,8 @@ public class BluetoothEventListener : MonoBehaviour {
                             int.Parse(splitMessage[2])
                         };
 
-                        // If there is a new sign that has been placed
                         if (!(lastPos[0] == lastSignPlaced[0] && lastPos[1] == lastSignPlaced[1])) {
+                            secondToLastSignPlaced[0] = lastSignPlaced[0]; secondToLastSignPlaced[1] = lastSignPlaced[1];
                             lastSignPlaced[0] = lastPos[0]; lastSignPlaced[1] = lastPos[1]; // Store new sign pos as last sign
                             
                             Cell.CellOcc lastType = (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), splitMessage[3]);
@@ -319,7 +359,6 @@ public class BluetoothEventListener : MonoBehaviour {
                         ClientUIInScript.UpdateImage(whoseTurn);
                         break;
                     case "ADDBORDER": // Server sends border data
-                        Debug.Log("readMessage " + differentMessages[i]);
                         // set lates bluetooth border id
                         lastBorderID = int.Parse(splitMessage[splitMessage.Length - 1]);
 

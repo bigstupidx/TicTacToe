@@ -54,6 +54,7 @@ public class CellPooling : MonoBehaviour {
 	public static void StoreObject(GameObject cell) {
         if (cell != null) {
             cell.transform.SetParent(parentObject.transform);
+            cell.GetComponent<SpriteRenderer>().sprite = null;
             cell.SetActive(false);
 
             pool.Push(cell);
