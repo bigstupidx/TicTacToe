@@ -5,6 +5,11 @@ using DG.Tweening;
 
 public class Grid : MonoBehaviour {
 
+    public delegate void SignPlaced(int[] pos, Cell.CellOcc type);
+    public event SignPlaced SignWasPlaced;
+    public delegate void SignRemoved(int[] pos);
+    public event SignRemoved SignWasRemoved;
+
     // How many need for a win
     protected int WIN_CONDITION = 5;
     protected const float UPDATE_SHOWN_TIME = .3f;
@@ -134,6 +139,9 @@ public class Grid : MonoBehaviour {
         // Remove sign
         CellHolder cellHolder = GetCellHolderAtGridPos(previousGridPos);
         if (!cellHolder.IsFull()) return false; // Return if we don't have a sign there
+
+        // At this point we surely are going to remove the sign
+        SignWasRemoved(previousGridPos);
 
         cellHolder.RemoveCurrentCellWithoutStoring();
 
@@ -278,6 +286,8 @@ public class Grid : MonoBehaviour {
             // Increase amount of cells in game
             numberOfSignsInGame++;
             removeCount = 0; // Reset removecount to be able to remove sign again
+
+            SignWasPlaced(gridPos, cellType);
         }
         return couldBePlaced;
     }

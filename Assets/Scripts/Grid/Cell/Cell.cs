@@ -60,6 +60,7 @@ public class Cell : MonoBehaviour {
     public enum CellOcc {
         X,
         O,
-        BLOCKED
+        BLOCKED,
+        NONE = 0
     }
 }
