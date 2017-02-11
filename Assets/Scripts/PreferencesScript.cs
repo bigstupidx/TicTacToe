@@ -5,6 +5,64 @@ public class PreferencesScript : MonoBehaviour {
 
     private const string FIRST_USE = "FirstUse";
 
+    private void Start() {
+
+        DontDestroyOnLoad(gameObject);
+
+        // If first use
+        if (PlayerPrefs.GetString(FIRST_USE) == "IMDEADINSIDE") {
+            PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
+            PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
+            PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
+            PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
+            PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
+            PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
+            PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDEPLSHELPME");
+        }
+
+        // Color mode
+        currentMode = (ColorMode) Enum.Parse(typeof(ColorMode), PlayerPrefs.GetString(COLOR_MODE));
+        currentTheme = ColorThemes.GetTheme(PlayerPrefs.GetString(THEME_MODE));
+        UpdateSignResourceStrgColors();
+    }
+
+    // _________________________Emojis_______________________________________________
+
+    /// <summary>
+    /// There are 4 emojis which can be chosen so after this you need to put 0...3
+    /// </summary>
+    private const string EMOJI_NAME = "EmojiName";
+
+    public readonly int EMOJI_COUNT = 4;
+
+    public string[] GetEmojiNames() {
+        string[] s = new string[EMOJI_COUNT];
+        for (int i = 0; i < s.Length; i++)
+            s[i] = PlayerPrefs.GetString(EMOJI_NAME + i);
+
+        return s;
+    }
+
+    public Sprite[] GetEmojiSprites() {
+        Sprite[] s = new Sprite[EMOJI_COUNT];
+        for (int i = 0; i < s.Length; i++)
+            s[i] = EmojiSprites.GetEmoji(PlayerPrefs.GetString(EMOJI_NAME + i));
+
+        return s;
+    }
+
+    public string GetEmojiNameInSlot(int slot) {
+        return PlayerPrefs.GetString(EMOJI_NAME + slot);
+    }
+
+    public Sprite GetEmojiSpriteInSlot(int slot) {
+        return EmojiSprites.GetEmoji(PlayerPrefs.GetString(EMOJI_NAME + slot));
+    }
+
+    public void SetEmojiInSlotTo(int slot, string name) {
+        PlayerPrefs.SetString(EMOJI_NAME + slot, name);
+    }
+
 
     // ______________________Color mode variables_________________________________
 
@@ -28,7 +86,7 @@ public class PreferencesScript : MonoBehaviour {
     public static OnColorChange ColorChangeEvent;
 
     // _______________________Which colors are chosen in colormode____________________________
-    private ColorTheme currentTheme;
+    public ColorTheme currentTheme;
 
     /// <summary>
     /// Delegate used for theme changes
@@ -39,23 +97,6 @@ public class PreferencesScript : MonoBehaviour {
     /// When we subscribe to this we can be sure that the color in SignResourceScript has already been changed
     /// </summary>
     public static OnThemeChange ThemeChangeEvent;
-
-    private void Start() {
-
-        DontDestroyOnLoad(gameObject);
-
-        // If first use
-        if (PlayerPrefs.GetString(FIRST_USE) == "IMBEINUSEDJUSTLIKEINREALLIFE") {
-            PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
-            PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
-            PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDE");
-        }
-        
-        // Color mode
-        currentMode = (ColorMode) Enum.Parse(typeof(ColorMode), PlayerPrefs.GetString(COLOR_MODE));
-        currentTheme = ColorThemes.GetTheme(PlayerPrefs.GetString(THEME_MODE));
-        UpdateSignResourceStrgColors();
-    }
 
 
 
@@ -94,11 +135,14 @@ public class PreferencesScript : MonoBehaviour {
         public Color xColorDark;
         public Color oColorDark;
 
-        public ColorTheme(Color xColorLight, Color oColorLight, Color xColorDark, Color oColorDark) {
+        public string themeName;
+
+        public ColorTheme(Color xColorLight, Color oColorLight, Color xColorDark, Color oColorDark, string themeName) {
             this.xColorDark = xColorDark;
             this.oColorDark = oColorDark;
             this.xColorLight = xColorLight;
             this.oColorLight = oColorLight;
+            this.themeName = themeName;
         }
 
         public Color GetXColorOfMode(ColorMode mode) {

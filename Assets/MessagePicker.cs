@@ -23,11 +23,12 @@ public class MessagePicker : MonoBehaviour {
     private LineRenderer lineRenderer;
     private RectTransform rectTransform;
     private Image fullPanelImage;
-
-    [Tooltip("What messages to show")]
-    public MessagePickerMessage[] messages;
-
-    public GameObject textPrefab;
+    
+    /// <summary>
+    /// Which messages to show in picker
+    /// </summary>
+    private MessagePickerMessageWithUI[] messages;
+    
     public GameObject imgPrefab;
 
     // Geometry stuff :'(
@@ -41,9 +42,14 @@ public class MessagePicker : MonoBehaviour {
 
         fullPanelImage = GameObject.Find("FullPanel").GetComponent<Image>();
         fullPanelImage.gameObject.SetActive(false);
-        // Set to full screen
-        /* fullPanelImage.GetComponent<RectTransform>().sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
-        fullPanelImage.GetComponent<RectTransform>().position = new Vector2(+Camera.main.pixelWidth / 2f, +Camera.main.pixelHeight / 2f); */
+
+        // Set messages
+        PreferencesScript preferences = FindObjectOfType<PreferencesScript>();
+        messages = new MessagePickerMessageWithUI[preferences.EMOJI_COUNT];
+        string[] msgPaths = preferences.GetEmojiNames();
+        for (int i = msgPaths.Length - 1; i >= 0; i--) {
+            messages[i] = new MessagePickerMessageWithUI(msgPaths[i]);
+        }
 
         // Set radius to correct size
         textCircleRadius *= canvasHeight;
@@ -63,24 +69,15 @@ public class MessagePicker : MonoBehaviour {
 
             // Make text gameobject
             GameObject go;
-            if (!messages[i].isEmoji) { 
-                go = Instantiate(textPrefab);
-                go.name = messages[i].message;
+            go = Instantiate(imgPrefab, transform, false);
+            go.name = messages[i].message;
 
-                Text text = go.GetComponent<Text>();
-                text.text = messages[i].message;
-            } else {
-                go = Instantiate(imgPrefab);
-                go.name = messages[i].message;
-
-                Image img = go.GetComponent<Image>();
-                img.sprite = EmojiSprites.GetEmoji(messages[i].message);
-            }
-
-            go.transform.SetParent(transform, false);
+            // set image
+            Image img = go.GetComponent<Image>();
+            img.sprite = EmojiSprites.GetEmoji(messages[i].message);
 
             messages[i].rectTransform = go.GetComponent<RectTransform>();
-            messages[i].rectTransform.localScale = new Vector3(); // By default the messages are inside the the message icon
+            messages[i].rectTransform.localScale = new Vector3(); // By default the messages are inside the the message icon so we can animate them out
 
 
             // Store message's pos
@@ -139,7 +136,7 @@ public class MessagePicker : MonoBehaviour {
         float rad = Mathf.Atan2(dragEnd.y - dragStart.y, dragEnd.x - dragStart.x);
         
         // Se wich message we wanted by going through the messages and comparing this rad to the start and end rad stored in messages
-        foreach (MessagePickerMessage mpm in messages) {
+        foreach (MessagePickerMessageWithUI mpm in messages) {
             // We found the message
             if (rad >= mpm.fromRad && rad < mpm.toRad) {
                 SendMessage(mpm);
@@ -161,28 +158,22 @@ public class MessagePicker : MonoBehaviour {
     /// <summary>
     /// Send a message via bluetooth
     /// </summary>
-    private void SendMessage(MessagePickerMessage mpm) {
+    private void SendMessage(MessagePickerMessageWithUI mpm) {
         // Show it for yourself
         // Not emoji -> show text message
-        if (!mpm.isEmoji) { 
-            BluetoothMessageManager.ShowTextMessage(mpm.message, true);
-        } else { // it is an emoji
-            BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(mpm.message), true);
-        }
+        BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(mpm.message), true);
 
         // Send it vie bluetooth
-        Bluetooth.Instance().Send(BluetoothMessageStrings.SEND_MESSAGE + "#" + mpm.isEmoji.ToString() + "#" + mpm.message);
+        Bluetooth.Instance().Send(BluetoothMessageStrings.SEND_MESSAGE + "#" + mpm.message);
     }
 
 }
 
+/// <summary>
+/// This is a storing method made for the MessagePicker class which contains some UI data that it needs
+/// </summary>
 [System.Serializable]
-public struct MessagePickerMessage {
-    [Tooltip("The name of emoji if it's emoji. Otherwise text message")]
-    public string message;
-    [Tooltip("Whether it's an emoji or a message")]
-    public bool isEmoji;
-
+public class MessagePickerMessageWithUI : MessagePickerMessage {
     [HideInInspector]
     public float fromRad;
     [HideInInspector]
@@ -197,4 +188,19 @@ public struct MessagePickerMessage {
 
     [HideInInspector]
     public RectTransform rectTransform;
+
+    public MessagePickerMessageWithUI(string message) : base(message) { }
+}
+
+/// <summary>
+/// Only contains the message and whether it is an emjoji, so it can be used for storing anywhere else
+/// </summary>
+[System.Serializable]
+public class MessagePickerMessage {
+    [Tooltip("The name of emoji if it's emoji. Otherwise text message")]
+    public string message;
+
+    public MessagePickerMessage(string message) {
+        this.message = message;
+    }
 }

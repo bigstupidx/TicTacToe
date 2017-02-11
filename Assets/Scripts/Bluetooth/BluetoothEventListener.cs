@@ -181,7 +181,7 @@ public class BluetoothEventListener : MonoBehaviour {
                 "|||",
 
                 // The score
-                BluetoothMessageStrings.SEND_MESSAGE,
+                BluetoothMessageStrings.SEND_SCORE,
                 "#",
                 GameLogic.XScore.ToString(),
                 "#",
@@ -273,6 +273,7 @@ public class BluetoothEventListener : MonoBehaviour {
                 // Go to lobby
                 bluetoothConnectionManager.GoToLobby(Bluetooth.Instance().GetDeviceConnectedName());
                 isInGame = true;
+                bluetoothConnectionManager.NotConnectingAnymore();
                 break;
             case "STATE_CONNECTING":
                 break;
@@ -419,11 +420,7 @@ public class BluetoothEventListener : MonoBehaviour {
             // BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH BOTH
             switch (splitMessage[0]) {
                 case "SMSG":
-                    if (bool.Parse(splitMessage[1])) { // It is emoji
-                        BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(splitMessage[2]));
-                    } else { // It is not emoji
-                        BluetoothMessageManager.ShowTextMessage(splitMessage[2]);
-                    }
+                    BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(splitMessage[1]));
                     break;
             }
         }
@@ -435,8 +432,7 @@ public static class BluetoothMessageStrings {
     //_________________________________ S -> C || C -> S ___________________________
     /// <summary>
     /// Sent by both client and server and it simply sends a message then displays it
-    /// ID isEmoji message
-    /// If it is emoji then the message is the emoji's variable name in EmojiSprite
+    /// ID path
     /// </summary>
     public static readonly string SEND_MESSAGE = "SMSG";
 

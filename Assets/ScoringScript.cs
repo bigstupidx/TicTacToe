@@ -31,9 +31,11 @@ public class ScoringScript : MonoBehaviour {
         if (currentX == x) {
             txt = oText;
             s = o.ToString();
+            currentO = o;
         } else { // we need to refresh x
             s = x.ToString();
             txt = xText;
+            currentX = x;
         }
         // aniamtion
         DOTween.Sequence()

@@ -88,9 +88,9 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
 
             // text is exactly opposite color
             if (dlc != null) {
-                txt.DOColor(dlc.lightModeColor, time);
+                txt.DOColor(dlc.darkModeColor, time);
             } else {
-                txt.DOColor(lightModeColor, time);
+                txt.DOColor(darkModeColor, time);
             }
         }
     }

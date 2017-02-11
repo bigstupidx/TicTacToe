@@ -19,9 +19,11 @@ public class SetColorThemeUI : MonoBehaviour {
 
     private ColorThemesUIHandler colorThemesHandler;
     private PreferencesScript preferences;
-    
-	void Awake () {
-        // We need to to this in awake because in start which lightdark to use will be set
+
+    public Color clickedColor = new Color(0.32941f, 0.43137f, 0.47843f);
+
+    void Awake () {
+        // We need to do this in awake because in start which lightdark to use will be set
 
         // Get the theme
         currentTheme = ColorThemes.GetTheme(colorThemeName + "Theme");
@@ -56,8 +58,15 @@ public class SetColorThemeUI : MonoBehaviour {
             DOTween.Sequence()
                 .Append(rectTransform.DOScale(0.8f, CLICK_ANIM_TIME / 2f))
                 .Append(rectTransform.DOScale(1f, CLICK_ANIM_TIME / 2f))
-                .Insert(0, image.DOColor(new Color(0.32941f, 0.43137f, 0.47843f), CLICK_ANIM_TIME / 2f));
+                .Insert(0, image.DOColor(clickedColor, CLICK_ANIM_TIME / 2f));
         });
         eventTrigger.triggers.Add(entry);
+    }
+
+    /// <summary>
+    /// Sets this button's color to clickedColor
+    /// </summary>
+    public void SetClickedColor() {
+        image.color = clickedColor;
     }
 }

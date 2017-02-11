@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class BluetoothGridClickHandler : GridClickHandler {
 
@@ -18,7 +17,7 @@ public class BluetoothGridClickHandler : GridClickHandler {
     }
 
     public override void ClickedAt(Vector2 clickPos) {
-        if (EventSystem.current.IsPointerOverGameObject())
+        if (IsPointerOverUIObject())
             return;
 
         // We are on client side

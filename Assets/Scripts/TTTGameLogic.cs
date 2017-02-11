@@ -71,7 +71,7 @@ public class TTTGameLogic : MonoBehaviour {
             StartCoroutine("DrawBorderToGame", cellWon);
         }
 
-        won = cellWon.winType;
+        won = cellWon.gameWon ? cellWon.winType : Cell.CellOcc.BLOCKED;
     }
 
     /// <summary>

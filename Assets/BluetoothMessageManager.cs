@@ -58,34 +58,25 @@ public class BluetoothMessageManager : MonoBehaviour {
         return go;
     }
 
-    public static void ShowTextMessage(string message, bool ownMessage = false) {
-        GameObject messageObj = InstantiateMessage(ownMessage);
-
-        Text txt = messageObj.transform.GetChild(0).GetComponent<Text>();
-        txt.text = message;
-
-        messageObj.transform.GetChild(1).gameObject.SetActive(false);
-    }
-
     public static void ShowEmojiMessage(Sprite emojiSprite, bool ownMessage = false) {
         GameObject messageObj = InstantiateMessage(ownMessage);
-        messageObj.transform.GetChild(0).gameObject.SetActive(false);
 
-        Image img = messageObj.transform.GetChild(1).GetComponent<Image>();
+        Image img = messageObj.transform.GetChild(0).GetComponent<Image>();
         img.sprite = emojiSprite;
     }
 
 }
 
-public static class EmojiSprites {
-    private static string[] emojiPaths = new string[] {
+public static class 
+    EmojiSprites {
+    public static string[] emojiPaths = new string[] {
         "smilingEmoji",
         "angryEmoji",
         "bananaEmoji",
         "clownEmoji",
         "deathEmoji",
         "fightmeEmoji",
-        "fireworkEmojy",
+        "fireworkEmoji",
         "fistBumpEmoji",
         "muscleEmoji",
         "ohnoEmoji",
@@ -106,7 +97,7 @@ public static class EmojiSprites {
     static EmojiSprites() {
         emojis = new Dictionary<string, Sprite>();
 
-        string path = "Textures/GUI/Emojis";
+        string path = "Textures/GUI/Emojis/";
 
         foreach (string s in emojiPaths)
             emojis.Add(s, Resources.Load<Sprite>(path + s));
