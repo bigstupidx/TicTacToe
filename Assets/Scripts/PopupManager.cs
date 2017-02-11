@@ -8,14 +8,16 @@ public class PopupManager : MonoBehaviour {
     private static float timePerHalfScreen = .5f;
     
     private static GameObject popupPrefab;
-
     private static GameObject popupInstance;
+
     private static Image popupInstanceImage;
     private static Button popupInstanceButton;
     private static Text popupInstanceText;
 
     // Whether pop up is out of screen or not
     private static bool popupOut = true;
+
+    private static PreferencesScript preferences;
 
     void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -25,6 +27,7 @@ public class PopupManager : MonoBehaviour {
 
     private void LoadResources() {
         popupPrefab = Resources.Load<GameObject>("Prefabs/GUI/PopupPanel");
+        preferences = FindObjectOfType<PreferencesScript>();
     }
 
     void OnApplicationPause(bool paused) {

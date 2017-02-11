@@ -147,6 +147,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     /// </summary>
     /// <param name="address"></param>
     public void ConnectTo(string address) {
+        Bluetooth.Instance().Stop();
         Bluetooth.Instance().Connect(address);
         serverConnectPanel.rectTransform.DOMoveY(37.5f, 0.3f);
     }

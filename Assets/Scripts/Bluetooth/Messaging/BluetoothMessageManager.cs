@@ -89,7 +89,9 @@ public static class
         "trophyEmoji",
         "unicornEmoji",
         "upsidedownEmoji",
-        "cryingEmoji"
+        "cryingEmoji",
+        "rektEmoji",
+        "noobEmoji"
     };
 
     public static Dictionary<string, Sprite> emojis;

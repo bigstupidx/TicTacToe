@@ -15,9 +15,12 @@ public class ClientCellStorage : MonoBehaviour {
     public int[] lastRemovedSign = new int[1];
     public int[] lastSign;
 
+    private LastPlacedMarkerScript lastPlaced;
+
 	void Start () {
         visibleCells = new List<CellHolder>();
         notVisibleCells = new List<CellHolder>();
+        lastPlaced = FindObjectOfType<LastPlacedMarkerScript>();
         
         // Set camera size
         cameraHalfSize = new int[2];
@@ -64,6 +67,7 @@ public class ClientCellStorage : MonoBehaviour {
         ch.NewCell(type);
         visibleCells.Add(ch);
         lastSign = new int[2] { gridPos[0], gridPos[1] };
+        lastPlaced.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.GetColorRelatedTo(type == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
     }
 
     /// <summary>

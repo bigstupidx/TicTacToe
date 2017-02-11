@@ -44,6 +44,9 @@ public class Grid : MonoBehaviour {
     // Stores the signs which will be stored in the file
     protected List<SignStoreInFile> fileList = new List<SignStoreInFile>();
 
+    // Last sign marker
+    private LastPlacedMarkerScript lastPlacedMarker;
+
     protected virtual void Awake() {
         FILE_PATH = Application.persistentDataPath + "/Grid.txt";
 
@@ -61,6 +64,9 @@ public class Grid : MonoBehaviour {
 
         // GameLogic
         gameLogic = FindObjectOfType<TTTGameLogic>();
+
+        // Marker
+        lastPlacedMarker = FindObjectOfType<LastPlacedMarkerScript>();
     }
 
     /// <summary>
@@ -145,6 +151,9 @@ public class Grid : MonoBehaviour {
             SignWasRemoved(previousGridPos);
 
         cellHolder.RemoveCurrentCellWithoutStoring();
+
+        // move marker, do this before changin turns because we want the color to be the exact opposite of the sign at secondToPrevious pos
+        lastPlacedMarker.MoveMarkerTo(new Vector2(secondToPreviousGridPos[0], secondToPreviousGridPos[1]), SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn));
 
         // Revert back to previous turn in gamelogic
         gameLogic.SetPreviousTurn();
@@ -288,6 +297,9 @@ public class Grid : MonoBehaviour {
             numberOfSignsInGame++;
             removeCount = 0; // Reset removecount to be able to remove sign again
 
+            // move marker
+            lastPlacedMarker.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
+
             if (SignWasPlaced != null)
                 SignWasPlaced(gridPos, cellType);
         }
@@ -319,6 +331,9 @@ public class Grid : MonoBehaviour {
     public TTTGameLogic.GameWonData StopCurrentGame(TTTGameLogic.GameWonData wonData) {
         // We need to start a bejaras from the last placed sign's pos, which we happen to store in previousGridPos
         // Then set all of the found sign's cellholder to disabled
+
+        // Disable it
+        lastPlacedMarker.Disable();
 
         // Ended game so reset the amount of cells in game
         numberOfSignsInGame = 0;

@@ -8,6 +8,8 @@ using DG.Tweening;
 /// </summary>
 public class FoundDevicePanel : MonoBehaviour {
 
+    private Color darkModeColor = new Color(0.87843f, 0.87843f, 0.87843f);
+
     private const float clickAnimDuration = 0.45f;
 
     private Text nameText;
@@ -16,6 +18,7 @@ public class FoundDevicePanel : MonoBehaviour {
     private string connectionAddress;
 
     private BluetoothConnectionManager connectionManager;
+    private PreferencesScript preferences;
 
     void Awake() {
         connectionManager = FindObjectOfType<BluetoothConnectionManager>();
@@ -24,6 +27,12 @@ public class FoundDevicePanel : MonoBehaviour {
 
         imageTrigger = GetComponent<EventTrigger>();
         panel = GetComponent<Image>();
+        
+        // Dark mode
+        if (preferences.currentMode == PreferencesScript.ColorMode.DARK) {
+            nameText.color = darkModeColor;
+            transform.GetChild(1).GetComponent<Image>().color = darkModeColor;
+        }
     }
     
 	public void SetNameAndMac(string name, string mac, string connectionAddress) {
