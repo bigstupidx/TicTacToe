@@ -27,12 +27,27 @@ public class CellHolder {
         return new Vector3(0, 0, Random.Range(0f, 10f) - 5f + possibleRotation[Random.Range(0, possibleRotation.Length)]);
     }
 
-    // Holds the previous cell's template
-    // Otherwise it's null so be careful!
-    private CellTemplate prevCellTemplate;
+    /// <summary>
+    /// Holds the current cell's template. Always has something, if the cell is destroyed and has no body, it will keep the data.
+    /// This will surely have the cellType because cell may not have it if this cell has no body(gameobject), just like a BLOCKED cell
+    /// </summary>
+    private CellTemplate currentTemplate;
+    /// <summary>
+    /// Holds the current cell's template. Always has something, if the cell is destroyed and has no body, it will keep the data.
+    /// This will surely have the cellType because cell may not have it if this cell has no body(gameobject), just like a BLOCKED cell
+    /// </summary>
+    public CellTemplate CurrentTemplate {
+        get { return currentTemplate; }
+    }
 
     private GameObject cellGameObject;
+    /// <summary>
+    /// May be null if the cell has no body(gameobject)
+    /// </summary>
     private Cell cell;
+    /// <summary>
+    /// May be null if the cell has no body(gameobject)
+    /// </summary>
     public Cell Cell {
         get {
             return cell;
@@ -49,13 +64,24 @@ public class CellHolder {
 
     private float[] possibleRotation = new float[] { 0f, 90f, 180f, 270f };
     /// <summary>
-    /// Creates a new cell in this holder of type celltype
+    /// Creates a new cell in this holder of type celltype.
+    /// If type is blocked then it's gonna disable cell by default and the returned cell will be null
     /// </summary>
     /// <param name="cellType"></param>
     /// <param name="animate">Whether to animate the cell or not</param>
     /// <returns>Return null if the cell could not be created</returns>
     public Cell NewCell(Cell.CellOcc cellType, bool animate = true) {
         if (!cell) {
+            // We have a blocking cell, for example a hole filler
+            if (cellType == Cell.CellOcc.BLOCKED) {
+                Disable();
+
+                currentTemplate = new CellTemplate();
+                currentTemplate.cellOcc = cellType;
+
+                return null;
+            }
+
             cellGameObject = CellPooling.GetCell();
 
             SpriteRenderer sprR = cellGameObject.GetComponent<SpriteRenderer>();
@@ -65,6 +91,11 @@ public class CellHolder {
             if (Grid.cellParent != null) { 
                 cellGameObject.transform.parent = Grid.cellParent.transform;
             }
+
+            // current cell template
+            currentTemplate = new CellTemplate();
+            currentTemplate.cellOcc = cellType;
+            currentTemplate.cellPosition = new Vector2(worldPos[0], worldPos[1]);
 
             // Set cell type both for animation and data storage purposes
             cell = cellGameObject.GetComponent<Cell>();
@@ -83,21 +114,14 @@ public class CellHolder {
 
         return cell;
     }
-    
-    /// <summary>
-    /// Stores the current cell's template
-    /// </summary>
-    private void StoreCurrentCellInTemplate() {
-        // If we have a cell
-        if (cell != null) {
-            prevCellTemplate = cell.GetCellTemplate();
-        }
-    }
 
+    /// <summary>
+    /// Both in current and previous cell template
+    /// </summary>
     public void StoreTemplate(Cell.CellOcc type, Vector2 position) {
-        prevCellTemplate = new CellTemplate();
-        prevCellTemplate.cellOcc = type;
-        prevCellTemplate.cellPosition = position;
+        currentTemplate = new CellTemplate();
+        currentTemplate.cellOcc = type;
+        currentTemplate.cellPosition = position;
     }
     
     /// <summary>
@@ -105,8 +129,6 @@ public class CellHolder {
     /// </summary>
     public void RemoveCurrentCell() {
         if (cell) {
-            StoreCurrentCellInTemplate();
-
             cell.ResetAnimator();
             CellPooling.StoreObject(cellGameObject);
             cell = null;
@@ -126,11 +148,14 @@ public class CellHolder {
     /// </summary>
     public void ReInitCell() {
         // We have a template
-        if (prevCellTemplate != null) {
-            NewCell(prevCellTemplate.cellOcc, false);
-            cell.cellType = prevCellTemplate.cellOcc;
-            cellGameObject.transform.position = GetRandomPosBasedOnWorldPos();
-            cellGameObject.transform.eulerAngles = GetRandomAngles();
+        if (currentTemplate != null) {
+            NewCell(currentTemplate.cellOcc, false);
+            if (cell != null) { // may not have body
+                cell.cellType = currentTemplate.cellOcc;
+                
+                cellGameObject.transform.position = GetRandomPosBasedOnWorldPos();
+                cellGameObject.transform.eulerAngles = GetRandomAngles();
+            }
         }
     }
 

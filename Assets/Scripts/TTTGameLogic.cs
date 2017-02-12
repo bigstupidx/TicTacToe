@@ -229,15 +229,77 @@ public class TTTGameLogic : MonoBehaviour {
             return winLine;
         }
 
+        /// <summary>
+        /// Returns the position of cellhodlers which are holes in the game and need to be filled
+        /// Example:
+        /// XXXXX
+        /// XDDDX
+        /// XXXXX
+        /// </summary>
+        /// <returns></returns>
+        public List<int[]> GetFillableHoles() {
+            // we calculate the min and max position of a filled cell in the rows and cols
+            // Then we go through the cells and see if it is between those and there is no mark there
+            // if that is true we know that it is a hole so we add it to the list
+
+            List<int[]> holes = new List<int[]>();
+
+            // in these we store what is the min and max position of a filled cell in the rows and cols
+            int[,] minMaxCols = new int[table.GetLength(0), 2];
+            int[,] minMaxRows = new int[table.GetLength(1), 2];
+
+            // Calculate cols
+            for (int i = 0; i < table.GetLength(0); i++) {
+                int min = int.MaxValue;
+                int max = int.MinValue;
+
+                for (int k = 0; k < table.GetLength(1); k++) {
+                    if (table[i, k]) {
+                        if (min > k) min = k;
+                        if (max < k) max = k;
+                    }
+                }
+
+                minMaxCols[i, 0] = min;
+                minMaxCols[i, 1] = max;
+            }
+
+            // Calculate rows
+            for (int k = 0; k < table.GetLength(1); k++) {
+                int min = int.MaxValue;
+                int max = int.MinValue;
+
+                for (int i = 0; i < table.GetLength(0); i++) {
+                    if (table[i, k]) {
+                        if (min > i) min = i;
+                        if (max < i) max = i;
+                    }
+                }
+
+                minMaxRows[k, 0] = min;
+                minMaxRows[k, 1] = max;
+            }
+
+            // Go through the table
+            for (int i = 0; i < table.GetLength(0); i++) {
+                for (int k = 0; k < table.GetLength(1); k++) {
+                    if (!table[i, k] && k > minMaxCols[i, 0] && k < minMaxCols[i, 1] && i > minMaxRows[k, 0] && i < minMaxRows[k, 1]) {
+                        holes.Add(new int[] { i + startPos[0], k + startPos[1] });
+                    }
+                }
+            }
+
+            return holes;
+        }
+
         public int[,] GetShapePoints() {
             //if (table == null || startPos == null) return null;
 
             List<Line> border = new List<Line>();
             BorderedCell[,] cells = new BorderedCell[table.GetLength(0) + 2, table.GetLength(1) + 2];
             for (int i = 0; i < cells.GetLength(0); i++)
-                for (int k = 0; k < cells.GetLength(1); k++) {
+                for (int k = 0; k < cells.GetLength(1); k++)
                     cells[i, k] = new BorderedCell(new int[] { i - 1 + startPos[0], k - 1 + startPos[1] });
-                }
 
             // Calculating where the border should be
             for (int k = 0; k < table.GetLength(1); k++) {

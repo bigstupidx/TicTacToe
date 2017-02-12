@@ -6,18 +6,19 @@ public class CellPooling : MonoBehaviour {
     private const string CELL_PREFAB_PATH = "Prefabs/Cell";
     private static GameObject cellPrefab;
 
-    private static Stack<GameObject> pool = new Stack<GameObject>();
+    private static Stack<GameObject> pool;
 
     private static GameObject parentObject;
 
     void Start() {
+        pool = new Stack<GameObject>();
         LoadResources();
 
         parentObject = gameObject;
     }
 
     private void LoadResources() {
-        cellPrefab = Resources.Load(CELL_PREFAB_PATH) as GameObject;
+        cellPrefab = Resources.Load<GameObject>(CELL_PREFAB_PATH);
     }
 
     void OnApplicationPause(bool paused) {

@@ -113,8 +113,7 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
 
         // Set perferences
         preferences.SetEmojiInSlotTo(currentSlot, currentlyEnabled.transform.parent.name);
-
-        //TODO scroll there in drawer
+        
         DOTween.To(() => scrollRect.verticalNormalizedPosition, (float value) => scrollRect.verticalNormalizedPosition = value, 1 - (Mathf.Abs(currentlyEnabled.transform.parent.gameObject.GetComponent<RectTransform>().anchoredPosition.y) / realHeight), 0.2f);
     }
 

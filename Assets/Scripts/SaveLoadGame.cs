@@ -12,7 +12,8 @@ public class SaveLoadGame : MonoBehaviour {
         if (!System.IO.File.Exists(Border.FILE_PATH))
             System.IO.File.Create(Border.FILE_PATH).Dispose();
 
-        ReadEverything();
+        StartCoroutine("ReadEverything");
+        // ReadEverything();
 	}
 
     void OnApplicationPause(bool pause) {

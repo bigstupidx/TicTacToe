@@ -57,7 +57,7 @@ public class PopupManager : MonoBehaviour {
 
             // Set event of popup button
             popupInstanceButton.onClick.AddListener(() => {
-                popupInstance.transform.DOMoveY(Camera.main.pixelHeight + popupInstanceImage.rectTransform.rect.height / 2f, timePerHalfScreen).OnComplete(() => {
+                popupInstanceImage.rectTransform.DOScale(0, 0.2f).OnComplete(() => {
                     popupOut = true;
                 });
                 popupInstanceButton.enabled = false;
@@ -68,7 +68,7 @@ public class PopupManager : MonoBehaviour {
         popupInstanceButton.enabled = true;
 
         // Set starting position of popup
-        popupInstance.transform.position = new Vector2(Camera.main.pixelWidth / 2f, -popupInstanceImage.rectTransform.rect.height / 2f);
+        popupInstance.transform.position = new Vector2(Camera.main.pixelWidth / 2f, Camera.main.pixelHeight / 2f);
         
         // Set text for button
         popupInstanceButton.transform.GetChild(0).GetComponent<Text>().text = buttonText;
@@ -79,7 +79,8 @@ public class PopupManager : MonoBehaviour {
         popupInstance.SetActive(true);
 
         // Start animation
-        popupInstance.transform.DOMoveY(Camera.main.pixelHeight / 2f, timePerHalfScreen);
+        popupInstanceImage.rectTransform.localScale = new Vector3();
+        popupInstanceImage.rectTransform.DOScale(1f, 0.2f).SetEase(Ease.OutBack);
     }
 
     /// <summary>

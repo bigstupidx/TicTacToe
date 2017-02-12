@@ -51,6 +51,7 @@ public class Partion {
         // If we want to create it disabled dont make an object at first just store a celltemplate
         if (disabled) {
             cells[pos[0], pos[1]].StoreTemplate(cellType, cells[pos[0], pos[1]].GetRandomPosBasedOnWorldPos());
+            cells[pos[0], pos[1]].Disable();
             return true;
         }
 
@@ -72,6 +73,19 @@ public class Partion {
     /// <returns></returns>
     public CellHolder GetCellHolderAt(int[] pos) {
         return cells[pos[0], pos[1]];
+    }
+
+    /// <summary>
+    /// Returns all cellholder which has signs in this partion
+    /// </summary>
+    /// <returns></returns>
+    public CellHolder[] GetAllCellsWhichHaveSigns() {
+        CellHolder[] holder = new CellHolder[hasSign.Count];
+
+        for (int i = 0; i < hasSign.Count; i++)
+            holder[i] = cells[hasSign[i][0], hasSign[i][1]];
+
+        return holder;
     }
     
     /// <summary>

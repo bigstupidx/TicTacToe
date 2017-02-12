@@ -24,14 +24,16 @@ public class Cell : MonoBehaviour {
     /// Triggers idle for this cell
     /// </summary>
     public void TriggerIdle() {
-        animator.SetTrigger("Idle" + cellOcc.ToString());
+        if (animator != null)
+            animator.SetTrigger("Idle" + cellOcc.ToString());
     }
 
     /// <summary>
     /// Triggers draw in animator
     /// </summary>
     public void TriggerDraw() {
-        animator.SetTrigger("Draw" + cellOcc.ToString());
+        if (animator != null)
+            animator.SetTrigger("Draw" + cellOcc.ToString());
     }
 
     /// <summary>
@@ -45,7 +47,10 @@ public class Cell : MonoBehaviour {
     public CellTemplate GetCellTemplate() {
         CellTemplate template = new CellTemplate();
         template.cellOcc = cellType;
-        template.cellPosition = transform.position;
+
+        // If it is blocked there is no gameobject
+        if (cellType != CellOcc.BLOCKED)
+            template.cellPosition = transform.position;
 
         return template;
     }
@@ -54,7 +59,9 @@ public class Cell : MonoBehaviour {
     public void UpdateAttributes(CellTemplate cellTemplate) {
         cellType = cellTemplate.cellOcc;
 
-        transform.position = cellTemplate.cellPosition;
+        // If it is blocked there is no gameobject
+        if (cellType != CellOcc.BLOCKED)
+            transform.position = cellTemplate.cellPosition;
     }
 
     public enum CellOcc {

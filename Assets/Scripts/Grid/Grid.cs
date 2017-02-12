@@ -41,9 +41,6 @@ public class Grid : MonoBehaviour {
     protected Dictionary<int[], Partion> partions = new Dictionary<int[], Partion>(new IntegerArrayComparer());
     protected List<int[]> shownPartions = new List<int[]>();
 
-    // Stores the signs which will be stored in the file
-    protected List<SignStoreInFile> fileList = new List<SignStoreInFile>();
-
     // Last sign marker
     private LastPlacedMarkerScript lastPlacedMarker;
 
@@ -70,6 +67,10 @@ public class Grid : MonoBehaviour {
     }
 
     /// <summary>
+    /// How many lines of data one coroutine should process
+    /// </summary>
+    private int dataProcessCount = 500;
+    /// <summary>
     /// Load borders and signs from file
     /// </summary>
     public virtual void LoadFromFile() {
@@ -79,21 +80,32 @@ public class Grid : MonoBehaviour {
 
             int count = int.Parse(lines[0]);
 
-            string[] line;
-            for (int i = 1; i <= count; i++) {
-                line = lines[i].Split(' ');
+            int coroutineCount = Mathf.CeilToInt(lines.Length / (float) dataProcessCount);
+            for (int i = 0; i < coroutineCount; i++) {
+                int arrayLength = i == coroutineCount - 1 ? lines.Length - 1 - (coroutineCount - 1) * dataProcessCount : dataProcessCount;
 
-                SignStoreInFile data = new SignStoreInFile(int.Parse(line[0]), int.Parse(line[1]), line[2]);
-                fileList.Add(data);
+                string[] lineTemp = new string[arrayLength];
+                Array.Copy(lines, 1 + i * dataProcessCount, lineTemp, 0, arrayLength);
+
+                StartCoroutine("ProcessLoadedData", lineTemp);
             }
         } catch (Exception e) {
-            Debug.LogError(e.Message);
+            Debug.LogError(e.Message + " " + e.Source + " " + e.StackTrace);
         }
+    }
 
+    /// <summary>
+    /// Processes lines of loaded data and the places the signs.
+    /// It is called ad a coroutine from LoadFromFile().
+    /// </summary>
+    private void ProcessLoadedData(string[] lines) {
+        string[] line;
         int[] pos = new int[2];
-        foreach (SignStoreInFile data in fileList) {
-            pos[0] = data.x; pos[1] = data.y;
-            PlaceSign(pos, (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), data.type), true);
+        for (int i = 0; i < lines.Length; i++) {
+            line = lines[i].Split(' ');
+
+            pos[0] = int.Parse(line[0]); pos[1] = int.Parse(line[1]);
+            PlaceSign(pos, (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), line[2]), true);
         }
     }
 
@@ -101,14 +113,23 @@ public class Grid : MonoBehaviour {
     /// Write borders and signs to file
     /// </summary>
     public virtual void WriteToFile() {
-        string[] lines = new string[fileList.Count + 1];
-        lines[0] = fileList.Count.ToString();
-        for (int i = 0; i < fileList.Count; i++) {
-            lines[i + 1] = fileList[i].x + " " + fileList[i].y + " " + fileList[i].type;
+        List<string> allLines = new List<string>();
+        int count = 0;
+
+        foreach (Partion partion in partions.Values) { 
+            foreach (CellHolder holder in partion.GetAllCellsWhichHaveSigns()) { 
+                if (holder.IsDisabled) { // Only write sign which are in game
+                    allLines.Add(holder.WorldPos[0] + " " + holder.WorldPos[1] + " " + holder.CurrentTemplate.cellOcc.ToString());
+                    count++;
+                }
+            }
         }
 
+        // add how many signs there are
+        allLines.Insert(0, count.ToString());
+
         try {
-            System.IO.File.WriteAllLines(FILE_PATH, lines);
+            System.IO.File.WriteAllLines(FILE_PATH, allLines.ToArray());
         } catch (Exception e) {
             Debug.LogError(e.StackTrace);
         }
@@ -174,6 +195,9 @@ public class Grid : MonoBehaviour {
         return true;
     }
 
+    /// <summary>
+    /// Brings back camera to last placed sign
+    /// </summary>
     public virtual void SetCameraToPreviousSign() {
         if (previousGridPos != null)
             Camera.main.transform.DOMove(new Vector3(previousGridPos[0], previousGridPos[1], Camera.main.transform.position.z), 1f, false);
@@ -220,9 +244,7 @@ public class Grid : MonoBehaviour {
         // Show partions which are visible
         for (int i = leftBottomPart[0]; i <= topRightPart[0]; i++) {
             for (int k = leftBottomPart[1]; k <= topRightPart[1]; k++) {
-                int[] temp = new int[2];
-                temp[0] = i;
-                temp[1] = k;
+                int[] temp = new int[] { i, k };
 
                 Partion p;
                 partions.TryGetValue(temp, out p);
@@ -235,6 +257,11 @@ public class Grid : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Returns the position of camera's viewport's lefbottom and topright position
+    /// </summary>
+    /// <param name="leftBottomPart"></param>
+    /// <param name="topRightPart"></param>
     protected void GetCameraCoords(out int[] leftBottomPart, out int[] topRightPart) {
         Vector2 cameraPos = Camera.main.transform.position;
 
@@ -311,7 +338,8 @@ public class Grid : MonoBehaviour {
     public bool CanPlaceAt(int[] gridPos) {
         // Game has not started, explained in GameLogic
         if (!gameLogic.GameSarted) {
-            return true;
+            CellHolder ch = GetCellHolderAtGridPos(gridPos);
+            return ch == null || !ch.IsDisabled;
         }
 
         CellHolder[] holders = GetAllNeighbourCellHolders(gridPos);
@@ -332,13 +360,14 @@ public class Grid : MonoBehaviour {
         // We need to start a bejaras from the last placed sign's pos, which we happen to store in previousGridPos
         // Then set all of the found sign's cellholder to disabled
 
-        // Disable it
+        // Disable marker
         lastPlacedMarker.Disable();
 
         // Ended game so reset the amount of cells in game
         numberOfSignsInGame = 0;
 
         // Store all of the cellholders which have signs in game
+
         List<CellHolder> listOfCells = new List<CellHolder>();
         listOfCells.Add(GetCellHolderAtGridPos(previousGridPos));
 
@@ -360,6 +389,7 @@ public class Grid : MonoBehaviour {
             if (currCH.WorldPos[1] < min[1]) min[1] = currCH.WorldPos[1];
             if (currCH.WorldPos[1] > max[1]) max[1] = currCH.WorldPos[1];
 
+            // Disable cell
             currCH.Disable();
 
             // Get all af nthe neighbours af current cell
@@ -377,14 +407,23 @@ public class Grid : MonoBehaviour {
 
         wonData.table = new bool[Mathf.Abs(max[0] - min[0] + 1), Mathf.Abs(max[1] - min[1] + 1)];
 
-        // Fill the thingy with true. Thingy defined in WonData class
+        // Fill the thingy with true where there is a cell. Thingy defined in WonData class
         foreach (CellHolder ch in listOfCells) {
             wonData.table[ch.WorldPos[0] - min[0], ch.WorldPos[1] - min[1]] = true;
-
-            // Store it in list which wil write it to file
-            fileList.Add(new SignStoreInFile(ch.WorldPos[0], ch.WorldPos[1], ch.Cell.cellType.ToString()));
         }
         wonData.startPos = min;
+
+        // Now we can fill the holes
+        List<int[]> holes = wonData.GetFillableHoles();
+        foreach (int[] pos in holes) {
+            // Get the partion the cell is in (we surely have this one, because holes are between signs
+            int[] partionPos = Partion.GetPartionPosOfCell(pos);
+            Partion p;
+            partions.TryGetValue(partionPos, out p);
+
+            // Place new BLOCKED cell in partion at pos
+            p.PlaceSign(Partion.GetLocalPosOfCell(pos), Cell.CellOcc.BLOCKED, true);
+        }
 
         return wonData;
     }
@@ -398,7 +437,7 @@ public class Grid : MonoBehaviour {
     /// <returns>Returns BLOCKED when no one won yet</returns>
     public TTTGameLogic.GameWonData DidWinGame(int[] gridPos) {
         CellHolder currCellHolder = GetCellHolderAtGridPos(gridPos);
-        Cell.CellOcc currCellType = currCellHolder.Cell.cellType;
+        Cell.CellOcc currCellType = currCellHolder.CurrentTemplate.cellOcc;
 
         // Used for return data
         TTTGameLogic.GameWonData gameWonData = new TTTGameLogic.GameWonData();
@@ -420,7 +459,7 @@ public class Grid : MonoBehaviour {
                         // OR  ch is not full  
                         // OR  ch is disabled  
                         // OR  cell type is not the one we have in this cell
-                        if (!(ch != null && ch.IsFull() && !ch.IsDisabled && ch.Cell.cellType == currCellType)) {
+                        if (!(ch != null && ch.IsFull() && !ch.IsDisabled && ch.CurrentTemplate.cellOcc == currCellType)) {
                             break;
                         }
 
@@ -436,7 +475,7 @@ public class Grid : MonoBehaviour {
                         // OR  ch is not full  
                         // OR  ch is disabled  
                         // OR  cell type is not the one we have in this cell
-                        if (!(ch != null && ch.IsFull() && !ch.IsDisabled && ch.Cell.cellType == currCellType)) {
+                        if (!(ch != null && ch.IsFull() && !ch.IsDisabled && ch.CurrentTemplate.cellOcc == currCellType)) {
                             break;
                         }
 
