@@ -7,7 +7,7 @@ public class AIScript : MonoBehaviour {
     public static Cell.CellOcc AIType = Cell.CellOcc.X;
     public static Cell.CellOcc HumanType = Cell.CellOcc.O;
     [HideInInspector]
-    private int DIFFICULTY = 5;
+    private int DIFFICULTY = 2;
 
     private Grid grid;
 
@@ -38,7 +38,7 @@ public class AIScript : MonoBehaviour {
     /// </summary>
     private IntVector2 topRightPosOfField;
 
-    void Start () {
+    void Start() {
         grid = GetComponent<Grid>();
         pointsInGame = new List<IntVector2>();
         Reset();
@@ -46,7 +46,7 @@ public class AIScript : MonoBehaviour {
         // subscribe to events
         grid.SignWasPlaced += SignWasAdded;
         grid.SignWasRemoved += SignWasRemoved;
-	}
+    }
 
     /// <summary>
     /// Called from grid in event when a sign was removed
@@ -160,8 +160,7 @@ public class AIScript : MonoBehaviour {
         for (int i = 0; i < checkDirections.GetLength(0); i++) {
             int count = 1;
             IntVector2 endOne = new IntVector2(where), endTwo = new IntVector2(where);
-            IntVector2 blockOne = null, blockTwo = null;
-            
+
             // Go through the checkdirection direction
             for (int j = 1; j < Grid.WIN_CONDITION; j++) {
                 int examineX = where.x + checkDirections[i, 0] * j;
@@ -169,14 +168,15 @@ public class AIScript : MonoBehaviour {
 
                 // We are in bounds
                 if (examineX >= 0 && examineX < field.GetLength(0) && examineY >= 0 && examineY < field.GetLength(1)) {
+                    // Update blocks
+                    if (j == 1)
+                        foreach (SignInARow signInARow in field[examineX, examineY].signsInARow)
+                            signInARow.UpdatePoints();
+
                     // It is the same sign
                     if (field[examineX, examineY].type == currentType) {
                         count++;
                         endOne = new IntVector2(examineX, examineY);
-                    } else if(field[examineX, examineY].type == SignResourceStorage.GetOppositeOfSign(field[examineX, examineY].type)) { 
-                        // There is a block at the end
-                        blockOne = new IntVector2(examineX, examineY);
-                        break;
                     } else {
                         break;
                     }
@@ -192,14 +192,15 @@ public class AIScript : MonoBehaviour {
 
                 // We are in bounds
                 if (examineX >= 0 && examineX < field.GetLength(0) && examineY >= 0 && examineY < field.GetLength(1)) {
+                    // Update blocks
+                    if (j == 1)
+                        foreach (SignInARow signInARow in field[examineX, examineY].signsInARow)
+                            signInARow.UpdatePoints();
+
                     // It is the same sign
                     if (field[examineX, examineY].type == currentType) {
                         count++;
                         endTwo = new IntVector2(examineX, examineY);
-                    } else if (field[examineX, examineY].type == SignResourceStorage.GetOppositeOfSign(field[examineX, examineY].type)) { 
-                        // There is a block at the end
-                        blockTwo = new IntVector2(examineX, examineY);
-                        break;
                     } else {
                         break;
                     }
@@ -208,21 +209,23 @@ public class AIScript : MonoBehaviour {
 
             if (count < 2) continue;
             // Now we have the endpoints of this checkdirection in endpoint one and endpoint two
-            // We also have if there are blocks at the end if there is not then the block variables are null
             SignInARow signsInARow = new SignInARow(endOne, endTwo, currentType);
-            if (blockOne != null) signsInARow.SetEndBlock(blockOne);
-            if (blockTwo != null) signsInARow.SetEndBlock(blockTwo);
+            IntVector2 block1 = signsInARow.From - signsInARow.Steepness; IntVector2 block2 = signsInARow.To + signsInARow.Steepness;
+            signsInARow.SetEndBlock(field[block1.x, block1.y], field[block2.x, block2.y]);
+            signsInARow.UpdatePoints();
 
-            SignInARow removedSignInARow = null;
-            field[where.x, where.y].AddSignInARow(signsInARow, out removedSignInARow);
+            for (int j = signsInARow.From.x, k = signsInARow.From.y; j <= signsInARow.To.x && k <= signsInARow.To.y; j += signsInARow.Steepness.x, k += signsInARow.Steepness.y) {
+                SignInARow removedSignInARow = null;
+                field[j, k].AddSignInARow(signsInARow, out removedSignInARow);
 
-            _placed.Add(new PlaceData(new IntVector2(where), signsInARow));
-            if (removedSignInARow != null) _removed.Add(new PlaceData(new IntVector2(where), removedSignInARow));
+                _placed.Add(new PlaceData(new IntVector2(j, k), signsInARow));
+                if (removedSignInARow != null) _removed.Add(new PlaceData(new IntVector2(j, k), removedSignInARow));
+            }
         }
 
         placed = _placed; removed = _removed;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -232,7 +235,7 @@ public class AIScript : MonoBehaviour {
     private EvaluationResult EvaluateField(EvaluationField[,] field, Cell.CellOcc whoseTurn, int deepCount, List<IntVector2> pointsInGame, float alpha, float beta) {
         EvaluationResult result = new EvaluationResult(whoseTurn == HumanType ? int.MaxValue : int.MinValue, new IntVector2());
 
-        if (deepCount == DIFFICULTY) { 
+        if (deepCount == DIFFICULTY) {
             result.points = GetPointsFromSignsInARow(field, pointsInGame);
         } else {
             List<IntVector2> been = new List<IntVector2>();
@@ -242,13 +245,15 @@ public class AIScript : MonoBehaviour {
 
             // Go through the places where we can place
             // Call NewSignPlaced with field and position where we want to place
-            for (int j = 0; j < pointsInGameLength && !alphaBetaEnd; j++) { 
+            for (int j = 0; j < pointsInGameLength && !alphaBetaEnd; j++) {
                 // In each direction
                 for (int i = -1; i <= 1 && !alphaBetaEnd; i++) {
                     for (int k = -1; k <= 1 && !alphaBetaEnd; k++) {
                         // Not 0 0 and in bounds
                         if (!(i == 0 && k == 0) && pointsInGame[j].x + i >= 0 && pointsInGame[j].x + i < field.GetLength(0) && pointsInGame[j].y + k >= 0 && pointsInGame[j].y + k < field.GetLength(1)) {
                             IntVector2 pos = new IntVector2(pointsInGame[j].x + i, pointsInGame[j].y + k);
+
+                            Debug.Log("Examining with deepnes " + deepCount + "   -   " + pos.x + " " + pos.y);
 
                             // if we haven't checked this position and the type of cell we are examining is NONE, so empty
                             if (!been.Contains(pos) && field[pos.x, pos.y].type == Cell.CellOcc.NONE) {
@@ -257,7 +262,7 @@ public class AIScript : MonoBehaviour {
                                 // Data so we can revert the field back (because recursive algorithm)
                                 List<PlaceData> placed;
                                 List<PlaceData> removed;
-                                
+
                                 // Set the examined cell to the current's sign
                                 field[pos.x, pos.y].type = whoseTurn;
                                 // Place that sign and while that's happening determine signsinarow
@@ -269,7 +274,7 @@ public class AIScript : MonoBehaviour {
 
                                 // If it is human's turn we search for min value - MINIMIZER
                                 if (whoseTurn == HumanType) {
-                                    if (result.points > evalResult.points) { 
+                                    if (result.points > evalResult.points) {
                                         result.points = evalResult.points;
                                         result.fieldPos = new IntVector2(pos);
                                     }
@@ -285,7 +290,7 @@ public class AIScript : MonoBehaviour {
                                 }
                                 // Otherwise if it is AI's turn we search for the max points - MAXIMIZER
                                 else if (whoseTurn == AIType) {
-                                    if (result.points < evalResult.points) { 
+                                    if (result.points < evalResult.points) {
                                         result.points = evalResult.points;
                                         result.fieldPos = new IntVector2(pos);
                                     }
@@ -390,7 +395,15 @@ internal class EvaluationField {
                 break;
             }
         }
-        
+
+        signsInARow.Add(inARow);
+    }
+
+    /// <summary>
+    /// Used for when we know which signInARow to remove (the remove parameter)
+    /// </summary>
+    public void AddSignInARow(SignInARow inARow, SignInARow remove) {
+        signsInARow.Remove(remove);
         signsInARow.Add(inARow);
     }
 }
@@ -420,6 +433,10 @@ internal class IntVector2 : IEquatable<IntVector2> {
 
     public static IntVector2 operator +(IntVector2 vect, int number) {
         return new IntVector2(vect.x + number, vect.y + number);
+    }
+
+    public static IntVector2 operator -(IntVector2 vect1, IntVector2 vect2) {
+        return new IntVector2(vect1.x - vect2.x, vect1.y - vect2.y);
     }
 
     public static IntVector2 operator /(IntVector2 vect, int number) {
@@ -489,7 +506,8 @@ internal class SignInARow : IEquatable<SignInARow> {
     private IntVector2 steepness;
     public IntVector2 Steepness { get { return steepness; } }
 
-    private IntVector2[] blocksAtEnd = new IntVector2[2];
+    private EvaluationField blockOne;
+    private EvaluationField blockTwo;
 
     private float points;
     public float PointsWorth { get { return points; } }
@@ -507,17 +525,15 @@ internal class SignInARow : IEquatable<SignInARow> {
     /// <summary>
     /// If you set it a third time it will rewrite the second one and so on
     /// </summary>
-    public void SetEndBlock(IntVector2 pos) {
-        int at = 0;
-        if (blocksAtEnd[0] != null)
-            at++;
-
-        blocksAtEnd[at] = new IntVector2(pos);
+    public void SetEndBlock(EvaluationField blockOne, EvaluationField blockTwo) {
+        this.blockOne = blockOne;
+        this.blockTwo = blockTwo;
     }
 
     public int BlockCount() {
-        if (blocksAtEnd[0] != null && blocksAtEnd[1] != null) return 2;
-        else if (blocksAtEnd[0] != null) return 1;
+        Cell.CellOcc oppType = SignResourceStorage.GetOppositeOfSign(type);
+        if (blockOne.type == oppType && blockTwo.type == oppType) return 2;
+        else if (blockOne.type == oppType || blockTwo.type == oppType) return 1;
         else return 0;
     }
 
@@ -555,10 +571,14 @@ internal class SignInARow : IEquatable<SignInARow> {
         UpdatePoints(type);
     }
 
-    private void UpdatePoints(Cell.CellOcc type) {
+    public void UpdatePoints(Cell.CellOcc type) {
         length = Mathf.Max(to.x - from.x, to.y - from.y);
 
         points = (2 - BlockCount()) * GetLengthMultiplier(length) * Mathf.Pow(length, 3) * (type == AIScript.AIType ? 1 : -1);
+    }
+
+    public void UpdatePoints() {
+        UpdatePoints(type);
     }
 
     private float GetLengthMultiplier(int length) {
