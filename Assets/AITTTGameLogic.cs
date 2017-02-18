@@ -22,6 +22,14 @@ public class AITTTGameLogic : TTTGameLogic {
         }
     }
 
+    public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {
+        base.NextTurn(gridPos, out won);
+
+        if (won != Cell.CellOcc.BLOCKED && whoseTurn == AIScript.AIType) {
+            AIsTurn();
+        }
+    }
+
     void Update() {
         if (aiThread != null && !aiThread.IsAlive && aiPlacePos != null) {
             WantToPlaceAt(new Vector2(aiPlacePos[0], aiPlacePos[1]));
@@ -37,7 +45,9 @@ public class AITTTGameLogic : TTTGameLogic {
     }
 
     public override void StartNewGame(int[] gridPos) {
-        if (!gameStarted) aiScript.Reset();
+        if (!gameStarted) {
+            aiScript.Reset();
+        }
 
         base.StartNewGame(gridPos);
     }
