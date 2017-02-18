@@ -65,16 +65,4 @@ public class SignResourceStorage : MonoBehaviour {
         oColor = oColorNew;
     }
 
-    /// <summary>
-    /// Returns: X -> O ; O -> X ; other -> NONE
-    /// </summary>
-    /// <param name="cellType"></param>
-    /// <returns></returns>
-    public static Cell.CellOcc GetOppositeOfSign(Cell.CellOcc cellType) {
-        if (cellType == Cell.CellOcc.X) return Cell.CellOcc.O;
-        else if (cellType == Cell.CellOcc.O) return Cell.CellOcc.X;
-
-        return Cell.CellOcc.NONE;
-    }
-
 }

@@ -50,8 +50,6 @@ public class TTTGameLogic : MonoBehaviour {
                 Cell.CellOcc b;
                 NextTurn(gridPos, out b);
             }
-        } else {
-            Debug.Log("Sign couldn't be placed at " + clickPos.x + " " + clickPos.y);
         }
     }
     
@@ -94,7 +92,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// <summary>
     /// Sets the previous person (whoseturn)
     /// </summary>
-    public virtual void PreviousPerson() {
+    protected void PreviousPerson() {
         if (whoseTurn == Cell.CellOcc.X) whoseTurn = Cell.CellOcc.O;
         else whoseTurn = Cell.CellOcc.X;
     }
@@ -102,7 +100,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// <summary>
     /// Sets the next person (whoseturn)
     /// </summary>
-    public virtual void NextPerson() {
+    protected void NextPerson() {
         if (whoseTurn == Cell.CellOcc.X) whoseTurn = Cell.CellOcc.O;
         else whoseTurn = Cell.CellOcc.X;
     }
