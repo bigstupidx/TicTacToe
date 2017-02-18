@@ -29,8 +29,8 @@ public class ScoringScript : MonoBehaviour {
         string s;
         // We need to refresh o
         if (currentX == x) {
-            txt = oText;
             s = o.ToString();
+            txt = oText;
             currentO = o;
         } else { // we need to refresh x
             s = x.ToString();

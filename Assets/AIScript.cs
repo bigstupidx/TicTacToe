@@ -212,7 +212,6 @@ public class AIScript : MonoBehaviour {
             SignInARow signsInARow = new SignInARow(endOne, endTwo, currentType);
             if (blockOne != null) signsInARow.SetEndBlock(blockOne);
             if (blockTwo != null) signsInARow.SetEndBlock(blockTwo);
-            signsInARow.UpdatePoints();
 
             SignInARow removedSignInARow = null;
             field[where.x, where.y].AddSignInARow(signsInARow, out removedSignInARow);
@@ -394,16 +393,6 @@ internal class EvaluationField {
         
         signsInARow.Add(inARow);
     }
-
-    /// <summary>
-    /// Used for when we know which signInARow to remove
-    /// </summary>
-    /// <param name="inARow"></param>
-    /// <param name="remove"></param>
-    public void AddSignInARow(SignInARow inARow, SignInARow remove) {
-        signsInARow.Remove(remove);
-        signsInARow.Add(inARow);
-    }
 }
 
 internal class IntVector2 : IEquatable<IntVector2> {
@@ -566,14 +555,10 @@ internal class SignInARow : IEquatable<SignInARow> {
         UpdatePoints(type);
     }
 
-    public void UpdatePoints(Cell.CellOcc type) {
+    private void UpdatePoints(Cell.CellOcc type) {
         length = Mathf.Max(to.x - from.x, to.y - from.y);
 
         points = (2 - BlockCount()) * GetLengthMultiplier(length) * Mathf.Pow(length, 3) * (type == AIScript.AIType ? 1 : -1);
-    }
-
-    public void UpdatePoints() {
-        UpdatePoints(type);
     }
 
     private float GetLengthMultiplier(int length) {
