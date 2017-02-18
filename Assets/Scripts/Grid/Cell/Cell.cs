@@ -65,9 +65,9 @@ public class Cell : MonoBehaviour {
     }
 
     public enum CellOcc {
-        X,
-        O,
-        BLOCKED,
+        X = 1,
+        O = 2,
+        BLOCKED = 3,
         NONE = 0
     }
 }

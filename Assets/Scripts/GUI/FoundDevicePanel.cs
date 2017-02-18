@@ -27,12 +27,6 @@ public class FoundDevicePanel : MonoBehaviour {
 
         imageTrigger = GetComponent<EventTrigger>();
         panel = GetComponent<Image>();
-        
-        // Dark mode
-        if (preferences.currentMode == PreferencesScript.ColorMode.DARK) {
-            nameText.color = darkModeColor;
-            transform.GetChild(1).GetComponent<Image>().color = darkModeColor;
-        }
     }
     
 	public void SetNameAndMac(string name, string mac, string connectionAddress) {
@@ -55,6 +49,12 @@ public class FoundDevicePanel : MonoBehaviour {
                 .Insert(clickAnimDuration / 2f, panel.DOFade(10f / 255f, clickAnimDuration / 2f));
         });
         imageTrigger.triggers.Add(entry);
+
+        // Dark mode
+        if (preferences.currentMode == PreferencesScript.ColorMode.DARK) {
+            nameText.color = darkModeColor;
+            transform.GetChild(1).GetComponent<Image>().color = darkModeColor;
+        }
     }
 
     public void DestroyIt() {
