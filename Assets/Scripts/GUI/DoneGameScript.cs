@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using DG.Tweening;
 using System.Collections;
 
 public class DoneGameScript : MonoBehaviour {
@@ -34,7 +33,6 @@ public class DoneGameScript : MonoBehaviour {
 
     public void ChangeToColorMode(PreferencesScript.ColorMode colorMode, float time) {
         StartCoroutine(UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time, Random.Range(0f, 0.5f)));
-        //UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time);
         UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
     }
 
@@ -67,6 +65,10 @@ public class DoneGameScript : MonoBehaviour {
     /// </summary>
     /// <param name="borderColor"></param>
     public void UpdateBordercolor(Color borderColor) {
-        transform.FindChild("Border").GetComponent<LineRenderer>().material.SetColor("_EmissionColor", borderColor);
+        GameObject child = transform.FindChild("Border").gameObject;
+        LineRenderer lr = child.GetComponent<LineRenderer>();
+        Material mat = lr.material;
+        mat.SetColor("_EmissionColor", borderColor);
+        // transform.FindChild("Border").GetComponent<LineRenderer>().material.SetColor("_EmissionColor", borderColor);
     }
 }

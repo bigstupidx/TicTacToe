@@ -4,7 +4,7 @@ using DG.Tweening;
 public class GridLightDarkMode : MonoBehaviour {
 
     public Color lightModeColor = new Color(0.88627f, 0.88627f, 0.88627f);
-    public Color darkModeColor = new Color(0.25882f, 0.25882f, 0.25882f);
+    public Color darkModeColor = new Color(0.12941f, 0.12941f, 0.12941f);
 
     void Start() {
         PreferencesScript.ColorChangeEvent += ToMode;

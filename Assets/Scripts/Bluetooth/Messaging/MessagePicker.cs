@@ -21,7 +21,6 @@ public class MessagePicker : MonoBehaviour {
     Vector3 dragEnd = new Vector3();
 
     private LineRenderer lineRenderer;
-    private RectTransform rectTransform;
     private Image fullPanelImage;
     
     /// <summary>
@@ -38,7 +37,6 @@ public class MessagePicker : MonoBehaviour {
 
     void Start() {
         lineRenderer = GetComponent<LineRenderer>();
-        rectTransform = GetComponent<RectTransform>();
 
         fullPanelImage = GameObject.Find("FullPanel").GetComponent<Image>();
         fullPanelImage.gameObject.SetActive(false);

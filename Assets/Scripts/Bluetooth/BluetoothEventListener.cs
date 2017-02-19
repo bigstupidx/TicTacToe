@@ -85,7 +85,7 @@ public class BluetoothEventListener : MonoBehaviour {
     private ScoringScript scoring;
     private ScoringScript Scoring {
         get {
-            if (scoring == null) GameObject.Find("Scoring").GetComponent<ScoringScript>();
+            if (scoring == null) scoring = GameObject.Find("Scoring").GetComponent<ScoringScript>();
 
             return scoring;
         }

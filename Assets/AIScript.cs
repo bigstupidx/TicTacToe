@@ -61,7 +61,6 @@ public class AIScript : MonoBehaviour {
         IntVector2 pos = GridToLocalAIPos(gridPos);
 
         AddPoint(pos, type);
-        Debug.Log("AI added sign at " + pos.x + " " + pos.y);
     }
 
     /// <summary>
@@ -508,7 +507,7 @@ internal class IntVector2 : IEquatable<IntVector2> {
     }
 
     public override string ToString() {
-        return string.Format("X: {0} - Y: {1}", x, y);
+        return string.Format("X: {0} and Y: {1}", x, y);
     }
 }
 
@@ -537,7 +536,7 @@ internal class SignInARow : IEquatable<SignInARow> {
         { 0, 0, 0 },
         { 2, 6, 0.5f },
         { 10000, 50, 10 },
-        { 20000, 5000, 30 },
+        { 50000, 50000, 200 },
         { 999999, 999999, 999999 }
     };
 
@@ -611,7 +610,7 @@ internal class SignInARow : IEquatable<SignInARow> {
     }
 
     public void UpdatePoints(Cell.CellOcc type) {
-        length = Mathf.Max(to.x - from.x, to.y - from.y) + 1;
+        length = Mathf.Max(Mathf.Abs(to.x - from.x), Mathf.Abs(to.y - from.y)) + 1;
         
         points = (2 - BlockCount()) * pointTable[length > 5 ? 5 : length, BlockCount()] * (type == AIScript.AIType ? 1 : -1);
     }

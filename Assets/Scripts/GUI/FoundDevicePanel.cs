@@ -22,6 +22,7 @@ public class FoundDevicePanel : MonoBehaviour {
 
     void Awake() {
         connectionManager = FindObjectOfType<BluetoothConnectionManager>();
+        preferences = FindObjectOfType<PreferencesScript>();
 
         nameText = transform.GetChild(0).GetComponent<Text>();
 

@@ -4,8 +4,6 @@ using DG.Tweening;
 using UnityEngine.Events;
 
 public class PopupManager : MonoBehaviour {
-
-    private static float timePerHalfScreen = .5f;
     
     private static GameObject popupPrefab;
     private static GameObject popupInstance;

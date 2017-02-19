@@ -5,11 +5,6 @@ using UnityEngine.UI;
 
 public class BluetoothMessageManager : MonoBehaviour {
 
-    private static Color darkColor = new Color(0.25882f, 0.25882f, 0.25882f);
-    private static Color lightColor = Color.white;
-
-    private static PreferencesScript preferences;
-
     private static GameObject messageSpawnerObject;
     private static GameObject messagePrefab;
 
@@ -18,8 +13,6 @@ public class BluetoothMessageManager : MonoBehaviour {
     private static List<RectTransform> messages = new List<RectTransform>();
 
     void Start() {
-        preferences = GameObject.FindObjectOfType<PreferencesScript>();
-
         messageSpawnerObject = GameObject.FindWithTag("BluetoothMessageSpawner");
         messagePrefab = Resources.Load<GameObject>("Prefabs/Bluetooth/Messaging/Message");
     }

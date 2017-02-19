@@ -5,7 +5,7 @@ public class PreferencesScript : MonoBehaviour {
 
     private const string FIRST_USE = "FirstUse";
 
-    private void Start() {
+    private void Awake() {
 
         DontDestroyOnLoad(gameObject);
 

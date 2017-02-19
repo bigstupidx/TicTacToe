@@ -54,7 +54,7 @@ public class SignResourceStorage : MonoBehaviour {
             case Cell.CellOcc.O: return oColor;
         }
 
-        return Color.white;
+        return Color.magenta;
     }
 
     /// <summary>

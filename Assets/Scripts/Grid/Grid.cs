@@ -80,7 +80,7 @@ public class Grid : MonoBehaviour {
 
             int count = int.Parse(lines[0]);
 
-            int coroutineCount = Mathf.CeilToInt(lines.Length / (float) dataProcessCount);
+            int coroutineCount = Mathf.CeilToInt(count / (float) dataProcessCount);
             for (int i = 0; i < coroutineCount; i++) {
                 int arrayLength = i == coroutineCount - 1 ? lines.Length - 1 - (coroutineCount - 1) * dataProcessCount : dataProcessCount;
 
