@@ -25,18 +25,22 @@ public class ScoringScript : MonoBehaviour {
     }
 
     public void SetScore(int x, int o) {
-        Text txt;
-        string s;
+        // Nothing changed
+        if (x == currentX && o == currentO) return;
+
+        Text txt = null;
+        string s = "";
         // We need to refresh o
         if (currentX == x) {
             s = o.ToString();
             txt = oText;
             currentO = o;
-        } else { // we need to refresh x
+        } else if (currentO == o) { // we need to refresh x
             s = x.ToString();
             txt = xText;
             currentX = x;
         }
+
         // aniamtion
         DOTween.Sequence()
                 .Insert(0, txt.rectTransform.DOLocalMoveY(height / 2f, ANIMATION))

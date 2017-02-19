@@ -61,6 +61,7 @@ public class PreferencesScript : MonoBehaviour {
 
     public void SetEmojiInSlotTo(int slot, string name) {
         PlayerPrefs.SetString(EMOJI_NAME + slot, name);
+        PlayerPrefs.Save();
     }
 
 
@@ -103,6 +104,7 @@ public class PreferencesScript : MonoBehaviour {
     public void ChangeToColorMode(ColorMode mode) {
         currentMode = mode;
         PlayerPrefs.SetString(COLOR_MODE, currentMode.ToString());
+        PlayerPrefs.Save();
 
         UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
         ColorChangeEvent(mode, changeDuration); // Call delaegateategateggatagegatge
@@ -111,6 +113,7 @@ public class PreferencesScript : MonoBehaviour {
     public void ChangeToColorTheme(ColorTheme newTheme, string nameOfTheme) {
         currentTheme = newTheme;
         PlayerPrefs.SetString(THEME_MODE, nameOfTheme + "Theme");
+        PlayerPrefs.Save();
 
         UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
         ThemeChangeEvent(newTheme, changeDuration);// Call delaegateategateggasdasdsfeewedscxycasaatagegatge

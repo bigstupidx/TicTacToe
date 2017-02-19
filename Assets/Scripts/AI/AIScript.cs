@@ -392,7 +392,7 @@ public class AIScript : MonoBehaviour {
         do {
             // It allocates a rectangle for the game, so it doesn't place it there (thats innerR) but just for good measures we put it in a dowhile
             float r = ((topRightPosOfField.x - bottomLeftPosOfField.x) * 3f);
-            float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x);
+            float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x) * 2f;
 
             Vector2 vect = UnityEngine.Random.insideUnitCircle * (r - innerR) + new Vector2(innerR, innerR);
             pos = topRightPosOfField + new IntVector2((int) vect.x, (int) vect.y);

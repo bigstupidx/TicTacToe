@@ -12,10 +12,15 @@ public class AITTTGameLogic : TTTGameLogic {
     private Thread aiThread;
     private int[] aiPlacePos;
 
+    private ScoringScript scoring;
+    private int humanPoint = 0;
+    private int aiPoint = 0;
+
     public override void Start() {
         base.Start();
 
         aiScript = GetComponent<AIScript>();
+        scoring = FindObjectOfType<ScoringScript>();
         whoseTurn = AIScript.HumanType;
     }
 
@@ -32,6 +37,13 @@ public class AITTTGameLogic : TTTGameLogic {
         } else if (whoseTurn == AIScript.AIType && won != Cell.CellOcc.BLOCKED) { // if player has won put a delay before AI puts
             Invoke("AiPlaceRandom", 3f);
         }
+
+        // Set points
+        if (won == AIScript.AIType) aiPoint++;
+        else if (won == AIScript.HumanType) humanPoint++;
+
+        if (AIScript.AIType == Cell.CellOcc.X) scoring.SetScore(aiPoint, humanPoint);
+        else scoring.SetScore(humanPoint, aiPoint);
     }
 
     /// <summary>

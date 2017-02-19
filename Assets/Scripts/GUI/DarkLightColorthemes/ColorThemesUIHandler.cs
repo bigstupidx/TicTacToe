@@ -10,7 +10,7 @@ public class ColorThemesUIHandler : MonoBehaviour {
     void Start() {
         ResetColorsOfButtons();
         preferences = FindObjectOfType<PreferencesScript>();
-
+        
         transform.FindChild(preferences.currentTheme.themeName).GetComponent<SetColorThemeUI>().SetClickedColor();
     }
     
