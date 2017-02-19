@@ -9,9 +9,10 @@ public class AIScript : MonoBehaviour {
     [HideInInspector]
     private int DIFFICULTY = 2;
     /// <summary>
-    /// What's the chance that the ai simply skips a place where it could place, it just doesn't examine it
+    /// What's the chance that the ai simply skips a place where it could place, it just doesn't examine it. 
+    /// It will also add some depending on the points in game (heuristic for the game's complexity)
     /// </summary>
-    private float leaveOutChance = 0.5f;
+    private float leaveOutChance = 0.1f;
 
     private Grid grid;
     private System.Random rand;
@@ -53,6 +54,23 @@ public class AIScript : MonoBehaviour {
     }
 
     /// <summary>
+    /// 1 - Easy; 2 - Normal; 3 - Hard
+    /// </summary>
+    public void SetDifficulty(int diff) {
+        switch (diff) {
+            case 1:
+                leaveOutChance = 0.4f;
+                break;
+            case 2:
+                leaveOutChance = 0.15f;
+                break;
+            case 3:
+                leaveOutChance = 0.05f;
+                break;
+        }
+    }
+
+    /// <summary>
     /// Called from grid in event when a sign was removed
     /// </summary>
     private void SignWasRemoved(int[] gridPos) {
@@ -89,7 +107,7 @@ public class AIScript : MonoBehaviour {
         if (pos.x < bottomLeftPosOfField.x) bottomLeftPosOfField.x = pos.x;
         if (pos.y < bottomLeftPosOfField.y) bottomLeftPosOfField.y = pos.y;
         if (pos.x > topRightPosOfField.x) topRightPosOfField.x = pos.x;
-        if (pos.y > topRightPosOfField.y) topRightPosOfField.y = pos.y; 
+        if (pos.y > topRightPosOfField.y) topRightPosOfField.y = pos.y;
 
         List<PlaceData> placeData;
         NewSignPlaced(gameField, pos, out placeData, out placeData);
@@ -215,13 +233,13 @@ public class AIScript : MonoBehaviour {
 
                 // We are in bounds
                 //if (examineX >= 0 && examineX < field.GetLength(0) && examineY >= 0 && examineY < field.GetLength(1)) {
-                    // It is the same sign
-                    if (field[examineX, examineY].type == currentType) {
-                        count++;
-                        endOne = new IntVector2(examineX, examineY);
-                    } else {
-                        break;
-                    }
+                // It is the same sign
+                if (field[examineX, examineY].type == currentType) {
+                    count++;
+                    endOne = new IntVector2(examineX, examineY);
+                } else {
+                    break;
+                }
                 /*} else {
                     break;
                 }*/
@@ -234,13 +252,13 @@ public class AIScript : MonoBehaviour {
 
                 // We are in bounds
                 //if (examineX >= 0 && examineX < field.GetLength(0) && examineY >= 0 && examineY < field.GetLength(1)) {
-                    // It is the same sign
-                    if (field[examineX, examineY].type == currentType) {
-                        count++;
-                        endTwo = new IntVector2(examineX, examineY);
-                    } else {
-                        break;
-                    }
+                // It is the same sign
+                if (field[examineX, examineY].type == currentType) {
+                    count++;
+                    endTwo = new IntVector2(examineX, examineY);
+                } else {
+                    break;
+                }
                 /*} else {
                     break;
                 }*/
@@ -269,91 +287,91 @@ public class AIScript : MonoBehaviour {
     private EvaluationResult EvaluateField(EvaluationField[,] field, Cell.CellOcc whoseTurn, int deepCount, List<IntVector2> pointsInGame, float alpha, float beta) {
         EvaluationResult result = new EvaluationResult(whoseTurn == HumanType ? int.MaxValue : int.MinValue, new IntVector2());
 
-        if (deepCount == DIFFICULTY) {
-            float aiPoint, humanPoint;
-            GetPointsFromSignsInARow(field, pointsInGame, out aiPoint, out humanPoint);
+        List<IntVector2> been = new List<IntVector2>();
+        int pointsInGameLength = pointsInGame.Count;
 
-            if (whoseTurn == AIType)
-                result.points = aiPoint + humanPoint * 1.2f;
-            else
-                result.points = aiPoint * 1.2f + humanPoint;
+        bool alphaBetaEnd = false;
 
-        } else {
-            List<IntVector2> been = new List<IntVector2>();
-            int pointsInGameLength = pointsInGame.Count;
+        // Go through the places where we can place
+        // Call NewSignPlaced with field and position where we want to place
+        for (int j = 0; j < pointsInGameLength && !alphaBetaEnd; j++) {
+            // In each direction
+            for (int i = -1; i <= 1 && !alphaBetaEnd; i++) {
+                for (int k = -1; k <= 1 && !alphaBetaEnd; k++) {
+                    // we just skip a place if we feel like, just to make AI a bit easier
+                    if (rand.NextDouble() <= leaveOutChance + pointsInGame.Count / 200f) continue;
 
-            bool alphaBetaEnd = false;
+                    IntVector2 pos = new IntVector2(pointsInGame[j].x + i, pointsInGame[j].y + k);
+                    // Not 0 0 and in bounds
+                    if (!(i == 0 && k == 0) /*&& pos.x >= 0 && pos.x < field.GetLength(0) && pos.y >= 0 && pos.y < field.GetLength(1)*/
+                        && field[pos.x, pos.y].type == Cell.CellOcc.NONE && !been.Contains(pos)) {  // if we haven't checked this position and the type of cell we are examining is NONE, so empty
+                        been.Add(pos);
 
-            // Go through the places where we can place
-            // Call NewSignPlaced with field and position where we want to place
-            for (int j = 0; j < pointsInGameLength && !alphaBetaEnd; j++) {
-                // In each direction
-                for (int i = -1; i <= 1 && !alphaBetaEnd; i++) {
-                    for (int k = -1; k <= 1 && !alphaBetaEnd; k++) {
-                        // we just skip a place if we feel like, just to make AI a bit easier
-                        if (rand.NextDouble() <= leaveOutChance) continue;
+                        // Data so we can revert the field back (because recursive algorithm)
+                        List<PlaceData> placed;
+                        List<PlaceData> removed;
 
-                        IntVector2 pos = new IntVector2(pointsInGame[j].x + i, pointsInGame[j].y + k);
-                        // Not 0 0 and in bounds
-                        if (!(i == 0 && k == 0) /*&& pos.x >= 0 && pos.x < field.GetLength(0) && pos.y >= 0 && pos.y < field.GetLength(1)*/
-                            && field[pos.x, pos.y].type == Cell.CellOcc.NONE && !been.Contains(pos)) {  // if we haven't checked this position and the type of cell we are examining is NONE, so empty
-                            been.Add(pos);
+                        // Set the examined cell to the current's sign
+                        field[pos.x, pos.y].type = whoseTurn;
+                        // Place that sign and while that's happening determine signsinarow
+                        NewSignPlaced(field, pos, out placed, out removed);
+                        pointsInGame.Add(new IntVector2(pos));
 
-                            // Data so we can revert the field back (because recursive algorithm)
-                            List<PlaceData> placed;
-                            List<PlaceData> removed;
+                        // Go recursively until DIFFICULTY
+                        EvaluationResult evalResult;
+                        if (deepCount == DIFFICULTY) {
+                            float aiPoint, humanPoint;
+                            GetPointsFromSignsInARow(field, pointsInGame, out aiPoint, out humanPoint);
 
-                            // Set the examined cell to the current's sign
-                            field[pos.x, pos.y].type = whoseTurn;
-                            // Place that sign and while that's happening determine signsinarow
-                            NewSignPlaced(field, pos, out placed, out removed);
-                            pointsInGame.Add(new IntVector2(pos));
-
-                            // Go recursively until DIFFICULTY
-                            EvaluationResult evalResult
-                                = EvaluateField(field, SignResourceStorage.GetOppositeOfSign(whoseTurn), deepCount + 1, pointsInGame, alpha, beta);
-
-                            // If it is human's turn we search for min value - MINIMIZER
-                            if (whoseTurn == HumanType) {
-                                if (result.points > evalResult.points) {
-                                    result.points = evalResult.points;
-                                    result.fieldPos = new IntVector2(pos);
-                                }
-
-                                beta = Mathf.Min(beta, result.points);
-                                // If the points here is smaller than the best value for the parent maximizer then we don't have to search further because this minimizer
-                                // potentially has the chance of picking this minimum value, which the parent maximizer will never pick otherwise if this minimizer
-                                // doesn't pick this vaue it's only gonna pick a smaller one which is even worse for the maximizer
-                                // so just stop the search
-                                if (result.points <= alpha) {
-                                    alphaBetaEnd = true;
-                                }
-                            }
-                            // Otherwise if it is AI's turn we search for the max points - MAXIMIZER
-                            else if (whoseTurn == AIType) {
-                                if (result.points < evalResult.points) {
-                                    result.points = evalResult.points;
-                                    result.fieldPos = new IntVector2(pos);
-                                }
-
-                                alpha = Mathf.Max(alpha, result.points);
-                                // if the point is higher then the minimizer minimum then we don't need to search further because this maximizer
-                                // will surely pick a greater value for the parent minimizer, than it already has
-                                if (result.points >= beta) {
-                                    alphaBetaEnd = true;
-                                }
-                            }
-
-                            // Revert the field back 
-                            foreach (PlaceData data in placed)
-                                field[data.fieldPos.x, data.fieldPos.y].signsInARow.Remove(data.signInARow);
-                            foreach (PlaceData data in removed)
-                                field[data.fieldPos.x, data.fieldPos.y].signsInARow.Add(data.signInARow);
-
-                            field[pos.x, pos.y].type = Cell.CellOcc.NONE;
-
-                            pointsInGame.RemoveAt(pointsInGame.Count - 1);
+                            if (whoseTurn == AIType)
+                                evalResult.points = aiPoint + humanPoint * 1.5f;
+                            else
+                                evalResult.points = aiPoint * 1.5f + humanPoint;
+                            evalResult.fieldPos = new IntVector2(pos);
+                        } else {
+                            evalResult = EvaluateField(field, SignResourceStorage.GetOppositeOfSign(whoseTurn), deepCount + 1, pointsInGame, alpha, beta);
                         }
+
+                        // If it is human's turn we search for min value - MINIMIZER
+                        if (whoseTurn == HumanType) {
+                            if (result.points > evalResult.points) {
+                                result.points = evalResult.points;
+                                result.fieldPos = new IntVector2(pos);
+                            }
+
+                            beta = Mathf.Min(beta, result.points);
+                            // If the points here is smaller than the best value for the parent maximizer then we don't have to search further because this minimizer
+                            // potentially has the chance of picking this minimum value, which the parent maximizer will never pick otherwise if this minimizer
+                            // doesn't pick this vaue it's only gonna pick a smaller one which is even worse for the maximizer
+                            // so just stop the search
+                            if (result.points <= alpha) {
+                                // alphaBetaEnd = true;
+                            }
+                        }
+                        // Otherwise if it is AI's turn we search for the max points - MAXIMIZER
+                        else if (whoseTurn == AIType) {
+                            if (result.points < evalResult.points) {
+                                result.points = evalResult.points;
+                                result.fieldPos = new IntVector2(pos);
+                            }
+
+                            alpha = Mathf.Max(alpha, result.points);
+                            // if the point is higher then the minimizer minimum then we don't need to search further because this maximizer
+                            // will surely pick a greater value for the parent minimizer, than it already has
+                            if (result.points >= beta) {
+                                // alphaBetaEnd = true;
+                            }
+                        }
+
+                        // Revert the field back 
+                        foreach (PlaceData data in placed)
+                            field[data.fieldPos.x, data.fieldPos.y].signsInARow.Remove(data.signInARow);
+                        foreach (PlaceData data in removed)
+                            field[data.fieldPos.x, data.fieldPos.y].signsInARow.Add(data.signInARow);
+
+                        field[pos.x, pos.y].type = Cell.CellOcc.NONE;
+
+                        pointsInGame.RemoveAt(pointsInGame.Count - 1);
                     }
                 }
             }
@@ -375,7 +393,7 @@ public class AIScript : MonoBehaviour {
         }
 
         EvaluationResult result = new EvaluationResult();
-        try { 
+        try {
             result = EvaluateField(gameField, AIType, 1, pointsInGame, int.MinValue, int.MaxValue);
         } catch (Exception e) {
             Debug.Log(e.Message + "\n" + e.StackTrace);
@@ -575,7 +593,7 @@ internal class SignInARow : IEquatable<SignInARow> {
     public IntVector2 To { get { return to; } }
     private IntVector2 steepness;
     public IntVector2 Steepness { get { return steepness; } }
-    
+
     private EvaluationField blockField1;
     private EvaluationField blockField2;
 
@@ -590,10 +608,19 @@ internal class SignInARow : IEquatable<SignInARow> {
     private float[,] pointTable = new float[,] {
         { 0, 0, 0 },
         { 0, 0, 0 },
-        { 2, 6, 0.5f },
+        { 15, 6, 0.5f },
         { 10000, 50, 10 },
-        { 50000, 50000, 200 },
+        { 50000, 15000, 200 },
         { 999999, 999999, 999999 }
+    };
+
+    private float[,] pointTableHuman = new float[,] {
+        { 0, 0, 0 },
+        { 0, 0, 0 },
+        { -15, -6, -0.5f },
+        { -25000, -50, -10 },
+        { -100000, -50000, -200 },
+        { -999999, -999999, -999999 }
     };
 
     public SignInARow(IntVector2 one, IntVector2 two, Cell.CellOcc type) {
@@ -650,8 +677,8 @@ internal class SignInARow : IEquatable<SignInARow> {
 
     public void UpdatePoints(Cell.CellOcc type) {
         length = Mathf.Max(Mathf.Abs(to.x - from.x), Mathf.Abs(to.y - from.y)) + 1;
-        
-        points = (2 - BlockCount()) * pointTable[length > 5 ? 5 : length, BlockCount()] * (type == AIScript.AIType ? 1 : -1);
+
+        points = (type == AIScript.AIType ? pointTable[length > 5 ? 5 : length, BlockCount()] : pointTableHuman[length > 5 ? 5 : length, BlockCount()]);
     }
 
     public void UpdatePoints() {

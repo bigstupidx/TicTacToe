@@ -194,7 +194,10 @@ public class BluetoothConnectionManager : MonoBehaviour {
     private void SignalToPressBluetoothIcon() {
         GameObject touchIcon = bluetoothEnabledImage.transform.GetChild(0).gameObject;
         touchIcon.SetActive(true);
-        // TODO chack if this works: in bluetoothconnectscreen the touch thingy
+        touchIcon.GetComponent<RectTransform>().DOShakeScale(2f, .7f, 3, 30f, false)
+            .OnComplete(new TweenCallback(() => {
+                touchIcon.SetActive(false);
+            }));
     }
 
     /// <summary>
