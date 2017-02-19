@@ -37,7 +37,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// Tries placing a sign at clickpos
     /// </summary>
     /// <param name="clickPos"></param>
-    public void WantToPlaceAt(Vector2 clickPos) {
+    public bool WantToPlaceAt(Vector2 clickPos) {
         int[] gridPos = Grid.GetCellInGridPos(clickPos);
 
         // Can be placed at
@@ -50,9 +50,13 @@ public class TTTGameLogic : MonoBehaviour {
                 Cell.CellOcc b;
                 NextTurn(gridPos, out b);
             }
+
+            return true;
         } else {
             Debug.Log("Sign couldn't be placed at " + clickPos.x + " " + clickPos.y);
         }
+
+        return false;
     }
     
     /// <summary>

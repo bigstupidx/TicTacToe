@@ -106,8 +106,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartClient() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            bluetoothEnabledImage.transform.DOShakePosition(1f, 1f, 3, 5f);
-            bluetoothEnabledImage.transform.DOShakeRotation(1f, 60f, 4, 5f, true);
+            SignalToPressBluetoothIcon();
             return;
         }
 
@@ -165,8 +164,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public void StartServer() {
         // Enable bluetooth if it's not enabled
         if (!Bluetooth.Instance().IsEnabled()) {
-            bluetoothEnabledImage.transform.DOShakePosition(1f, 1f, 3, 5f);
-            bluetoothEnabledImage.transform.DOShakeRotation(1f, 60f, 4, 5f, true);
+            SignalToPressBluetoothIcon();
             return;
         }
 
@@ -192,6 +190,12 @@ public class BluetoothConnectionManager : MonoBehaviour {
     //----------------------------
     //      GUI Stuff
     //----------------------------
+
+    private void SignalToPressBluetoothIcon() {
+        GameObject touchIcon = bluetoothEnabledImage.transform.GetChild(0).gameObject;
+        touchIcon.SetActive(true);
+        // TODO chack if this works: in bluetoothconnectscreen the touch thingy
+    }
 
     /// <summary>
     /// Sets default stuff for GUI

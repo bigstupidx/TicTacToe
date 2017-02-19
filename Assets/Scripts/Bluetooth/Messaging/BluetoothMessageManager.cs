@@ -83,6 +83,7 @@ public static class
         "unicornEmoji",
         "upsidedownEmoji",
         "cryingEmoji",
+        "hundredEmoji",
         "rektEmoji",
         "noobEmoji"
     };

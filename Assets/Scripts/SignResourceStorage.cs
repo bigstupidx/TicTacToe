@@ -77,4 +77,11 @@ public class SignResourceStorage : MonoBehaviour {
         return Cell.CellOcc.NONE;
     }
 
+    /// <summary>
+    /// Returns whether the given type is a sign type (not sign types is for example NONE)
+    /// </summary>
+    public static bool IsSignType(Cell.CellOcc type) {
+        return type == Cell.CellOcc.X || type == Cell.CellOcc.O;
+    }
+
 }

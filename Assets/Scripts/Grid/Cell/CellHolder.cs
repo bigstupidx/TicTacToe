@@ -56,6 +56,8 @@ public class CellHolder {
 
     public CellHolder(int[] worldPos) {
         this.worldPos = worldPos;
+        currentTemplate = new CellTemplate();
+        currentTemplate.cellOcc = Cell.CellOcc.NONE;
     }
 
     public bool IsFull() {

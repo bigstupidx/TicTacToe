@@ -31,12 +31,16 @@ public class MenuButtonPanelScript : MonoBehaviour {
     }
 
     public void LocalButtonPressed() {
+        if (isLocalForward) return;
+
         DOTween.Sequence()
             // Prepare for aniamtion
             .OnStart(new TweenCallback(() => {
                 localMultiButton.rectTransform.localPosition = new Vector3(localMultiButton.rectTransform.rect.width / 2f, localMultiButton.rectTransform.localPosition.y);
                 localAIButton.rectTransform.localPosition = new Vector3(localAIButton.rectTransform.rect.width / 2f, localAIButton.rectTransform.localPosition.y);
                 localBackButton.rectTransform.localPosition = new Vector3(localBackButton.rectTransform.rect.width / 2f, localBackButton.rectTransform.localPosition.y);
+                // if it's not here it will affect how animation looks (it will be disabled)
+                localBackButton.canavasGroup.interactable = true;
             }))
 
             // out animation
@@ -57,12 +61,13 @@ public class MenuButtonPanelScript : MonoBehaviour {
             .OnComplete(new TweenCallback(() => {
                 localButton.rectTransform.localPosition = new Vector3(-localButton.rectTransform.rect.width * 2f, localButton.rectTransform.localPosition.y);
                 bluetoothButton.rectTransform.localPosition = new Vector3(-bluetoothButton.rectTransform.rect.width * 2f, bluetoothButton.rectTransform.localPosition.y);
-                localBackButton.canavasGroup.interactable = true;
                 isLocalForward = true;
             }));
     }
 
     public void LocalBackButtonPressed() {
+        if (!isLocalForward) return;
+
         DOTween.Sequence()
             // Prepare for aniamtion
             .OnStart(new TweenCallback(() => {

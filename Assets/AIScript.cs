@@ -7,24 +7,29 @@ public class AIScript : MonoBehaviour {
     public static Cell.CellOcc AIType = Cell.CellOcc.X;
     public static Cell.CellOcc HumanType = Cell.CellOcc.O;
     [HideInInspector]
-    private int DIFFICULTY = 3;
+    private int DIFFICULTY = 2;
+    /// <summary>
+    /// What's the chance that the ai simply skips a place where it could place, it just doesn't examine it
+    /// </summary>
+    private float leaveOutChance = 0.5f;
 
     private Grid grid;
+    private System.Random rand;
 
     /// <summary>
     /// All the signPos in aiLocalPos in the game
     /// </summary>
     private List<IntVector2> pointsInGame;
     /// <summary>
-    /// The first point in current game, used for exchanging gridPos to aiLocalPos
+    /// The first point in current game, used for exchanging gridPos to aiLocalPos<para />
     /// This is 0, 0
     /// </summary>
     private IntVector2 firstPointInGame;
     /// <summary>
-    /// Stores the current gamefield
-    /// if there is no sign there it is NONE
-    /// At first it is a 51 * 51 array, if it is exceeded then it will be replaced in a (x + 50) * (x + 50)
-    /// 0, 0 is at [length / 2, length / 2]
+    /// Stores the current gamefield<para />
+    /// if there is no sign there it is NONE<para />
+    /// At first it is a 51 * 51 array, if it is exceeded then it will be replaced in a (x + 50) * (x + 50)<para />
+    /// 0, 0 is at [length / 2, length / 2]<para />
     /// </summary>
     private EvaluationField[,] gameField;
 
@@ -38,8 +43,8 @@ public class AIScript : MonoBehaviour {
     private IntVector2 topRightPosOfField;
 
     void Start() {
+        rand = new System.Random();
         grid = GetComponent<Grid>();
-        pointsInGame = new List<IntVector2>();
         Reset();
 
         // subscribe to events
@@ -58,6 +63,11 @@ public class AIScript : MonoBehaviour {
     /// Called from grid in event when sign was placed
     /// </summary>
     private void SignWasAdded(int[] gridPos, Cell.CellOcc type) {
+        // first point placed in this game
+        if (firstPointInGame == null) {
+            SetLocalGridDisabled(new int[] { gridPos[0] - gameField.GetLength(0) / 2, gridPos[1] - gameField.GetLength(1) / 2 });
+        }
+
         IntVector2 pos = GridToLocalAIPos(gridPos);
 
         AddPoint(pos, type);
@@ -131,10 +141,31 @@ public class AIScript : MonoBehaviour {
         return new IntVector2(gridPos[0] - firstPointInGame.x + gameField.GetLength(0) / 2, gridPos[1] - firstPointInGame.y + gameField.GetLength(1) / 2);
     }
 
+    /// <summary>
+    /// Disables int the local gameField the points, which are disabled in grid<para />
+    /// Requires the (0,0) point in gridPos of the gameField
+    /// </summary>
+    private void SetLocalGridDisabled(int[] zerozero) {
+        for (int i = 0; i < gameField.GetLength(0); i++) {
+            for (int k = 0; k < gameField.GetLength(1); k++) {
+                if (i == gameField.GetLength(0) / 2 && k == gameField.GetLength(1) / 2) continue;
+
+                CellHolder ch = grid.GetCellHolderAtGridPos(new int[] { zerozero[0] + i, zerozero[1] + k });
+                if (!(ch == null || ch.CurrentTemplate.cellOcc == Cell.CellOcc.NONE)) {
+                    gameField[i, k].type = Cell.CellOcc.BLOCKED; // Because it checks for NONEs in algorithm
+                }
+            }
+        }
+    }
+
     private int[] LocalAIToGridPos(IntVector2 pos) {
+        return LocalAIToGridPos(pos.x, pos.y);
+    }
+
+    private int[] LocalAIToGridPos(int x, int y) {
         return new int[] {
-            pos.x + firstPointInGame.x - gameField.GetLength(0) / 2,
-            pos.y + firstPointInGame.y - gameField.GetLength(1) / 2
+            x + firstPointInGame.x - gameField.GetLength(0) / 2,
+            y + firstPointInGame.y - gameField.GetLength(1) / 2
         };
     }
 
@@ -233,11 +264,8 @@ public class AIScript : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// A recursive minimax algorithm with alpha beta pruning
     /// </summary>
-    /// <param name="field">Pass a copy!</param>
-    /// <param name="alpha">Best for maximizer (AI)</param>
-    /// <param name="beta">Best form minimizer (HUMAN)</param>
     private EvaluationResult EvaluateField(EvaluationField[,] field, Cell.CellOcc whoseTurn, int deepCount, List<IntVector2> pointsInGame, float alpha, float beta) {
         EvaluationResult result = new EvaluationResult(whoseTurn == HumanType ? int.MaxValue : int.MinValue, new IntVector2());
 
@@ -262,6 +290,9 @@ public class AIScript : MonoBehaviour {
                 // In each direction
                 for (int i = -1; i <= 1 && !alphaBetaEnd; i++) {
                     for (int k = -1; k <= 1 && !alphaBetaEnd; k++) {
+                        // we just skip a place if we feel like, just to make AI a bit easier
+                        if (rand.NextDouble() <= leaveOutChance) continue;
+
                         IntVector2 pos = new IntVector2(pointsInGame[j].x + i, pointsInGame[j].y + k);
                         // Not 0 0 and in bounds
                         if (!(i == 0 && k == 0) /*&& pos.x >= 0 && pos.x < field.GetLength(0) && pos.y >= 0 && pos.y < field.GetLength(1)*/
@@ -343,14 +374,40 @@ public class AIScript : MonoBehaviour {
             return LocalAIToGridPos(pointsInGame[0] + random);
         }
 
-        EvaluationResult result = EvaluateField(gameField, AIType, 1, pointsInGame, int.MinValue, int.MaxValue);
+        EvaluationResult result = new EvaluationResult();
+        try { 
+            result = EvaluateField(gameField, AIType, 1, pointsInGame, int.MinValue, int.MaxValue);
+        } catch (Exception e) {
+            Debug.Log(e.Message + "\n" + e.StackTrace);
+        }
         return LocalAIToGridPos(result.fieldPos);
     }
 
+    /// <summary>
+    /// Places down a random sign in world while taking the already placed signs into consideration
+    /// </summary>
+    /// <returns></returns>
+    public int[] PlaceDownRandom() {
+        IntVector2 pos; CellHolder ch;
+        do {
+            // It allocates a rectangle for the game, so it doesn't place it there (thats innerR) but just for good measures we put it in a dowhile
+            float r = ((topRightPosOfField.x - bottomLeftPosOfField.x) * 3f);
+            float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x);
+
+            Vector2 vect = UnityEngine.Random.insideUnitCircle * (r - innerR) + new Vector2(innerR, innerR);
+            pos = topRightPosOfField + new IntVector2((int) vect.x, (int) vect.y);
+
+            ch = grid.GetCellHolderAtGridPos(LocalAIToGridPos(pos.x, pos.y));
+        } while (!(ch == null || ch.CurrentTemplate.cellOcc == Cell.CellOcc.NONE));
+
+        return LocalAIToGridPos(pos);
+    }
+
     public void Reset() {
-        bottomLeftPosOfField = new IntVector2();
-        topRightPosOfField = new IntVector2();
+        bottomLeftPosOfField = new IntVector2(int.MaxValue, int.MaxValue);
+        topRightPosOfField = new IntVector2(int.MinValue, int.MinValue);
         gameField = new EvaluationField[100, 100];
+        pointsInGame = new List<IntVector2>();
         for (int i = 0; i < gameField.GetLength(0); i++)
             for (int k = 0; k < gameField.GetLength(1); k++)
                 gameField[i, k] = new EvaluationField();
@@ -518,8 +575,7 @@ internal class SignInARow : IEquatable<SignInARow> {
     public IntVector2 To { get { return to; } }
     private IntVector2 steepness;
     public IntVector2 Steepness { get { return steepness; } }
-
-    private IntVector2[] blocksAtEnd = new IntVector2[2];
+    
     private EvaluationField blockField1;
     private EvaluationField blockField2;
 
@@ -545,22 +601,6 @@ internal class SignInARow : IEquatable<SignInARow> {
         SetPoints(one, two, type);
     }
 
-    /// <summary>
-    /// If you set it a third time it will rewrite the second one and so on
-    /// </summary>
-    public void SetEndBlock(IntVector2 pos) {
-        int at = 0;
-        if (blocksAtEnd[0] != null)
-            at++;
-
-        blocksAtEnd[at] = new IntVector2(pos);
-    }
-
-    public void SetEndBlocks(IntVector2 one, IntVector2 two) {
-        blocksAtEnd[0] = one;
-        blocksAtEnd[1] = two;
-    }
-
     public void SetEndEvaluationFields(EvaluationField one, EvaluationField two) {
         this.blockField1 = one;
         this.blockField2 = two;
@@ -568,23 +608,22 @@ internal class SignInARow : IEquatable<SignInARow> {
 
     public int BlockCount() {
         Cell.CellOcc oppType = SignResourceStorage.GetOppositeOfSign(type);
-        if (blockField1.type == oppType && blockField2.type == oppType) return 2;
-        else if (blockField1.type == oppType || blockField2.type == oppType) return 1;
-        else return 0;
+        bool block1 = blockField1.type == oppType || blockField1.type == Cell.CellOcc.BLOCKED;
+        bool block2 = blockField2.type == oppType || blockField2.type == Cell.CellOcc.BLOCKED;
 
-        /* if (blocksAtEnd[0] != null && blocksAtEnd[1] != null) return 2;
-        else if (blocksAtEnd[0] != null) return 1;
-        else return 0; */
+        if (block1 && block2) return 2;
+        else if (block1 || block2) return 1;
+        else return 0;
     }
 
     /// <summary>
-    /// DYDD
-    /// DYXD
-    /// DYYD
-    /// All ys are smaller than x
-    /// Always sets the smaller of the to vectors to be in the from vector
-    /// Also sets the steepness as well
-    /// Also updates points and length
+    /// DYDD<para />
+    /// DYXD<para />
+    /// DYYD<para />
+    /// All ys are smaller than x<para />
+    /// Always sets the smaller of the to vectors to be in the from vector<para />
+    /// Also sets the steepness as well<para />
+    /// Also updates points and length<para />
     /// </summary>
     public void SetPoints(IntVector2 from, IntVector2 to, Cell.CellOcc type) {
         if (from.y == to.y) {

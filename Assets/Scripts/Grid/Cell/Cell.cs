@@ -15,7 +15,7 @@ public class Cell : MonoBehaviour {
     private Animator animator;
 
     void Awake() {
-        cellOcc = CellOcc.BLOCKED;
+        cellOcc = CellOcc.NONE;
         
         animator = GetComponent<Animator>();
     }

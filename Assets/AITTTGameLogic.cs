@@ -1,7 +1,12 @@
 ﻿using System.Threading;
 using UnityEngine;
+using DG.Tweening;
+using System.Collections;
 
 public class AITTTGameLogic : TTTGameLogic {
+    private const float aiMinThinkTime = 0.7f;
+    private float aiTillThinkTime = 0f;
+
     private AIScript aiScript;
 
     private Thread aiThread;
@@ -16,32 +21,60 @@ public class AITTTGameLogic : TTTGameLogic {
 
     public override void NextPerson() {
         base.NextPerson();
-
-        if (whoseTurn == AIScript.AIType) {
-            AIsTurn();
-        }
     }
 
     public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {
         base.NextTurn(gridPos, out won);
 
-        if (won != Cell.CellOcc.BLOCKED && whoseTurn == AIScript.AIType) {
+        // If no one has won and it is AI's turn make AI place
+        if (won == Cell.CellOcc.BLOCKED && whoseTurn == AIScript.AIType) {
             AIsTurn();
+        } else if (whoseTurn == AIScript.AIType && won != Cell.CellOcc.BLOCKED) { // if player has won put a delay before AI puts
+            Invoke("AiPlaceRandom", 3f);
+        }
+    }
+
+    /// <summary>
+    /// Makes AI place at a random pos that is nearby the first game
+    /// </summary>
+    private void AiPlaceRandom() {
+        int[] pos = aiScript.PlaceDownRandom();
+        if (WantToPlaceAt(new Vector2(pos[0], pos[1]))) {
+            Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 1f);
         }
     }
 
     void Update() {
+        // If aithread is not working anymore but it has given a position place there
         if (aiThread != null && !aiThread.IsAlive && aiPlacePos != null) {
-            WantToPlaceAt(new Vector2(aiPlacePos[0], aiPlacePos[1]));
+            if (Time.time < aiTillThinkTime) { // We want the ai to at least make it like it think for aiMinThinkTime so if it didn't think for that much time make it only execute it after a while
+                // Also add a little randomness just so it's not rythmical
+                StartCoroutine(ProcessAIData(aiTillThinkTime - Time.time + Random.Range(0f, aiMinThinkTime * 0.4f), new int[] { aiPlacePos[0], aiPlacePos[1] }));
+            } else {
+                ProcessAIData(new int[] { aiPlacePos[0], aiPlacePos[1] });
+            }
             aiPlacePos = null;
         }
     }
 
+    private void ProcessAIData(int[] pos) {
+        WantToPlaceAt(new Vector2(pos[0], pos[1]));
+    }
+
+    private IEnumerator ProcessAIData(float delayTime, int[] pos) {
+        yield return new WaitForSeconds(delayTime);
+        ProcessAIData(pos);
+    }
+
+    /// <summary>
+    /// Starts a thread in which the ai works
+    /// </summary>
     private void AIsTurn() {
         aiThread = new Thread(new ThreadStart(() => {
             aiPlacePos = aiScript.StartEvaluation();
         }));
         aiThread.Start();
+        aiTillThinkTime = Time.time + aiMinThinkTime;
     }
 
     public override void StartNewGame(int[] gridPos) {
