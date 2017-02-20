@@ -39,6 +39,14 @@ public class MenuButtonPanelScript : MonoBehaviour {
                 localMultiButton.rectTransform.localPosition = new Vector3(localMultiButton.rectTransform.rect.width / 2f, localMultiButton.rectTransform.localPosition.y);
                 localAIButton.rectTransform.localPosition = new Vector3(localAIButton.rectTransform.rect.width / 2f, localAIButton.rectTransform.localPosition.y);
                 localBackButton.rectTransform.localPosition = new Vector3(localBackButton.rectTransform.rect.width / 2f, localBackButton.rectTransform.localPosition.y);
+
+                bluetoothButton.canavasGroup.interactable = false;
+                localButton.canavasGroup.interactable = false;
+
+                localMultiButton.canavasGroup.interactable = true;
+                localAIButton.canavasGroup.interactable = true;
+                localBackButton.canavasGroup.interactable = true;
+
                 // if it's not here it will affect how animation looks (it will be disabled)
                 localBackButton.canavasGroup.interactable = true;
             }))
@@ -73,6 +81,13 @@ public class MenuButtonPanelScript : MonoBehaviour {
             .OnStart(new TweenCallback(() => {
                 localButton.rectTransform.localPosition = new Vector3(-localButton.rectTransform.rect.width / 2f, localButton.rectTransform.localPosition.y);
                 bluetoothButton.rectTransform.localPosition = new Vector3(-bluetoothButton.rectTransform.rect.width / 2f, bluetoothButton.rectTransform.localPosition.y);
+                
+                bluetoothButton.canavasGroup.interactable = true;
+                localButton.canavasGroup.interactable = true;
+
+                localMultiButton.canavasGroup.interactable = false;
+                localAIButton.canavasGroup.interactable = false;
+                localBackButton.canavasGroup.interactable = false;
             }))
 
             // out animation

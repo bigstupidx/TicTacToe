@@ -97,7 +97,6 @@ public class CellHolder {
             // current cell template
             currentTemplate = new CellTemplate();
             currentTemplate.cellOcc = cellType;
-            currentTemplate.cellPosition = new Vector2(worldPos[0], worldPos[1]);
 
             // Set cell type both for animation and data storage purposes
             cell = cellGameObject.GetComponent<Cell>();
@@ -123,7 +122,6 @@ public class CellHolder {
     public void StoreTemplate(Cell.CellOcc type, Vector2 position) {
         currentTemplate = new CellTemplate();
         currentTemplate.cellOcc = type;
-        currentTemplate.cellPosition = position;
     }
     
     /// <summary>
@@ -152,12 +150,6 @@ public class CellHolder {
         // We have a template
         if (currentTemplate != null) {
             NewCell(currentTemplate.cellOcc, false);
-            if (cell != null) { // may not have body
-                cell.cellType = currentTemplate.cellOcc;
-                
-                cellGameObject.transform.position = GetRandomPosBasedOnWorldPos();
-                cellGameObject.transform.eulerAngles = GetRandomAngles();
-            }
         }
     }
 

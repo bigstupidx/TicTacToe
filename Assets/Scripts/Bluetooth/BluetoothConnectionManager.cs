@@ -92,8 +92,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
         serverPanel.SetActive(false);
         clientPanel.SetActive(false);
         lobbyPanel.SetActive(true);
-
-        lobbyPanel.transform.Find("ConnectedNameText").GetComponent<Text>().text = connectedName;
     }
 
     //----------------------------
@@ -109,6 +107,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
             SignalToPressBluetoothIcon();
             return;
         }
+        Bluetooth.Instance().Discoverable();
 
         // prefab
         bluetoothObject = Instantiate(clientListenerPrefab);
@@ -119,7 +118,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
         // GUI
         startPanel.SetActive(false);
         clientPanel.SetActive(true);
-        Bluetooth.Instance().Discoverable();
     }
 
     public void BackFromClientPanel() {
@@ -223,7 +221,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
             Bluetooth.Instance().DisableBluetooth();
         } else {
             Bluetooth.Instance().EnableBluetooth();
-            Bluetooth.Instance().Discoverable();
         }
     }
 

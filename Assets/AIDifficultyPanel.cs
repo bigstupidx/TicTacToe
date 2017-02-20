@@ -12,9 +12,9 @@ public class AIDifficultyPanel : MonoBehaviour {
         aiScript = FindObjectOfType<AIScript>();
 	}
 
-    public void SetDifficultyToEasy() { aiScript.SetDifficulty(0); }
-    public void SetDifficultyToNormal() { aiScript.SetDifficulty(1); }
-    public void SetDifficultyToHard() { aiScript.SetDifficulty(2); }
+    public void SetDifficultyToEasy() { aiScript.SetDifficulty(1); }
+    public void SetDifficultyToNormal() { aiScript.SetDifficulty(2); }
+    public void SetDifficultyToHard() { aiScript.SetDifficulty(3); }
 
     public void DismissDifficultyPanel() {
         transform.GetChild(0).GetComponent<RectTransform>().DOScale(0, animTime);

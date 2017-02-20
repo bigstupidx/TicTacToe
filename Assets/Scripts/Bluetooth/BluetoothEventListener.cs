@@ -151,7 +151,7 @@ public class BluetoothEventListener : MonoBehaviour {
     /// Also send last border's id
     /// Also send whose turn it is
     /// </summary>
-    private void SendClientLastSign() {
+    private void SendClientUpdateMsg() {
         if (Bluetooth.Instance().IsConnected() && isInGame) {
             // Most efficent way of concatting string
             string sent = String.Join("", new string[] {
@@ -231,8 +231,7 @@ public class BluetoothEventListener : MonoBehaviour {
         Bluetooth.Instance().MacAddresses.Add(Device); // Add to list in bluetooth
 
         // Create new GUI for device
-        GameObject newPanel = Instantiate(foundDevicePanel);
-        newPanel.transform.SetParent(ServerViewContent.transform, false);
+        GameObject newPanel = Instantiate(foundDevicePanel, ServerViewContent.transform, false);
         
         newPanel.GetComponent<FoundDevicePanel>().SetNameAndMac(data[0], data[1], Device);
     }

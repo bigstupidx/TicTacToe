@@ -48,20 +48,12 @@ public class Cell : MonoBehaviour {
         CellTemplate template = new CellTemplate();
         template.cellOcc = cellType;
 
-        // If it is blocked there is no gameobject
-        if (cellType != CellOcc.BLOCKED)
-            template.cellPosition = transform.position;
-
         return template;
     }
 
     // Updates attributes in cell template
     public void UpdateAttributes(CellTemplate cellTemplate) {
         cellType = cellTemplate.cellOcc;
-
-        // If it is blocked there is no gameobject
-        if (cellType != CellOcc.BLOCKED)
-            transform.position = cellTemplate.cellPosition;
     }
 
     public enum CellOcc {
