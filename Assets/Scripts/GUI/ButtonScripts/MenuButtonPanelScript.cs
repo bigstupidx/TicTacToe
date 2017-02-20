@@ -12,6 +12,16 @@ public class MenuButtonPanelScript : MonoBehaviour {
     private MenuButton localBackButton;
 
     private bool isLocalForward = false;
+
+    private PreferencesScript prefs;
+
+    void Awake() {
+        prefs = FindObjectOfType<PreferencesScript>();
+
+        // If we haven't completed the tutorial don't brin in the menus
+        if (!prefs.IsTutorialCompleted())
+            GetComponent<DOTweenAnimation>().DOKill();
+    }
     
 	void Start () {
         Transform child = transform.GetChild(3);

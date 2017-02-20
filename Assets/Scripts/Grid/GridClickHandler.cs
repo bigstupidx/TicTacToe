@@ -4,6 +4,9 @@ using UnityEngine.EventSystems;
 
 public class GridClickHandler : MonoBehaviour {
 
+    public bool isMovementEnabled = true;
+    public bool isZoomEnabled = true;
+
     protected const float zoomSpeed = 0.03f;
     protected const float minOrthSize = 4f;
     protected const float maxOrthSize = 15f;
@@ -29,7 +32,7 @@ public class GridClickHandler : MonoBehaviour {
         // Ended zooming
         if (Input.touchCount == 0 && zooming) zooming = false;
 
-        if (Input.touchCount == 2) { // Zooming
+        if (Input.touchCount == 2 && isZoomEnabled) { // Zooming
             zooming = true;
 
             // Store both touches.
@@ -37,8 +40,8 @@ public class GridClickHandler : MonoBehaviour {
             Touch touchOne = Input.GetTouch(1);
 
             // Find the position in the previous frame of each touch.
-            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+            Vector2 touchZeroPrevPos = Camera.main.ScreenToViewportPoint(touchZero.position - touchZero.deltaPosition);
+            Vector2 touchOnePrevPos = Camera.main.ScreenToViewportPoint(touchOne.position - touchOne.deltaPosition);
 
             // Find the magnitude of the vector (the distance) between the touches in each frame.
             float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
@@ -52,7 +55,7 @@ public class GridClickHandler : MonoBehaviour {
 
             // Make sure the orthographic size stays between the given numbers
             Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minOrthSize, maxOrthSize);
-        } else if (Input.touchCount == 1 && !zooming) {
+        } else if (Input.touchCount == 1 && !zooming && isMovementEnabled) {
             Touch touch = new Touch();
             touch = Input.GetTouch(0);
             

@@ -4,7 +4,7 @@ using DG.Tweening;
 using System.Collections;
 
 public class AITTTGameLogic : TTTGameLogic {
-    private const float aiMinThinkTime = 0.7f;
+    public float aiMinThinkTime = 0.7f;
     private float aiTillThinkTime = 0f;
 
     private AIScript aiScript;

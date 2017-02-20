@@ -7,9 +7,16 @@ public class ColorThemesUIHandler : MonoBehaviour {
 
     private PreferencesScript preferences;
 
+    void Awake() {
+        preferences = FindObjectOfType<PreferencesScript>();
+
+        // If we haven't completed tutorial just disable this because it would be too much for the player
+        if (!preferences.IsTutorialCompleted())
+            gameObject.SetActive(false);
+    }
+ 
     void Start() {
         ResetColorsOfButtons();
-        preferences = FindObjectOfType<PreferencesScript>();
         
         transform.FindChild(preferences.currentTheme.themeName).GetComponent<SetColorThemeUI>().SetClickedColor();
     }

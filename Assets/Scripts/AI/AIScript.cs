@@ -59,10 +59,13 @@ public class AIScript : MonoBehaviour {
     }
 
     /// <summary>
-    /// 1 - Easy; 2 - Normal; 3 - Hard
+    /// 0 - Baby; 1 - Easy; 2 - Normal; 3 - Hard
     /// </summary>
     public void SetDifficulty(int diff) {
         switch (diff) {
+            case 0:
+                leaveOutChance = 0.7f;
+                break;
             case 1:
                 leaveOutChance = 0.4f;
                 break;

@@ -4,19 +4,24 @@ using System;
 public class PreferencesScript : MonoBehaviour {
 
     private const string FIRST_USE = "FirstUse";
+    private const string TUTORIAL_COMPLETED = "TutCompleted";
 
     private void Awake() {
 
         DontDestroyOnLoad(gameObject);
 
         // If first use
-        if (PlayerPrefs.GetString(FIRST_USE) == "IMDEADINSIDE") {
+        if (PlayerPrefs.GetString(FIRST_USE) == "") {
             PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
             PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
+
             PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
+            
+            PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
+
             PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDEPLSHELPME");
         }
 
@@ -25,6 +30,9 @@ public class PreferencesScript : MonoBehaviour {
         currentTheme = ColorThemes.GetTheme(PlayerPrefs.GetString(THEME_MODE));
         UpdateSignResourceStrgColors();
     }
+
+    public bool IsTutorialCompleted() { return PlayerPrefs.GetInt(TUTORIAL_COMPLETED) == 1; }
+    public void SetTutorialToCompleted() { PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1); PlayerPrefs.Save(); }
 
     // _________________________Emojis_______________________________________________
 
