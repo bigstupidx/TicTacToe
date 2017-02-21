@@ -21,7 +21,7 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     [SerializeField]
     protected List<Text> updateToColorModesTxt = new List<Text>();
 
-    void Start() {
+    void Start() { // Thee can only be done in start
         // Add every image that has a darklightcolor component
         foreach (Image img in FindObjectsOfType<Image>()) {
             if (img.GetComponent<DarkLightColor>() != null && !updateToColorModesImg.Contains(img)) {

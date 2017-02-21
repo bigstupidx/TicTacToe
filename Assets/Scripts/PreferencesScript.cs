@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 
 public class PreferencesScript : Singleton<PreferencesScript> {
 
@@ -20,18 +21,152 @@ public class PreferencesScript : Singleton<PreferencesScript> {
             PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
 
             PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDEPLSHELPME");
+
+            PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+            PlayerPrefs.Save();
         }
+
+        expBarScript = FindObjectOfType<ExpBarScript>();
 
         // Color mode
         currentMode = (ColorMode) Enum.Parse(typeof(ColorMode), PlayerPrefs.GetString(COLOR_MODE));
         currentTheme = ColorThemes.GetTheme(PlayerPrefs.GetString(THEME_MODE));
         UpdateSignResourceStrgColors();
+
+        // Player level
+        playerLevel = PlayerPrefs.GetInt(PLAYER_LEVEL);
+        playerExp = PlayerPrefs.GetInt(PLAYER_EXP);
+
+        for (int i = 2; i <= maxPlayerLevel; i++)
+            expNeededForLevel[i] = ExpNeededForLevel(i);
     }
 
     public bool IsTutorialCompleted() {
         return PlayerPrefs.GetInt(TUTORIAL_COMPLETED) == 1;
     }
-    public void SetTutorialToCompleted() { PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1); PlayerPrefs.Save(); }
+    public void SetTutorialToCompleted() { PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1); }
+
+    private IEnumerator ExecuteAfterSeconds(float seconds, Action action) {
+        yield return new WaitForSeconds(seconds);
+
+        action.Invoke();
+    }
+
+    // ____________________________________LEVELS____________________________________
+
+    private const string PLAYER_LEVEL = "PlayerLevel";
+    private const string PLAYER_EXP = "PlayerExp";
+
+    private int playerLevel;
+    public int PlayerLevel { get { return playerLevel; } }
+
+    private int playerExp;
+    public int PlayerEXP { get { return playerExp; } }
+
+    private ExpBarScript expBarScript;
+
+    /// <summary>
+    /// Return whether player has levelled up. If they did it automatically levels the player up.
+    /// </summary>
+    public bool AddEXP(int exp) {
+        // If reached max player level
+        if (playerLevel >= maxPlayerLevel) return false;
+
+        // Animation
+        expBarScript.AddExpAnimation(exp);
+
+        playerExp += exp;
+
+        if (playerExp > expNeededForLevel[playerLevel + 1]) {
+            LevelUp();
+            return true;
+        }
+
+        // At this point we know that we haven't levelled up
+        expBarScript.UpdateCurrExp(playerExp, ExpForNextLevel(), false);
+
+        PlayerPrefs.SetInt(PLAYER_EXP, playerExp);
+        return false;
+    }
+
+    /// <summary>
+    /// First pulls the exp bar down the adds exp. If it wasn't pulled down it will push it up
+    /// </summary>
+    /// <param name="exp"></param>
+    public void PullExpBarThenAdd(int exp) {
+        if (expBarScript.IsPulledDown) {
+            AddEXP(exp);
+        } else { 
+            expBarScript.PullDownExpBar(new DG.Tweening.TweenCallback(() => {
+                StartCoroutine(ExecuteAfterSeconds(0.2f, new Action(() => {
+                    AddEXP(exp);
+
+                    StartCoroutine(ExecuteAfterSeconds(2f, new Action(() => {
+                        expBarScript.PushUpExpBar();
+                    })));
+                })));
+            }));
+        }
+    }
+
+    /// <summary>
+    /// Levels up the player. Updates the levels and the exp as well. Also writes to playerprefs.
+    /// </summary>
+    private void LevelUp() {
+        if (playerLevel >= maxPlayerLevel) return;
+
+        playerExp = playerExp - expNeededForLevel[playerLevel + 1];
+        playerLevel++;
+
+        expBarScript.UpdateLevelUpTexts(playerLevel, ExpForNextLevel(), playerExp);
+
+        PlayerPrefs.SetInt(PLAYER_LEVEL, playerLevel);
+        PlayerPrefs.SetInt(PLAYER_EXP, playerExp);
+    }
+
+    private const int maxPlayerLevel = 30;
+    public int MaxPlayerLevel { get { return maxPlayerLevel; } }
+
+    /// <summary>
+    /// Stores the calculated expneeded
+    /// </summary>
+    private int[] expNeededForLevel = new int[maxPlayerLevel + 1];
+    /// <summary>
+    /// Returns -1 if the level you given is not between 2 and the maxLevel (both included)
+    /// </summary>
+    public int ExpForLevel(int level) {
+        if (level < 2 || level > maxPlayerLevel) return -1;
+
+        return expNeededForLevel[level];
+    }
+    /// <summary>
+    /// Returns how much exp is needed alles zusammen for the player to level up
+    /// </summary>
+    public int ExpForNextLevel() {
+        return expNeededForLevel[playerLevel + 1];
+    }
+    /// <summary>
+    /// Returns how much exp is left for the player to collect to level up
+    /// </summary>
+    public int ExpLeftForNextLevel() {
+        return expNeededForLevel[playerLevel + 1] - playerExp;
+    }
+
+    /// <summary>
+    /// This is only used for the first calculation at the start
+    /// </summary>
+    private int ExpNeededForLevel(int level) {
+        if (level <= 1) return 0;
+
+        if (level <= 7) {
+            return 1000 + (level - 2) * 200;
+        } else if (level <= maxPlayerLevel) {
+            return 1600 + (int) (Mathf.Pow(level, 3f) * 1.5f);
+        }
+
+        return 0;
+    }
+
 
     // _________________________Emojis_______________________________________________
 
@@ -68,7 +203,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
     public void SetEmojiInSlotTo(int slot, string name) {
         PlayerPrefs.SetString(EMOJI_NAME + slot, name);
-        PlayerPrefs.Save();
     }
 
 
@@ -111,7 +245,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public void ChangeToColorMode(ColorMode mode) {
         currentMode = mode;
         PlayerPrefs.SetString(COLOR_MODE, currentMode.ToString());
-        PlayerPrefs.Save();
 
         UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
         ColorChangeEvent(mode, changeDuration); // Call delaegateategateggatagegatge
@@ -120,7 +253,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public void ChangeToColorTheme(ColorTheme newTheme, string nameOfTheme) {
         currentTheme = newTheme;
         PlayerPrefs.SetString(THEME_MODE, nameOfTheme + "Theme");
-        PlayerPrefs.Save();
 
         UpdateSignResourceStrgColors(); // First update colors because some delegate listeners use it for simplicity
         ThemeChangeEvent(newTheme, changeDuration);// Call delaegateategateggasdasdsfeewedscxycasaatagegatge

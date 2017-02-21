@@ -3,8 +3,6 @@ using UnityEngine.UI;
 
 public class FirstUseCanvasScript : MonoBehaviour {
 
-    private float animTime = 0.3f;
-
     public Image lightLogo, darkLogo;
     
 	void Start() {

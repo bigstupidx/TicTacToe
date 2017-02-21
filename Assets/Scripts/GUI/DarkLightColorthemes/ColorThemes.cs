@@ -12,7 +12,7 @@ public static class ColorThemes {
         = new PreferencesScript.ColorTheme(new Color(0.47451f, 0.33333f, 0.28235f), new Color(1f, 0.34118f, 0.13333f), new Color(1f, 0.92157f, 0.23137f), new Color(0.39608f, 0.12157f, 1f), "DefaultAltAlt");
 
     public static PreferencesScript.ColorTheme AAAltTheme
-        = new PreferencesScript.ColorTheme(new Color(1f, 0.18824f, 0f), new Color(0f, 0.69804f, 0.4549f), new Color(1f, 0.75686f, 0.01569f), new Color(0.01569f, 0.18431f, 1f), "DefaultAAAlt");
+        = new PreferencesScript.ColorTheme(new Color(1f, 0.18824f, 0f), new Color(0f, 0.69804f, 0.4549f), new Color(0.95686f, 0.26275f, 0.21176f), new Color(0.24706f, 0.31765f, 0.7098f), "DefaultAAAlt");
 
     public static PreferencesScript.ColorTheme GetTheme(string name) {
         switch (name) {

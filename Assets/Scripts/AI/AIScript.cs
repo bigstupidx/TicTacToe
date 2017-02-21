@@ -20,6 +20,7 @@ public class AIScript : MonoBehaviour {
     private int afterSignCountMiss = 200;
 
     private Grid grid;
+    private AITTTGameLogic gameLogic;
     private System.Random rand;
 
     /// <summary>
@@ -51,11 +52,64 @@ public class AIScript : MonoBehaviour {
     void Start() {
         rand = new System.Random();
         grid = GetComponent<Grid>();
+        gameLogic = GetComponent<AITTTGameLogic>();
         Reset();
 
         // subscribe to events
         grid.SignWasPlaced += SignWasAdded;
         grid.SignWasRemoved += SignWasRemoved;
+        gameLogic.SomeoneWonGame += SomeoneWonGame;
+    }
+
+    /// <summary>
+    /// Event for when someone has won the game
+    /// </summary>
+    private void SomeoneWonGame(Cell.CellOcc type) {
+        if (type == HumanType) {
+            PreferencesScript.Instance.PullExpBarThenAdd((int) GetGameWonExp());
+        } else {
+            PreferencesScript.Instance.PullExpBarThenAdd((int) GetGameLostExp());
+        }
+    }
+
+    private int[,] playerExpTable = new int[,] {
+        { 0, 0, 0 },
+        { 0, 0, 0 },
+        { 0, 0, 0 },
+        { 100, 30, 10 },
+        { 200, 75, 40 }
+    };
+    /// <summary>
+    /// How much exp the player gets for winning this game
+    /// </summary>
+    private float GetGameWonExp() {
+        // Add for every sign in the game
+        float exp = pointsInGame.Count * 2f;
+
+        // Add for base for playing/winning
+        exp += 300;
+
+        // Add for every player's signinarow
+        for (int i = 0; i < pointsInGame.Count; i++) {
+            foreach (SignInARow signInARow in gameField[pointsInGame[i].x, pointsInGame[i].y].signsInARow) {
+                if (signInARow.Type == HumanType) {
+                    int length = signInARow.Length;
+
+                    if (length >= 3 && length <= 4) exp += playerExpTable[length, signInARow.BlockCount()];
+                }
+            }
+        }
+
+        // Difficulty
+        return exp * (1f - Mathf.Min(leaveOutChance * 1.8f, 1f));
+    }
+
+    /// <summary>
+    /// How much exp the player gets for losing this game
+    /// </summary>
+    /// <returns></returns>
+    private float GetGameLostExp() {
+        return GetGameWonExp() * 0.3f;
     }
 
     /// <summary>
@@ -498,6 +552,9 @@ public class AIScript : MonoBehaviour {
         return LocalAIToGridPos(pos);
     }
 
+    /// <summary>
+    /// It is called from AITTTGL StartNewGame
+    /// </summary>
     public void Reset() {
         bottomLeftPosOfField = new IntVector2(int.MaxValue, int.MaxValue);
         topRightPosOfField = new IntVector2(int.MinValue, int.MinValue);
