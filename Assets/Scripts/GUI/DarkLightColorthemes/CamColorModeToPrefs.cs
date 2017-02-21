@@ -2,9 +2,6 @@
 using DG.Tweening;
 
 public class CamColorModeToPrefs : MonoBehaviour {
-
-    private PreferencesScript preferences;
-
     /// <summary>
     /// Dark background's color
     /// </summary>
@@ -18,13 +15,12 @@ public class CamColorModeToPrefs : MonoBehaviour {
     private Camera myCamera;
 
     void Start () {
-        preferences = FindObjectOfType<PreferencesScript>();
         myCamera = GetComponent<Camera>();
 
         // Susbcribe to event
         PreferencesScript.ColorChangeEvent += ToMode;
 
-        ToMode(preferences.currentMode, 0);
+        ToMode(PreferencesScript.Instance.currentMode, 0);
 	}
 
     void OnDestroy() {

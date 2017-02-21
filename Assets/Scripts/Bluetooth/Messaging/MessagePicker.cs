@@ -42,9 +42,8 @@ public class MessagePicker : MonoBehaviour {
         fullPanelImage.gameObject.SetActive(false);
 
         // Set messages
-        PreferencesScript preferences = FindObjectOfType<PreferencesScript>();
-        messages = new MessagePickerMessageWithUI[preferences.EMOJI_COUNT];
-        string[] msgPaths = preferences.GetEmojiNames();
+        messages = new MessagePickerMessageWithUI[PreferencesScript.Instance.EMOJI_COUNT];
+        string[] msgPaths = PreferencesScript.Instance.GetEmojiNames();
         for (int i = msgPaths.Length - 1; i >= 0; i--) {
             messages[i] = new MessagePickerMessageWithUI(msgPaths[i]);
         }

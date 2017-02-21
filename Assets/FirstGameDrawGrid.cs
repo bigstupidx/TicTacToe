@@ -6,7 +6,7 @@ public class FirstGameDrawGrid : AIDrawGrid {
 
         // Disable movement for the player at start
         Camera.main.GetComponent<CameraMovement>().enabled = false;
-        gridManager.GetComponent<AIGridClickHandler>().isMovementEnabled = false
+        gridManager.GetComponent<AIGridClickHandler>().isMovementEnabled = false;
         gridManager.GetComponent<AIGridClickHandler>().isZoomEnabled = false;
     }
 }

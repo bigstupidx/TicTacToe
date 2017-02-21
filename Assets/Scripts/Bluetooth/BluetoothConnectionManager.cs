@@ -41,9 +41,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
     // For switching between states of bluetooth icon
     private DarkLightColor bluetoothColors;
 
-    // Prefs
-    private PreferencesScript preferences;
-
     void Start() {
         // Log if something has been missed in unity explorer
         if (!bluetoothEnabledImage) Debug.Log("Bluetooth enabled image missing!");
@@ -54,8 +51,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
         if (!lobbyPanel) Debug.Log("Lobby panel missing!");
 
         InitGUI();
-
-        preferences = FindObjectOfType<PreferencesScript>();
+        
         bluetoothColors = bluetoothEnabledImage.GetComponent<DarkLightColor>();
 
         //TODO find out why we can't connect
@@ -192,7 +188,10 @@ public class BluetoothConnectionManager : MonoBehaviour {
     private void SignalToPressBluetoothIcon() {
         GameObject touchIcon = bluetoothEnabledImage.transform.GetChild(0).gameObject;
         touchIcon.SetActive(true);
-        touchIcon.GetComponent<RectTransform>().DOShakeScale(2f, .7f, 3, 30f, false)
+        DOTween.Sequence()
+            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.1f, 1.5f))
+            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.0f, 1.5f))
+            .SetLoops(3, LoopType.Restart)
             .OnComplete(new TweenCallback(() => {
                 touchIcon.SetActive(false);
             }));
@@ -229,7 +228,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
         if (Bluetooth.Instance().IsEnabled()) {
             bluetoothEnabledImage.color = new Color(0.055f, 0.2265f, 0.5549f);
         } else {
-            bluetoothEnabledImage.color = bluetoothColors.GetColorOfMode(preferences.currentMode);
+            bluetoothEnabledImage.color = bluetoothColors.GetColorOfMode(PreferencesScript.Instance.currentMode);
         }
     }
 	

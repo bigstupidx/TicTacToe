@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
 using System;
 
-public class PreferencesScript : MonoBehaviour {
+public class PreferencesScript : Singleton<PreferencesScript> {
 
     private const string FIRST_USE = "FirstUse";
     private const string TUTORIAL_COMPLETED = "TutCompleted";
 
     private void Awake() {
-
-        DontDestroyOnLoad(gameObject);
-
         // If first use
         if (PlayerPrefs.GetString(FIRST_USE) == "") {
             PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
@@ -31,7 +28,9 @@ public class PreferencesScript : MonoBehaviour {
         UpdateSignResourceStrgColors();
     }
 
-    public bool IsTutorialCompleted() { return PlayerPrefs.GetInt(TUTORIAL_COMPLETED) == 1; }
+    public bool IsTutorialCompleted() {
+        return PlayerPrefs.GetInt(TUTORIAL_COMPLETED) == 1;
+    }
     public void SetTutorialToCompleted() { PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1); PlayerPrefs.Save(); }
 
     // _________________________Emojis_______________________________________________

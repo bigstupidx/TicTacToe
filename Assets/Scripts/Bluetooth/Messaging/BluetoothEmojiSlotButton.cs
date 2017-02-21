@@ -40,7 +40,7 @@ public class BluetoothEmojiSlotButton : MonoBehaviour {
         img = transform.GetChild(0).GetComponent<Image>();
 
         // Set current image
-        img.sprite = FindObjectOfType<PreferencesScript>().GetEmojiSpriteInSlot(slot);
+        img.sprite = PreferencesScript.Instance.GetEmojiSpriteInSlot(slot);
 
         // Subscribe to choose event
         pickContentPanel.OnEmojiChosen += SetImageTo;

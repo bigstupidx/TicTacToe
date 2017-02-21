@@ -36,7 +36,7 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
             }
         }
 
-        ChangeToMode(FindObjectOfType<PreferencesScript>().currentMode, 0);
+        ChangeToMode(PreferencesScript.Instance.currentMode, 0);
         PreferencesScript.ColorChangeEvent += ChangeToMode;
     }
 

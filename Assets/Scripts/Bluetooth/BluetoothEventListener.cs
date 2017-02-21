@@ -256,7 +256,7 @@ public class BluetoothEventListener : MonoBehaviour {
     private void StartGame() {
         if (!isServer) return;
 
-        FindObjectOfType<ScaneManager>().GoToScene("ServerBluetoothGame");
+        ScaneManager.Instance.GoToScene("ServerBluetoothGame");
         Bluetooth.Instance().Send(BluetoothMessageStrings.START_GAME);
     }
 
@@ -279,12 +279,12 @@ public class BluetoothEventListener : MonoBehaviour {
             case "UNABLE TO CONNECT":
                 // We are not in game, so most likely in lobby
                 if (!isInGame) {
-                    PopupManager.PopUp("Couldn't connect!", "OK");
+                    PopupManager.Instance.PopUp("Couldn't connect!", "OK");
                     bluetoothConnectionManager.NotConnectingAnymore();
                 } else { 
                     // We are in game
-                    PopupManager.PopUp("Lost connection!\n Going back to menu", "OK", () => {
-                        FindObjectOfType<ScaneManager>().GoToSceneWithErase("Menu");
+                    PopupManager.Instance.PopUp("Lost connection!\n Going back to menu", "OK", () => {
+                        ScaneManager.Instance.GoToSceneWithErase("Menu");
                     });
                 }
                 break;
@@ -344,7 +344,7 @@ public class BluetoothEventListener : MonoBehaviour {
                 switch (splitMessage[0]) {
                     case "STARTGAME": // Server sends that the game has been started
                         // Switch scenes
-                        FindObjectOfType<ScaneManager>().GoToScene("ClientBluetoothGame");
+                        ScaneManager.Instance.GoToScene("ClientBluetoothGame");
                         break;
                     case "WLP": // Server sends where last sign has been placed
                         int[] lastPos = new int[] {

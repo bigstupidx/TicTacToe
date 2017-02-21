@@ -15,17 +15,29 @@ public class EmojiPickPanelScript : MonoBehaviour {
     private bool isOpen = false;
     public bool IsOpen { get { return isOpen; } }
 
+
 	void Start () {
         rect = GetComponent<RectTransform>();
         buttonGroup = FindObjectOfType<EmojiSlotButtonGroupScript>();
 	}
 
+    private bool isMoved = false;
     void Update() {
-        // If not clicked on not UI and the drawer is open just close it for convinience
-        if ((!GridClickHandler.IsPointerOverUIObject() && Input.touchCount > 0) && isOpen) { 
-            Close();
-            buttonGroup.SetEveryButtonToggleFalse();
-            buttonGroup.MakeEveryButtonNormal();
+        if (Input.touchCount == 1) { 
+            Touch one = Input.GetTouch(0);
+            
+            if (one.phase == TouchPhase.Moved) isMoved = true;
+
+            // If not clicked on not UI and the drawer is open just close it for convinience
+            if (one.phase == TouchPhase.Ended && !isMoved) { 
+                if (!GridClickHandler.IsPointerOverUIObject() && isOpen) { 
+                    Close();
+                    buttonGroup.SetEveryButtonToggleFalse();
+                    buttonGroup.MakeEveryButtonNormal();
+                }
+
+                isMoved = false;
+            }
         }
     }
 	

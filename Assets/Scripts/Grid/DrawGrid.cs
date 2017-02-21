@@ -22,13 +22,10 @@ public class DrawGrid : MonoBehaviour {
 
     public int gridWidth;
     public int gridHeight;
-
-    protected PreferencesScript preferences;
+    
     protected GridLightDarkMode lightDark;
 
     public virtual void Start() {
-        preferences = FindObjectOfType<PreferencesScript>();
-
         // Init grid
         gridManager = Instantiate(Resources.Load(GRIDMANAGER_PREFAB_PATH) as GameObject);
         gridManager.name = "GridManager";
@@ -88,6 +85,6 @@ public class DrawGrid : MonoBehaviour {
         line.transform.DOScale(scale, 2f);
 
         // Set color based on dark or light color mode
-        line.GetComponent<SpriteRenderer>().color = lightDark.GetCorrespondingColor(preferences.currentMode);
+        line.GetComponent<SpriteRenderer>().color = lightDark.GetCorrespondingColor(PreferencesScript.Instance.currentMode);
     }
 }

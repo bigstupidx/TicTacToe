@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
-public class ScaneManager : MonoBehaviour {
+public class ScaneManager : Singleton<ScaneManager> {
 
     private Stack<string> prevScenes = new Stack<string>();
     

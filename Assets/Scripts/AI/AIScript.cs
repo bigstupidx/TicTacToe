@@ -59,7 +59,7 @@ public class AIScript : MonoBehaviour {
     }
 
     /// <summary>
-    /// 0 - Baby; 1 - Easy; 2 - Normal; 3 - Hard
+    /// 0 - Baby; 1 - Easy; 2 - Normal; 3 - Hard; 4 - Impossible
     /// </summary>
     public void SetDifficulty(int diff) {
         switch (diff) {
@@ -70,10 +70,13 @@ public class AIScript : MonoBehaviour {
                 leaveOutChance = 0.4f;
                 break;
             case 2:
-                leaveOutChance = 0.15f;
+                leaveOutChance = 0.185f;
                 break;
             case 3:
                 leaveOutChance = 0.05f;
+                break;
+            case 4:
+                leaveOutChance = 0f;
                 break;
         }
     }
@@ -363,6 +366,40 @@ public class AIScript : MonoBehaviour {
         return result;
     }
 
+    private IntVector2 WhichIsBetter(IntVector2 first, IntVector2 second, Cell.CellOcc placeType) {
+        float[] points = new float[2];
+
+        for (int j = 0; j < 2; j++) {
+            IntVector2 pos = j == 0 ? first : second;
+
+            // Data so we can revert the field back (because recursive algorithm)
+            List<PlaceData> placed;
+            List<PlaceData> removed;
+
+            // Set the examined cell to the current's sign
+            gameField[pos.x, pos.y].type = placeType;
+            NewSignPlaced(gameField, pos, out placed, out removed);
+            pointsInGame.Add(new IntVector2(pos));
+
+            float aiPoints, humPoints;
+            points[j] = GetPointsFromSignsInARow(gameField, pointsInGame, out aiPoints, out humPoints);
+
+            // Revert the field back 
+            for (int l = 0; l < placed.Count; l++)
+                gameField[placed[l].fieldPos.x, placed[l].fieldPos.y].signsInARow.Remove(placed[l].signInARow);
+            for (int l = 0; l < removed.Count; l++)
+                gameField[removed[l].fieldPos.x, removed[l].fieldPos.y].signsInARow.Add(removed[l].signInARow);
+
+            gameField[pos.x, pos.y].type = Cell.CellOcc.NONE;
+            pointsInGame.RemoveAt(pointsInGame.Count - 1);
+        }
+
+        if (placeType == AIType) // We are maximizing
+            return points[0] > points[1] ? first : second;
+        else // We are minimizing
+            return points[0] > points[1] ? second : first;
+    }
+
     public int[] StartEvaluation() {
         // ________________________________________ FIRST POINT __________________________________________________
         // There is only one placed in the game so just randomize it because otherwise it only places where we examine first
@@ -380,63 +417,55 @@ public class AIScript : MonoBehaviour {
         // It' only a defending mechanism so only checks for human pointsinrow
         // try places where we surely have to place
         // it has a smaller chance that it skips that position
-        SignInARow four = null, three = null;
+        SignInARow humThree = null, humFour = null;
+        SignInARow aiThree = null, aiFour = null;
 
         int tillI = pointsInGame.Count;
+        float exponentialChance = Mathf.Pow(leaveOutChance, 1.55f);
         for (int i = 0; i < tillI; i++) {
             List<SignInARow> list = gameField[pointsInGame[i].x, pointsInGame[i].y].signsInARow;
             for (int k = 0; k < list.Count; k++) {
                 // skip at random
-                if (list[k].Type == AIType || rand.NextDouble() <= leaveOutChance * 0.6f) continue;
+                if (rand.NextDouble() < exponentialChance) continue;
                 
 
                 int length = list[k].Length;
                 int blockCount = list[k].BlockCount();
                 
                 if (length == 3 && blockCount == 0) {
-                    three = list[k];
+                    // Store it so if after this loop we don't find a four (we don't return) place there
+                    if (list[k].Type == HumanType)
+                        humThree = list[k];
+                    else
+                        aiThree = list[k];
                 } else if (length == 4 && blockCount != 2) {
-                    four = list[k];
+
+                    // It prioritizes the fours so if it finds one place there
+                    if (list[k].Type == HumanType) {
+                        humFour = list[k];
+                    } else { // There is a 4 length that is AIType so place there
+                        aiFour = list[k];
+                    }
                 }
             }
         }
 
-        // We need to check here because it has to prioritize the fours and not the threes if it comes down to that
-        if (four != null) {
-            return LocalAIToGridPos(four.GetUnblockedPos());
-        } else if (three != null) {// We are going to decide which position is better 
+        // First if there is a four type ai where we can place win the game
+        if (aiFour != null) return LocalAIToGridPos(aiFour.GetUnblockedPos());
+        // If there is a four that is type of human we should really place there
+        if (humFour != null) return LocalAIToGridPos(humFour.GetUnblockedPos());
 
-            float[] points = new float[2];
-
-            for (int j = 0; j < 2; j++) {
-                IntVector2 pos = j == 0 ? three.GetBlockField1Pos() : three.GetBlockField2Pos();
-
-                // Data so we can revert the field back (because recursive algorithm)
-                List<PlaceData> placed;
-                List<PlaceData> removed;
-
-                // Set the examined cell to the current's sign
-                gameField[pos.x, pos.y].type = AIType;
-                NewSignPlaced(gameField, three.GetBlockField1Pos(), out placed, out removed);
-                pointsInGame.Add(new IntVector2(pos));
-
-                float aiPoints, humPoints;
-                points[j] = GetPointsFromSignsInARow(gameField, pointsInGame, out aiPoints, out humPoints);
-
-                // Revert the field back 
-                for (int l = 0; l < placed.Count; l++)
-                    gameField[placed[l].fieldPos.x, placed[l].fieldPos.y].signsInARow.Remove(placed[l].signInARow);
-                for (int l = 0; l < removed.Count; l++)
-                    gameField[removed[l].fieldPos.x, removed[l].fieldPos.y].signsInARow.Add(removed[l].signInARow);
-
-                gameField[pos.x, pos.y].type = Cell.CellOcc.NONE;
-                pointsInGame.RemoveAt(pointsInGame.Count - 1);
-            }
-
-            return LocalAIToGridPos(points[0] > points[1] ? three.GetBlockField1Pos() : three.GetBlockField2Pos());
+        // If there is a signinarow with aitype that is length of three decide which is better and return that
+        if (aiThree != null) {
+            return LocalAIToGridPos(WhichIsBetter(aiThree.GetBlockField1Pos(), aiThree.GetBlockField2Pos(), AIType));
         }
 
+        // If there is no three with AI type but there is one for the human decide which is better
+        if (humThree != null) { // We are going to decide which position is better 
+            return LocalAIToGridPos(WhichIsBetter(humThree.GetBlockField1Pos(), humThree.GetBlockField2Pos(), AIType));
+        }
 
+        // Come here is everything else fails
         // ___________________ NORMAL EVAL _____________________________-
         EvaluationResult result = new EvaluationResult();
         try {
@@ -459,6 +488,8 @@ public class AIScript : MonoBehaviour {
             float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x) * 2f;
 
             Vector2 vect = UnityEngine.Random.insideUnitCircle * (r - innerR) + new Vector2(innerR, innerR);
+            vect.x *= rand.NextDouble() < 0.5 ? -1 : 1;
+            vect.y *= rand.NextDouble() < 0.5 ? -1 : 1;
             pos = topRightPosOfField + new IntVector2((int) vect.x, (int) vect.y);
 
             ch = grid.GetCellHolderAtGridPos(LocalAIToGridPos(pos.x, pos.y));

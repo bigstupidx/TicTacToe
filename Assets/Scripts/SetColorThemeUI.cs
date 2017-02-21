@@ -18,7 +18,6 @@ public class SetColorThemeUI : MonoBehaviour {
     private EventTrigger eventTrigger;
 
     private ColorThemesUIHandler colorThemesHandler;
-    private PreferencesScript preferences;
 
     public Color clickedColor = new Color(0.32941f, 0.43137f, 0.47843f);
 
@@ -43,7 +42,6 @@ public class SetColorThemeUI : MonoBehaviour {
         rectTransform = GetComponent<RectTransform>();
         eventTrigger = gameObject.AddComponent<EventTrigger>();
         colorThemesHandler = transform.parent.GetComponent<ColorThemesUIHandler>();
-        preferences = FindObjectOfType<PreferencesScript>();
     }
 
     void Start() {
@@ -54,7 +52,7 @@ public class SetColorThemeUI : MonoBehaviour {
             // Reset all button's color first
             colorThemesHandler.ResetColorsOfButtons();
             // Set color theme
-            preferences.ChangeToColorTheme(currentTheme, colorThemeName);
+            PreferencesScript.Instance.ChangeToColorTheme(currentTheme, colorThemeName);
             DOTween.Sequence()
                 .Append(rectTransform.DOScale(0.8f, CLICK_ANIM_TIME / 2f))
                 .Append(rectTransform.DOScale(1f, CLICK_ANIM_TIME / 2f))

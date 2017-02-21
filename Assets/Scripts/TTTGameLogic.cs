@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public class TTTGameLogic : MonoBehaviour {
 
+    public delegate void GameWon(Cell.CellOcc type);
+    public event GameWon SomeoneWonGame;
+
     public static bool ResetFiles = false;
 
     // grid
@@ -73,6 +76,8 @@ public class TTTGameLogic : MonoBehaviour {
         if (cellWon.gameWon) {
             cellWon = grid.StopCurrentGame(cellWon);
             gameStarted = false;
+
+            if (SomeoneWonGame != null) SomeoneWonGame(cellWon.winType);
             
             StartCoroutine("DrawBorderToGame", cellWon);
         }

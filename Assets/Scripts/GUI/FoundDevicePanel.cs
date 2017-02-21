@@ -18,11 +18,9 @@ public class FoundDevicePanel : MonoBehaviour {
     private string connectionAddress;
 
     private BluetoothConnectionManager connectionManager;
-    private PreferencesScript preferences;
 
     void Awake() {
         connectionManager = FindObjectOfType<BluetoothConnectionManager>();
-        preferences = FindObjectOfType<PreferencesScript>();
 
         nameText = transform.GetChild(0).GetComponent<Text>();
 
@@ -52,7 +50,7 @@ public class FoundDevicePanel : MonoBehaviour {
         imageTrigger.triggers.Add(entry);
 
         // Dark mode
-        if (preferences.currentMode == PreferencesScript.ColorMode.DARK) {
+        if (PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.DARK) {
             nameText.color = darkModeColor;
             transform.GetChild(1).GetComponent<Image>().color = darkModeColor;
         }

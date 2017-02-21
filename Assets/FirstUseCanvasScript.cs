@@ -8,10 +8,10 @@ public class FirstUseCanvasScript : MonoBehaviour {
     public Image lightLogo, darkLogo;
     
 	void Start() {
-        if (FindObjectOfType<PreferencesScript>().IsTutorialCompleted()) gameObject.SetActive(false);
+        if (PreferencesScript.Instance.IsTutorialCompleted()) gameObject.SetActive(false);
 	}
 
     public void StartButtonPressed() {
-        FindObjectOfType<ScaneManager>().GoToScene("FirstGame");
+        ScaneManager.Instance.GoToScene("FirstGame");
     }
 }

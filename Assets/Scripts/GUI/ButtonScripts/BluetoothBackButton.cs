@@ -13,7 +13,7 @@ public class BluetoothBackButton : MonoBehaviour {
             Bluetooth.Instance().Stop();
             Bluetooth.Instance().DisableBluetooth();
 
-            GameObject.Find("SceneManager").GetComponent<ScaneManager>().GoToSceneWithErase("Menu");
+            ScaneManager.Instance.GoToSceneWithErase("Menu");
         });
     }
 

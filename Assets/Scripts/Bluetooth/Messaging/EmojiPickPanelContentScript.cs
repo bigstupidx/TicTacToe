@@ -22,8 +22,6 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
 
     private GameObject messageOnDrawerPrefab;
 
-    private PreferencesScript preferences;
-
     private RectTransform rect;
     private ScrollRect scrollRect;
     private GameObject currentlyEnabled;
@@ -39,7 +37,6 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
         rect = GetComponent<RectTransform>();
         messageOnDrawerPrefab = Resources.Load<GameObject>("Prefabs/Bluetooth/Messaging/MessageOnDrawer");
         scrollRect = transform.parent.GetComponent<ScrollRect>();
-        preferences = FindObjectOfType<PreferencesScript>();
 
         // adding images to drawer fomr here
 
@@ -92,7 +89,7 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
     public void SetNumberEnabled(int number) {
         currentSlot = number;
 
-        SetEnabled(preferences.GetEmojiNameInSlot(number));
+        SetEnabled(PreferencesScript.Instance.GetEmojiNameInSlot(number));
     }
 
     /// <summary>
@@ -112,7 +109,7 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
         currentlyEnabled.transform.parent.GetComponent<EmojiButtonScript>().isEnabled = true;
 
         // Set perferences
-        preferences.SetEmojiInSlotTo(currentSlot, currentlyEnabled.transform.parent.name);
+        PreferencesScript.Instance.SetEmojiInSlotTo(currentSlot, currentlyEnabled.transform.parent.name);
         
         DOTween.To(() => scrollRect.verticalNormalizedPosition, (float value) => scrollRect.verticalNormalizedPosition = value, 1 - (Mathf.Abs(currentlyEnabled.transform.parent.gameObject.GetComponent<RectTransform>().anchoredPosition.y) / realHeight), 0.2f);
     }

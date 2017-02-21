@@ -10,7 +10,7 @@ public class BackButton : MonoBehaviour {
         buttonScript = GetComponent<Button>();
 
         buttonScript.onClick.AddListener(() => {
-            GameObject.Find("SceneManager").GetComponent<ScaneManager>().GoToPreviousSene();
+            ScaneManager.Instance.GoToPreviousSene();
 
             // Do something based on which screen we backed from
             switch (SceneManager.GetActiveScene().name) {

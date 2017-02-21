@@ -55,7 +55,7 @@ public class GridClickHandler : MonoBehaviour {
 
             // Make sure the orthographic size stays between the given numbers
             Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minOrthSize, maxOrthSize);
-        } else if (Input.touchCount == 1 && !zooming && isMovementEnabled) {
+        } else if (Input.touchCount == 1 && !zooming) {
             Touch touch = new Touch();
             touch = Input.GetTouch(0);
             
@@ -63,10 +63,10 @@ public class GridClickHandler : MonoBehaviour {
                 moveAmount.x = 0; moveAmount.y = 0;
                 fingerPrevPos = Camera.main.ScreenToViewportPoint(touch.position);
                 // Move grid
-            } else if (touch.phase == TouchPhase.Moved) {
+            } else if (touch.phase == TouchPhase.Moved && Input.touchCount == 1) {
                 moveAmount += new Vector2(Mathf.Abs(touch.deltaPosition.x), Mathf.Abs(touch.deltaPosition.y));
 
-                if (moveAmount.x > fingerMoveMin || moveAmount.y > fingerMoveMin) {
+                if ((moveAmount.x > fingerMoveMin || moveAmount.y > fingerMoveMin) && isMovementEnabled) {
                     // Set finger pos in viewport coords
                     Vector3 fingerPos = Camera.main.ScreenToViewportPoint(touch.position);
                     Vector3 fingerDelta = Camera.main.ViewportToWorldPoint(fingerPos) - Camera.main.ViewportToWorldPoint(fingerPrevPos);

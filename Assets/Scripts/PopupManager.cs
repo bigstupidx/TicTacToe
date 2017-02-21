@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.Events;
 
-public class PopupManager : MonoBehaviour {
+public class PopupManager : Singleton<PopupManager> {
     
     private static GameObject popupPrefab;
     private static GameObject popupInstance;
@@ -14,9 +14,7 @@ public class PopupManager : MonoBehaviour {
 
     // Whether pop up is out of screen or not
     private static bool popupOut = true;
-
-    private static PreferencesScript preferences;
-
+    
     void Awake() {
         DontDestroyOnLoad(gameObject);
 
@@ -25,7 +23,6 @@ public class PopupManager : MonoBehaviour {
 
     private void LoadResources() {
         popupPrefab = Resources.Load<GameObject>("Prefabs/GUI/PopupPanel");
-        preferences = FindObjectOfType<PreferencesScript>();
     }
 
     void OnApplicationPause(bool paused) {
@@ -37,7 +34,7 @@ public class PopupManager : MonoBehaviour {
     /// <summary>
     /// Create new popup
     /// </summary>
-    public static void PopUp(string text, string buttonText) {
+    public void PopUp(string text, string buttonText) {
         if (!popupOut) return;
         popupOut = false;
 
@@ -85,7 +82,7 @@ public class PopupManager : MonoBehaviour {
     /// Makes popup
     /// After button is pressed and animation is played the callback happens
     /// </summary>
-    public static void PopUp(string text, string buttonText, UnityAction action) {
+    public void PopUp(string text, string buttonText, UnityAction action) {
         if (!popupOut) return;
 
         PopUp(text, buttonText);
