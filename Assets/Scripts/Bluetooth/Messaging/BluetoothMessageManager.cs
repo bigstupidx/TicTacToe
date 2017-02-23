@@ -60,8 +60,7 @@ public class BluetoothMessageManager : MonoBehaviour {
 
 }
 
-public static class 
-    EmojiSprites {
+public static class EmojiSprites {
     public static string[] emojiPaths = new string[] {
         "smilingEmoji",
         "angryEmoji",
@@ -90,7 +89,7 @@ public static class
 
     public static Dictionary<string, Sprite> emojis;
 
-    static EmojiSprites() {
+    public static void LoadEmojiSprites() {
         emojis = new Dictionary<string, Sprite>();
 
         string path = "Textures/GUI/Emojis/";

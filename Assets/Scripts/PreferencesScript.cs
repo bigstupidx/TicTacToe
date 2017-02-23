@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PreferencesScript : Singleton<PreferencesScript> {
 
@@ -8,21 +9,31 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     private const string TUTORIAL_COMPLETED = "TutCompleted";
 
     private void Awake() {
+        EmojiSprites.LoadEmojiSprites();
+        rewardPanel = FindObjectOfType<RewardPanelScript>();
+
         // If first use
-        if (PlayerPrefs.GetString(FIRST_USE) == "") {
+        if (PlayerPrefs.GetString(FIRST_USE) == "IMDEADINSIDEPLSHELPME") {
             PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
             PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
+
+            for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++)
+                PlayerPrefs.SetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i], 0);
 
             PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
             PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
-            
+            PlayerPrefs.SetInt(IS_UNLOCKED + "smilingEmoji", 1);
+            PlayerPrefs.SetInt(IS_UNLOCKED + "angryEmoji", 1);
+            PlayerPrefs.SetInt(IS_UNLOCKED + "fistBumpEmoji", 1);
+            PlayerPrefs.SetInt(IS_UNLOCKED + "thinkingEmoji", 1);
+
             PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
 
             PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDEPLSHELPME");
 
-            PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+            PlayerPrefs.SetInt(PLAYER_LEVEL, 2);
             PlayerPrefs.Save();
         }
 
@@ -39,6 +50,11 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         for (int i = 2; i <= maxPlayerLevel; i++)
             expNeededForLevel[i] = ExpNeededForLevel(i);
+
+        // Unlocks
+        for (int i = 0; i < emojisUnlocked.Length; i++) {
+            emojisUnlocked[i] = PlayerPrefs.GetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i]) == 1;
+        }
     }
 
     public bool IsTutorialCompleted() {
@@ -52,10 +68,95 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         action.Invoke();
     }
 
+    // ____________________________________UNLOCKS_____________________________________
+
+    /// <summary>
+    /// Concat a string at the end about which item you want the information
+    /// </summary>
+    private const string IS_UNLOCKED = "unlocked";
+    private const string IS_BLUETOOTH_UNLOCKED = "BluetoothUnlocked";
+    private const string IS_LOCAL_MULTI_UNLOCKED = "LocalMultiUnlocked";
+
+    /// <summary>
+    /// These correspond to the one in EmojiSprites
+    /// </summary>
+    private bool[] emojisUnlocked = new bool[EmojiSprites.emojiPaths.Length];
+    
+    /// <summary>
+    /// Returns the three unlocks that the given level has
+    /// </summary>
+    public Unlockable[] GetUnlocks(int level) {
+        // What kind of unlockables are left that should be given at random
+        List<Unlockable> left = new List<Unlockable>();
+
+        for (int i = 0; i < emojisUnlocked.Length; i++)
+            if (!emojisUnlocked[i])
+                left.Add(new Unlockable(UnlockableType.Emoji, EmojiSprites.emojiPaths[i]));
+
+        // There are going to be 3 of them
+        Unlockable[] unlock = new Unlockable[3];
+        int unlockAt = 0;
+
+        // assign the ones that we have to
+        switch (level) {
+            case 2:
+                unlock[0] = new Unlockable(UnlockableType.LocalMulti, "");
+                unlockAt++;
+                break;
+            case 5:
+                unlock[0] = new Unlockable(UnlockableType.Bluetooth, "");
+                unlockAt++;
+                break;
+        }
+
+        // there is nothing to unlock so get out of here
+        if (left.Count == 0 && unlockAt == 0) return new Unlockable[3];
+
+        while (unlockAt < 3) {
+            Unlockable ul;
+            do {
+                ul = left[UnityEngine.Random.Range(0, left.Count)];
+            } while (ul.extra == "ITHASALREADYBEEN__!!/%/");
+
+            unlock[unlockAt] = new Unlockable(ul);
+            ul.extra = "ITHASALREADYBEEN__!!/%/";
+            unlockAt++;
+        }
+
+        return unlock;
+    }
+
+    /// <summary>
+    /// Unlocks all unlockabled given to it
+    /// </summary>
+    public void Unlock(Unlockable[] unlocks) {
+        for (int i = 0; i < unlocks.Length; i++) {
+            if (unlocks[i] != null)
+                switch (unlocks[i].type) {
+                    case UnlockableType.Bluetooth: PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 1); break;
+                    case UnlockableType.LocalMulti: PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 1); break;
+                    case UnlockableType.Emoji: PlayerPrefs.SetInt(IS_UNLOCKED + unlocks[i].extra, 1); break;
+                }
+        }
+    }
+
+    /// <summary>
+    /// Does the job of GetUnlocks and Unlock as well
+    /// </summary>
+    public Unlockable[] GetUnlocksForLevelAndUnlock(int level) {
+        Unlockable[] unlocks = GetUnlocks(level);
+        Unlock(unlocks);
+
+        return unlocks;
+    }
+
+
     // ____________________________________LEVELS____________________________________
 
     private const string PLAYER_LEVEL = "PlayerLevel";
     private const string PLAYER_EXP = "PlayerExp";
+
+    private RewardPanelScript rewardPanel;
 
     private int playerLevel;
     public int PlayerLevel { get { return playerLevel; } }
@@ -119,6 +220,8 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         playerLevel++;
 
         expBarScript.UpdateLevelUpTexts(playerLevel, ExpForNextLevel(), playerExp);
+
+        rewardPanel.LevelUpAnimation();
 
         PlayerPrefs.SetInt(PLAYER_LEVEL, playerLevel);
         PlayerPrefs.SetInt(PLAYER_EXP, playerExp);
@@ -304,4 +407,23 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         }
     }
 
+}
+
+public class Unlockable {
+    public UnlockableType type;
+    public string extra;
+
+    public Unlockable(UnlockableType type, string extra) {
+        this.type = type;
+        this.extra = extra;
+    }
+
+    public Unlockable(Unlockable other) {
+        this.type = other.type;
+        this.extra = other.extra;
+    }
+}
+
+public enum UnlockableType {
+    Emoji, Bluetooth, LocalMulti
 }

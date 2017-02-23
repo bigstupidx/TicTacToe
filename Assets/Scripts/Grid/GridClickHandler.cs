@@ -40,8 +40,8 @@ public class GridClickHandler : MonoBehaviour {
             Touch touchOne = Input.GetTouch(1);
 
             // Find the position in the previous frame of each touch.
-            Vector2 touchZeroPrevPos = Camera.main.ScreenToViewportPoint(touchZero.position - touchZero.deltaPosition);
-            Vector2 touchOnePrevPos = Camera.main.ScreenToViewportPoint(touchOne.position - touchOne.deltaPosition);
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
             // Find the magnitude of the vector (the distance) between the touches in each frame.
             float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;

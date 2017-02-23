@@ -48,24 +48,34 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     /// Changes everything that we told it to to light mode
     /// </summary>
     public void ChangeToLightMode(float time) {
-        foreach (Image image in updateToColorModesImg) {
-            DarkLightColor dlc = image.GetComponent<DarkLightColor>();
+        for (int i = updateToColorModesImg.Count - 1; i >= 0; i--) {
+            if (updateToColorModesImg[i] == null) {
+                updateToColorModesImg.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorModesImg[i].GetComponent<DarkLightColor>();
 
             if (dlc != null) {
-                image.DOColor(dlc.lightModeColor, time);
-            } else { 
-                image.DOColor(lightModeColor, time);
+                updateToColorModesImg[i].DOColor(dlc.lightModeColor, time);
+            } else {
+                updateToColorModesImg[i].DOColor(lightModeColor, time);
             }
         }
 
-        foreach (Text txt in updateToColorModesTxt) {
-            DarkLightColor dlc = txt.GetComponent<DarkLightColor>();
+        for (int i = updateToColorModesTxt.Count - 1; i >= 0; i--) {
+            if (updateToColorModesTxt[i] == null) {
+                updateToColorModesTxt.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorModesTxt[i].GetComponent<DarkLightColor>();
 
             // text is exactly opposite color
             if (dlc != null) {
-                txt.DOColor(dlc.lightModeColor, time);
+                updateToColorModesTxt[i].DOColor(dlc.lightModeColor, time);
             } else {
-                txt.DOColor(lightModeColor, time);
+                updateToColorModesTxt[i].DOColor(lightModeColor, time);
             }
         }
     }
@@ -73,24 +83,34 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     /// Changes everything that we told it to to dark mode
     /// </summary>
     public void ChangeToDarkMode(float time) {
-        foreach (Image image in updateToColorModesImg) {
-            DarkLightColor dlc = image.GetComponent<DarkLightColor>();
+        for (int i = updateToColorModesImg.Count - 1; i >= 0; i--) {
+            if (updateToColorModesImg[i] == null) {
+                updateToColorModesImg.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorModesImg[i].GetComponent<DarkLightColor>();
 
             if (dlc != null) {
-                image.DOColor(dlc.darkModeColor, time);
+                updateToColorModesImg[i].DOColor(dlc.darkModeColor, time);
             } else {
-                image.DOColor(darkModeColor, time);
+                updateToColorModesImg[i].DOColor(darkModeColor, time);
             }
         }
 
-        foreach (Text txt in updateToColorModesTxt) {
-            DarkLightColor dlc = txt.GetComponent<DarkLightColor>();
+        for (int i = updateToColorModesTxt.Count - 1; i >= 0; i--) {
+            if (updateToColorModesTxt[i] == null) {
+                updateToColorModesTxt.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorModesTxt[i].GetComponent<DarkLightColor>();
 
             // text is exactly opposite color
             if (dlc != null) {
-                txt.DOColor(dlc.darkModeColor, time);
+                updateToColorModesTxt[i].DOColor(dlc.darkModeColor, time);
             } else {
-                txt.DOColor(darkModeColor, time);
+                updateToColorModesTxt[i].DOColor(darkModeColor, time);
             }
         }
     }

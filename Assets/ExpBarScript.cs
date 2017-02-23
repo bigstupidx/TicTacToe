@@ -16,7 +16,7 @@ public class ExpBarScript : MonoBehaviour {
     
 	void Start() {
         if (FindObjectsOfType<ExpBarScript>().Length > 1) {
-            Destroy(gameObject);
+            Destroy(transform.parent.gameObject);
             return;
         }
 

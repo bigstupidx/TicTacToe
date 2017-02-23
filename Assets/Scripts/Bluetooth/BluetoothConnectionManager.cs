@@ -189,8 +189,8 @@ public class BluetoothConnectionManager : MonoBehaviour {
         GameObject touchIcon = bluetoothEnabledImage.transform.GetChild(0).gameObject;
         touchIcon.SetActive(true);
         DOTween.Sequence()
-            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.1f, 1.5f))
-            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.0f, 1.5f))
+            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.3f, 0.5f))
+            .Append(touchIcon.GetComponent<RectTransform>().DOScale(1.0f, 0.5f))
             .SetLoops(3, LoopType.Restart)
             .OnComplete(new TweenCallback(() => {
                 touchIcon.SetActive(false);
