@@ -1,14 +1,26 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class MenuButtonPanelScript : MonoBehaviour {
 
     float animTime = 0.5f;
 
+    [SerializeField]
     private MenuButton localButton;
+    [SerializeField]
+    private MenuButton onlineButton;
+    [SerializeField]
     private MenuButton bluetoothButton;
+    [SerializeField]
+    private MenuButton googlePlayButton;
+    [SerializeField]
+    private MenuButton onlineBackButton;
+    [SerializeField]
     private MenuButton localMultiButton;
+    [SerializeField]
     private MenuButton localAIButton;
+    [SerializeField]
     private MenuButton localBackButton;
 
     private bool isLocalForward = false;
@@ -20,20 +32,14 @@ public class MenuButtonPanelScript : MonoBehaviour {
     }
     
 	void Start () {
-        Transform child = transform.GetChild(3);
-        localButton = new MenuButton(child.GetComponent<RectTransform>(), child.GetComponent<CanvasGroup>());
-
-        child = transform.GetChild(4);
-        bluetoothButton = new MenuButton(child.GetComponent<RectTransform>(), child.GetComponent<CanvasGroup>());
-
-        child = transform.GetChild(0);
-        localMultiButton = new MenuButton(child.GetComponent<RectTransform>(), child.GetComponent<CanvasGroup>());
-
-        child = transform.GetChild(1);
-        localAIButton = new MenuButton(child.GetComponent<RectTransform>(), child.GetComponent<CanvasGroup>());
-
-        child = transform.GetChild(2);
-        localBackButton = new MenuButton(child.GetComponent<RectTransform>(), child.GetComponent<CanvasGroup>());
+        localAIButton.canavasGroup = localButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        onlineButton.canavasGroup = onlineButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        bluetoothButton.canavasGroup = bluetoothButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        googlePlayButton.canavasGroup = googlePlayButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        onlineBackButton.canavasGroup = onlineBackButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        localMultiButton.canavasGroup = localMultiButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        localAIButton.canavasGroup = localAIButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        localBackButton.canavasGroup = localBackButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
     }
 
     public void LocalButtonPressed() {
@@ -121,8 +127,10 @@ public class MenuButtonPanelScript : MonoBehaviour {
     }
 }
 
+[Serializable]
 internal struct MenuButton {
     public RectTransform rectTransform;
+    [HideInInspector]
     public CanvasGroup canavasGroup;
 
     public MenuButton(RectTransform rectTransform, CanvasGroup canvasGroup) {
