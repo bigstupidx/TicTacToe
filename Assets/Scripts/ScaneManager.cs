@@ -5,14 +5,28 @@ using System.Collections.Generic;
 public class ScaneManager : Singleton<ScaneManager> {
 
     private Stack<string> prevScenes = new Stack<string>();
+
+    public delegate void ScreenChange(string from, string to);
+    public static event ScreenChange OnScreenChange;
     
     void Start() {
         DontDestroyOnLoad(gameObject);
     }
 
 	public void GoToScene(string name) {
-        prevScenes.Push(SceneManager.GetActiveScene().name);
+        string from = SceneManager.GetActiveScene().name;
+        prevScenes.Push(from);
         SceneManager.LoadScene(name);
+
+        StartCoroutine(SceneLoaded(from, name));
+    }
+
+    private System.Collections.IEnumerator SceneLoaded(string from, string name) {
+        // the loading of scene ends the next frame from when it started so we need two of these
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        
+        if (OnScreenChange != null) OnScreenChange(from, name);
     }
 
     /// <summary>

@@ -6,6 +6,8 @@ using System;
 
 public class FirstGameManager : MonoBehaviour {
 
+    private CanvasScaler canvasScaler;
+
     public RectTransform scoringRect;
     public GameObject backButton;
     public Image clickImge;
@@ -36,6 +38,8 @@ public class FirstGameManager : MonoBehaviour {
         grid = GetComponent<Grid>();
         gameLogic = GetComponent<AITTTGameLogic>();
         aiScript = GetComponent<AIScript>();
+
+        canvasScaler = GameObject.Find("Canvas").GetComponent<CanvasScaler>();
 
         Color htc = helpText.color; htc.a = 0; helpText.color = htc;
 
@@ -148,11 +152,11 @@ public class FirstGameManager : MonoBehaviour {
                 break;
             case 13: // Give move abilities
 
-                Vector2 clickimgPos = new Vector2(-Camera.main.pixelWidth * 0.25f, -Camera.main.pixelHeight / 2 * 0.7f);
+                Vector2 clickimgPos = new Vector2(-canvasScaler.referenceResolution.x * 0.25f, -canvasScaler.referenceResolution.y / 2 * 0.7f);
                 DOTween.Sequence()
                     .Append(clickImge.rectTransform.DOLocalMove(clickimgPos, 0f))
                     .Append(clickImge.DOFade(1f, 0.2f))
-                    .Append(clickImge.rectTransform.DOLocalMoveX(Camera.main.pixelWidth * 0.25f, 1.4f))
+                    .Append(clickImge.rectTransform.DOLocalMoveX(canvasScaler.referenceResolution.x * 0.25f, 1.4f))
                     .Append(clickImge.DOFade(0f, 0.2f))
                     .SetLoops(2, LoopType.Restart);
 

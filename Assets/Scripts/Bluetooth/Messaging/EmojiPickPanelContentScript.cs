@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
@@ -39,9 +40,17 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
         scrollRect = transform.parent.GetComponent<ScrollRect>();
 
         // adding images to drawer fomr here
+        // only include unlocked emojis
+        List<string> unlockedEmojis = new List<string>();
+
+        for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++) {
+            if (PreferencesScript.Instance.IsEmojiUnlocked(i)) {
+                unlockedEmojis.Add(EmojiSprites.emojiPaths[i]);
+            }
+        }
 
         colCount = (int) (rect.rect.width / widthHeight) - 1; // -1 so we can have some padding around the images
-        rowCount = Mathf.CeilToInt((float) EmojiSprites.emojiPaths.Length / colCount);
+        rowCount = Mathf.CeilToInt((float) unlockedEmojis.Count / colCount);
 
         realHeight = (rowCount + 1) * (widthHeight + imagePadding) + imagePadding;
 
@@ -53,12 +62,12 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
         float xPos;
         float yPos = -imagePadding;
         // Going from left to right, top to bottom
-        for (int i = 0; i < rowCount && at < EmojiSprites.emojiPaths.Length; i++) {
+        for (int i = 0; i < rowCount && at < unlockedEmojis.Count; i++) {
             xPos = imagePadding;
-            for (int k = 0; k < colCount && at < EmojiSprites.emojiPaths.Length; k++) {
+            for (int k = 0; k < colCount && at < unlockedEmojis.Count; k++) {
                 // making gameobject
                 GameObject msg = Instantiate(messageOnDrawerPrefab, transform, false);
-                msg.name = EmojiSprites.emojiPaths[at];
+                msg.name = unlockedEmojis[at];
 
                 // Setting size and pos
                 RectTransform msgrect = msg.GetComponent<RectTransform>();
@@ -67,7 +76,7 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
 
                 // Setting sprite
                 Image img = msg.transform.GetChild(1).GetComponent<Image>();
-                img.sprite = EmojiSprites.GetEmoji(EmojiSprites.emojiPaths[at]);
+                img.sprite = EmojiSprites.GetEmoji(msg.name);
                 img.color = disabledColor;
 
 

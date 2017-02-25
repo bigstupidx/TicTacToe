@@ -13,28 +13,9 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         rewardPanel = FindObjectOfType<RewardPanelScript>();
 
         // If first use
-        if (PlayerPrefs.GetString(FIRST_USE) == "IMDEADINSIDEPLSHELPME") {
-            PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
-            PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
-
-            for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++)
-                PlayerPrefs.SetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i], 0);
-
-            PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
-            PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
-            PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
-            PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
-            PlayerPrefs.SetInt(IS_UNLOCKED + "smilingEmoji", 1);
-            PlayerPrefs.SetInt(IS_UNLOCKED + "angryEmoji", 1);
-            PlayerPrefs.SetInt(IS_UNLOCKED + "fistBumpEmoji", 1);
-            PlayerPrefs.SetInt(IS_UNLOCKED + "thinkingEmoji", 1);
-
-            PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
-
+        if (PlayerPrefs.GetString(FIRST_USE) == "") {
+            ResetPreferences();
             PlayerPrefs.SetString(FIRST_USE, "IMDEADINSIDEPLSHELPME");
-
-            PlayerPrefs.SetInt(PLAYER_LEVEL, 2);
-            PlayerPrefs.Save();
         }
 
         expBarScript = FindObjectOfType<ExpBarScript>();
@@ -52,9 +33,30 @@ public class PreferencesScript : Singleton<PreferencesScript> {
             expNeededForLevel[i] = ExpNeededForLevel(i);
 
         // Unlocks
-        for (int i = 0; i < emojisUnlocked.Length; i++) {
-            emojisUnlocked[i] = PlayerPrefs.GetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i]) == 1;
-        }
+        UpdateEmojiUnlocks();
+    }
+
+    public void ResetPreferences() {
+        PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
+        PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
+
+        for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++)
+            PlayerPrefs.SetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i], 0);
+        PlayerPrefs.SetInt(PLAYER_EXP, 0);
+
+        PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
+        PlayerPrefs.SetInt(IS_UNLOCKED + "smilingEmoji", 1);
+        PlayerPrefs.SetInt(IS_UNLOCKED + "angryEmoji", 1);
+        PlayerPrefs.SetInt(IS_UNLOCKED + "fistBumpEmoji", 1);
+        PlayerPrefs.SetInt(IS_UNLOCKED + "thinkingEmoji", 1);
+
+        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
+
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+        PlayerPrefs.Save();
     }
 
     public bool IsTutorialCompleted() {
@@ -81,6 +83,30 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// These correspond to the one in EmojiSprites
     /// </summary>
     private bool[] emojisUnlocked = new bool[EmojiSprites.emojiPaths.Length];
+
+    /// <summary>
+    /// Returns whether the emoji is unlocked based on it's name. It goes through the list to search so if you can go for the other function.
+    /// </summary>
+    public bool IsEmojiUnlocked(string name) {
+        for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++)
+            if (EmojiSprites.emojiPaths[i] == name)
+                return emojisUnlocked[i];
+
+        return false;
+    }
+
+    private void UpdateEmojiUnlocks() {
+        for (int i = 0; i < emojisUnlocked.Length; i++) {
+            emojisUnlocked[i] = PlayerPrefs.GetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i]) == 1;
+        }
+    }
+
+    /// <summary>
+    /// Returns whether the emoji is unlocked based on it's id in EmojiSprites path array
+    /// </summary>
+    public bool IsEmojiUnlocked(int idInEmojiSprites) {
+        return emojisUnlocked[idInEmojiSprites];
+    }
     
     /// <summary>
     /// Returns the three unlocks that the given level has
@@ -131,13 +157,17 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// </summary>
     public void Unlock(Unlockable[] unlocks) {
         for (int i = 0; i < unlocks.Length; i++) {
-            if (unlocks[i] != null)
+            Debug.Log(unlocks[i].extra);
+            if (unlocks[i] != null) { 
                 switch (unlocks[i].type) {
                     case UnlockableType.Bluetooth: PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 1); break;
                     case UnlockableType.LocalMulti: PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 1); break;
                     case UnlockableType.Emoji: PlayerPrefs.SetInt(IS_UNLOCKED + unlocks[i].extra, 1); break;
                 }
+            }
         }
+
+        UpdateEmojiUnlocks();
     }
 
     /// <summary>

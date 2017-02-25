@@ -6,23 +6,27 @@ using System;
 
 public class RewardPanelScript : MonoBehaviour {
 
+    private CanvasScaler canvasScaler;
+
     public Image firstPanel;
     public Text pressToContinue;
     private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
 
     private GameObject rewardInstancePrefab;
     
 	void Start() {
         rewardInstancePrefab = Resources.Load<GameObject>("Prefabs/Rewards/RewardInstance");
         rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
 
-        LevelUpAnimation();
-	}
+        canvasScaler = transform.parent.GetComponent<CanvasScaler>();
+    }
 
     private float firstPanelAnim = 1f;
     public void LevelUpAnimation() {
-
-        rectTransform.DOScale(1f, 0.3f)
+        rectTransform.localScale = new Vector3(1, 1, 1);
+        canvasGroup.DOFade(1f, 0.3f)
             .OnComplete(new TweenCallback(() => {
                 // Set level text correctly
                 firstPanel.transform.FindChild("LevelText").GetComponent<Text>().text = "Level " + PreferencesScript.Instance.PlayerLevel;
@@ -40,7 +44,7 @@ public class RewardPanelScript : MonoBehaviour {
                     // First panel goes up
                     DOTween.Sequence()
                         .Append(firstPanel.rectTransform.DOScale(1f, firstPanelAnim * 0.7f))
-                        .Append(firstPanel.rectTransform.DOAnchorPosY((Camera.main.pixelHeight - firstPanel.rectTransform.rect.height) / 2f, firstPanelAnim * 0.7f))
+                        .Append(firstPanel.rectTransform.DOAnchorPosY((canvasScaler.referenceResolution.y - firstPanel.rectTransform.rect.height) / 2f, firstPanelAnim * 0.7f))
 
                         // Bring in the crates
                         .OnComplete(new TweenCallback(() => {
@@ -75,9 +79,9 @@ public class RewardPanelScript : MonoBehaviour {
             crates[i] = crate.GetComponent<RewardInstanceScript>();
             crates[i].SetUnlockable(unlocks[i]);
 
-            crate.anchoredPosition = new Vector2((Camera.main.pixelWidth + crate.rect.width) / 2f, Camera.main.pixelHeight * -0.1f);
+            crate.anchoredPosition = new Vector2((canvasScaler.referenceResolution.x + crate.rect.width) / 2f, canvasScaler.referenceResolution.y * -0.1f);
             crate
-                .DOAnchorPosX(((Camera.main.pixelWidth - unlockCount * crate.rect.width) / (unlockCount + 1f) * (i + 1) + crate.rect.width * i) - Camera.main.pixelWidth / 2f, 1f)
+                .DOAnchorPosX(((canvasScaler.referenceResolution.x - unlockCount * crate.rect.width) / (unlockCount + 1f) * (i + 1) + crate.rect.width * i) - canvasScaler.referenceResolution.x / 2f, 1f)
                 .SetDelay(i * 0.3f);
         }
 
@@ -85,6 +89,8 @@ public class RewardPanelScript : MonoBehaviour {
     }
 
     private void HidePanel() {
+        rectTransform.localScale = new Vector3(0, 0, 1);
+
         pressToContinue.DOKill();
         // Destroy crates
         for (int i = 0; i < crates.Length; i++) {

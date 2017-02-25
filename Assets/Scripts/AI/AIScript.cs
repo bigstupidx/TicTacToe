@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -76,18 +77,18 @@ public class AIScript : MonoBehaviour {
         { 0, 0, 0 },
         { 0, 0, 0 },
         { 0, 0, 0 },
-        { 100, 30, 10 },
-        { 200, 75, 40 }
+        { 75, 20, 5 },
+        { 150, 45, 15 }
     };
     /// <summary>
     /// How much exp the player gets for winning this game
     /// </summary>
     private float GetGameWonExp() {
         // Add for every sign in the game
-        float exp = pointsInGame.Count * 2f;
+        float exp = pointsInGame.Count * 1.7f;
 
         // Add for base for playing/winning
-        exp += 300;
+        exp += 200;
 
         // Add for every player's signinarow
         for (int i = 0; i < pointsInGame.Count; i++) {
@@ -118,13 +119,13 @@ public class AIScript : MonoBehaviour {
     public void SetDifficulty(int diff) {
         switch (diff) {
             case 0:
-                leaveOutChance = 0.7f;
+                leaveOutChance = 0.8f;
                 break;
             case 1:
-                leaveOutChance = 0.4f;
+                leaveOutChance = 0.57f;
                 break;
             case 2:
-                leaveOutChance = 0.185f;
+                leaveOutChance = 0.25f;
                 break;
             case 3:
                 leaveOutChance = 0.05f;
@@ -176,33 +177,32 @@ public class AIScript : MonoBehaviour {
 
         List<PlaceData> placeData;
         NewSignPlaced(gameField, pos, out placeData, out placeData);
-        float asd;
-        GetPointsFromSignsInARow(gameField, pointsInGame, out asd, out asd);
     }
 
     /// <summary>
     /// Returns the signsinarow points summed up in the gamefield we give it
     /// </summary>
-    private float GetPointsFromSignsInARow(EvaluationField[,] field, List<IntVector2> pointsInGame, out float aiPoint, out float humanPoint) {
-        // Update end blocks
-        int till = pointsInGame.Count;
-        for (int i = 0; i < till; i++) {
-            int tillK = field[pointsInGame[i].x, pointsInGame[i].y].signsInARow.Count;
-            for (int k = 0; k < tillK; k++) {
-                field[pointsInGame[i].x, pointsInGame[i].y].signsInARow[k].UpdatePoints();
+    private float GetPointsFromSignsInARow(EvaluationField[,] field, List<IntVector2> pointsInGame, IntVector2 lastPlaced, out float aiPoint, out float humanPoint) {
+        for (int i = lastPlaced.x - Grid.WIN_CONDITION; i <= lastPlaced.x + Grid.WIN_CONDITION; i++) {
+            for (int j = lastPlaced.y - Grid.WIN_CONDITION; j <= lastPlaced.y + Grid.WIN_CONDITION; j++) {
+                foreach (SignInARow signInARow in field[i, j].signsInARow) {
+                    signInARow.UpdatePoints();
+                }
             }
         }
 
+        // Update end blocks
         float aiP = 0f, humP = 0f;
-        for (int i = 0; i < pointsInGame.Count; i++)
+        for (int i = 0; i < pointsInGame.Count; i++) {
             foreach (SignInARow signInARow in field[pointsInGame[i].x, pointsInGame[i].y].signsInARow)
                 if (signInARow.Type == AIType)
                     aiP += signInARow.PointsWorth;
                 else
                     humP += signInARow.PointsWorth;
+        }
 
         aiPoint = aiP; humanPoint = humP;
-
+        
         return aiP + humP;
     }
 
@@ -280,9 +280,6 @@ public class AIScript : MonoBehaviour {
                 } else {
                     break;
                 }
-                /*} else {
-                    break;
-                }*/
             }
 
             // Go through the opposite of checkdirection direction
@@ -299,9 +296,6 @@ public class AIScript : MonoBehaviour {
                 } else {
                     break;
                 }
-                /*} else {
-                    break;
-                }*/
             }
 
             if (count < 2) continue;
@@ -334,7 +328,7 @@ public class AIScript : MonoBehaviour {
 
         // Go through the places where we can place
         // Call NewSignPlaced with field and position where we want to place
-        for (int j = 0; j < pointsInGameLength && !alphaBetaEnd; j++) {
+        for (int j = pointsInGame.Count - 1; j >= 0; j--) {
             // In each direction
             for (int i = -1; i <= 1 && !alphaBetaEnd; i++) {
                 for (int k = -1; k <= 1 && !alphaBetaEnd; k++) {
@@ -361,7 +355,7 @@ public class AIScript : MonoBehaviour {
                         EvaluationResult evalResult;
                         if (deepCount == DIFFICULTY) {
                             float aiPoint, humanPoint;
-                            GetPointsFromSignsInARow(field, pointsInGame, out aiPoint, out humanPoint);
+                            GetPointsFromSignsInARow(field, pointsInGame, pos, out aiPoint, out humanPoint);
 
                             if (whoseTurn == AIType)
                                 evalResult.points = aiPoint + humanPoint * 1.5f;
@@ -385,7 +379,7 @@ public class AIScript : MonoBehaviour {
                             // doesn't pick this vaue it's only gonna pick a smaller one which is even worse for the maximizer
                             // so just stop the search
                             if (result.points <= alpha) {
-                                // alphaBetaEnd = true;
+                                alphaBetaEnd = true;
                             }
                         }
                         // Otherwise if it is AI's turn we search for the max points - MAXIMIZER
@@ -399,7 +393,7 @@ public class AIScript : MonoBehaviour {
                             // if the point is higher then the minimizer minimum then we don't need to search further because this maximizer
                             // will surely pick a greater value for the parent minimizer, than it already has
                             if (result.points >= beta) {
-                                // alphaBetaEnd = true;
+                                alphaBetaEnd = true;
                             }
                         }
 
@@ -436,7 +430,7 @@ public class AIScript : MonoBehaviour {
             pointsInGame.Add(new IntVector2(pos));
 
             float aiPoints, humPoints;
-            points[j] = GetPointsFromSignsInARow(gameField, pointsInGame, out aiPoints, out humPoints);
+            points[j] = GetPointsFromSignsInARow(gameField, pointsInGame, pos, out aiPoints, out humPoints);
 
             // Revert the field back 
             for (int l = 0; l < placed.Count; l++)
@@ -525,7 +519,7 @@ public class AIScript : MonoBehaviour {
         try {
             result = EvaluateField(gameField, AIType, 1, pointsInGame, int.MinValue, int.MaxValue);
         } catch (Exception e) {
-            Debug.Log(e.Message + "\n" + e.StackTrace);
+            UnityEngine.Debug.Log(e.Message + "\n" + e.StackTrace);
         }
         return LocalAIToGridPos(result.fieldPos);
     }
@@ -747,6 +741,14 @@ internal class SignInARow : IEquatable<SignInARow> {
 
     private float points;
     public float PointsWorth { get { return points; } }
+    public float PointsWorthRecounted {
+        get {
+            int length = Length;
+            points = (type == AIScript.AIType ? pointTable[length > 5 ? 5 : length, BlockCount()] : pointTableHuman[length > 5 ? 5 : length, BlockCount()]);
+
+            return points;
+        }
+    }
     public int Length { get { return Mathf.Max(Mathf.Abs(to.x - from.x), Mathf.Abs(to.y - from.y)) + 1; } }
 
     private Cell.CellOcc type = Cell.CellOcc.NONE;
@@ -824,7 +826,7 @@ internal class SignInARow : IEquatable<SignInARow> {
 
     public void UpdatePoints(Cell.CellOcc type) {
         int length = Length;
-        points = (type == AIScript.AIType ? pointTable[length > 5 ? 5 : length, BlockCount()] : pointTableHuman[length > 5 ? 5 : length, BlockCount()]);
+        points = (type == AIScript.AIType ? pointTable[Mathf.Min(5, length), BlockCount()] : pointTableHuman[Mathf.Min(5, length), BlockCount()]);
     }
 
     public void UpdatePoints() {
