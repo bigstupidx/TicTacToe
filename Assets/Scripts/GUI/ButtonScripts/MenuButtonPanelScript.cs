@@ -1,129 +1,182 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 using DG.Tweening;
 using System;
 
 public class MenuButtonPanelScript : MonoBehaviour {
+    
+    // Both of those below are dictated by this, those are only precentages while this controls all timings
+    float animTime = 0.4f;
+    // The time gap between the in and out animation happend
+    float inOtDelay = 0.2f;
+    // The time gap between the buttons going in and out
+    float gapBetween = 0.2f;
 
-    float animTime = 0.5f;
+    [SerializeField]
+    [Tooltip("Which button is pressed in order to birng out second panel")]
+    private MenuButton mainButton;
 
     [SerializeField]
-    private MenuButton localButton;
-    [SerializeField]
-    private MenuButton onlineButton;
-    [SerializeField]
-    private MenuButton bluetoothButton;
-    [SerializeField]
-    private MenuButton googlePlayButton;
-    [SerializeField]
-    private MenuButton onlineBackButton;
-    [SerializeField]
-    private MenuButton localMultiButton;
-    [SerializeField]
-    private MenuButton localAIButton;
-    [SerializeField]
-    private MenuButton localBackButton;
+    [Tooltip("The back button of the second panel")]
+    private MenuButton backButton;
 
-    private bool isLocalForward = false;
+    [SerializeField]
+    [Tooltip("All of the buttons of the main button panel")]
+    private MenuButton[] firstPanelButtons;
+
+    [SerializeField]
+    [Tooltip("The buttons to bring out")]
+    private MenuButton[] secondPanelButtons;
+
+    private bool isSecondPanelShown = false;
 
     void Awake() {
-        // If we haven't completed the tutorial don't brin in the menus
+        // If we haven't completed the tutorial don't bring in the menus
         if (!PreferencesScript.Instance.IsTutorialCompleted())
             GetComponent<DOTweenAnimation>().DOKill();
     }
     
 	void Start () {
-        localAIButton.canavasGroup = localButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        onlineButton.canavasGroup = onlineButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        bluetoothButton.canavasGroup = bluetoothButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        googlePlayButton.canavasGroup = googlePlayButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        onlineBackButton.canavasGroup = onlineBackButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        localMultiButton.canavasGroup = localMultiButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        localAIButton.canavasGroup = localAIButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
-        localBackButton.canavasGroup = localBackButton.rectTransform.gameObject.GetComponent<CanvasGroup>();
+        // Get canvasgroup
+        mainButton.canavasGroup = mainButton.rectTransform.GetComponent<CanvasGroup>();
+        backButton.canavasGroup = backButton.rectTransform.GetComponent<CanvasGroup>();
+
+        int mainAt = -1;
+        for (int i = 0; i < firstPanelButtons.Length; i++) { 
+            firstPanelButtons[i].canavasGroup = firstPanelButtons[i].rectTransform.GetComponent<CanvasGroup>();
+
+            if (firstPanelButtons[i] == mainButton) {
+                mainAt = i;
+            }
+        }
+
+        // If the main button is not at the start of the array bring it there
+        if (mainAt != 0) { 
+            MenuButton[] temp = new MenuButton[firstPanelButtons.Length];
+            temp[0] = firstPanelButtons[mainAt];
+
+            int at = 0;
+            while (at < firstPanelButtons.Length) {
+                if (at < mainAt) {
+                    temp[at + 1] = firstPanelButtons[at];
+                } else if (at == mainAt) {
+                    at++;
+                } else {
+                    temp[at] = firstPanelButtons[at];
+                }
+
+                at++;
+            }
+
+            firstPanelButtons = temp;
+        }
+
+        for (int i = 0; i < secondPanelButtons.Length; i++)
+            secondPanelButtons[i].canavasGroup = secondPanelButtons[i].rectTransform.GetComponent<CanvasGroup>();
+
+        // Assign events
+        mainButton.rectTransform.GetComponent<Button>().onClick.AddListener(new UnityAction(() => {
+            ShowSecondPanel();
+        }));
+
+        backButton.rectTransform.GetComponent<Button>().onClick.AddListener(new UnityAction(() => {
+            HideSecondPanel();
+        }));
     }
 
-    public void LocalButtonPressed() {
-        if (isLocalForward) return;
+    public void ShowSecondPanel() {
+        if (isSecondPanelShown) return;
 
-        DOTween.Sequence()
+        isSecondPanelShown = true;
+
+        Sequence seq = DOTween.Sequence()
             // Prepare for aniamtion
             .OnStart(new TweenCallback(() => {
-                localMultiButton.rectTransform.localPosition = new Vector3(localMultiButton.rectTransform.rect.width / 2f, localMultiButton.rectTransform.localPosition.y);
-                localAIButton.rectTransform.localPosition = new Vector3(localAIButton.rectTransform.rect.width / 2f, localAIButton.rectTransform.localPosition.y);
-                localBackButton.rectTransform.localPosition = new Vector3(localBackButton.rectTransform.rect.width / 2f, localBackButton.rectTransform.localPosition.y);
-
-                bluetoothButton.canavasGroup.interactable = false;
-                localButton.canavasGroup.interactable = false;
-
-                localMultiButton.canavasGroup.interactable = true;
-                localAIButton.canavasGroup.interactable = true;
-                localBackButton.canavasGroup.interactable = true;
-
-                // if it's not here it will affect how animation looks (it will be disabled)
-                localBackButton.canavasGroup.interactable = true;
-            }))
-
-            // out animation
-            .Insert(0f, localButton.rectTransform.DOLocalMoveX(-localButton.rectTransform.rect.width / 2f, animTime))
-            .Insert(0f, localButton.canavasGroup.DOFade(0f, animTime))
-            .Insert(animTime * 0.2f, bluetoothButton.rectTransform.DOLocalMoveX(-bluetoothButton.rectTransform.rect.width / 2f, animTime))
-            .Insert(animTime * 0.2f, bluetoothButton.canavasGroup.DOFade(0f, animTime))
-
-            // in animation
-            .Insert(animTime * 0.5f, localMultiButton.rectTransform.DOLocalMoveX(0, animTime))
-            .Insert(animTime * 0.5f, localMultiButton.canavasGroup.DOFade(1f, animTime))
-            .Insert(animTime * 0.7f, localAIButton.rectTransform.DOLocalMoveX(0, animTime))
-            .Insert(animTime * 0.7f, localAIButton.canavasGroup.DOFade(1f, animTime))
-            .Insert(animTime * 0.8f, localBackButton.rectTransform.DOLocalMoveX(0, animTime))
-            .Insert(animTime * 0.8f, localBackButton.canavasGroup.DOFade(1f, animTime))
-
-            // Put everything in place - Afetr part
-            .OnComplete(new TweenCallback(() => {
-                localButton.rectTransform.localPosition = new Vector3(-localButton.rectTransform.rect.width * 2f, localButton.rectTransform.localPosition.y);
-                bluetoothButton.rectTransform.localPosition = new Vector3(-bluetoothButton.rectTransform.rect.width * 2f, bluetoothButton.rectTransform.localPosition.y);
-                isLocalForward = true;
-            }));
-    }
-
-    public void LocalBackButtonPressed() {
-        if (!isLocalForward) return;
-
-        DOTween.Sequence()
-            // Prepare for aniamtion
-            .OnStart(new TweenCallback(() => {
-                localButton.rectTransform.localPosition = new Vector3(-localButton.rectTransform.rect.width / 2f, localButton.rectTransform.localPosition.y);
-                bluetoothButton.rectTransform.localPosition = new Vector3(-bluetoothButton.rectTransform.rect.width / 2f, bluetoothButton.rectTransform.localPosition.y);
+                // Set all to starting pos and make it interactable
+                for (int i = 0; i < secondPanelButtons.Length; i++) {
+                    secondPanelButtons[i].rectTransform.localPosition = new Vector3(secondPanelButtons[i].rectTransform.rect.width / 2f, secondPanelButtons[i].rectTransform.localPosition.y);
+                    secondPanelButtons[i].canavasGroup.interactable = true;
+                    secondPanelButtons[i].canavasGroup.blocksRaycasts = true;
+                }
                 
-                bluetoothButton.canavasGroup.interactable = true;
-                localButton.canavasGroup.interactable = true;
-
-                localMultiButton.canavasGroup.interactable = false;
-                localAIButton.canavasGroup.interactable = false;
-                localBackButton.canavasGroup.interactable = false;
+                // Set main buttons to uninteractable
+                for (int i = 0; i < firstPanelButtons.Length; i++) {
+                    firstPanelButtons[i].canavasGroup.interactable = false;
+                    firstPanelButtons[i].canavasGroup.blocksRaycasts = false;
+                }
             }))
-
-            // out animation
-            .Insert(0, localMultiButton.rectTransform.DOLocalMoveX(localMultiButton.rectTransform.rect.width / 2f, animTime))
-            .Insert(0, localMultiButton.canavasGroup.DOFade(0f, animTime))
-            .Insert(animTime * 0.2f, localAIButton.rectTransform.DOLocalMoveX(localAIButton.rectTransform.rect.width / 2f, animTime))
-            .Insert(animTime * 0.2f, localAIButton.canavasGroup.DOFade(0f, animTime))
-            .Insert(animTime * 0.3f, localBackButton.rectTransform.DOLocalMoveX(localBackButton.rectTransform.rect.width / 2f, animTime))
-            .Insert(animTime * 0.3f, localBackButton.canavasGroup.DOFade(0f, animTime))
-
-            // in animation
-            .Insert(animTime * 0.5f, localButton.rectTransform.DOLocalMoveX(0, animTime))
-            .Insert(animTime * 0.5f, localButton.canavasGroup.DOFade(1f, animTime))
-            .Insert(animTime * 0.7f, bluetoothButton.rectTransform.DOLocalMoveX(0, animTime))
-            .Insert(animTime * 0.7f, bluetoothButton.canavasGroup.DOFade(1f, animTime))
+            
 
             // Put everything in place - Afetr part
             .OnComplete(new TweenCallback(() => {
-                localMultiButton.rectTransform.localPosition = new Vector3(0, localMultiButton.rectTransform.localPosition.y);
-                localAIButton.rectTransform.localPosition = new Vector3(0, localAIButton.rectTransform.localPosition.y);
-                localBackButton.rectTransform.localPosition = new Vector3(0, localBackButton.rectTransform.localPosition.y);
-                localBackButton.canavasGroup.interactable = false;
-                isLocalForward = false;
+                for (int i = 0; i < firstPanelButtons.Length; i++) {
+                    firstPanelButtons[i].rectTransform.localPosition = new Vector3(-firstPanelButtons[i].rectTransform.rect.width * 2f, firstPanelButtons[i].rectTransform.localPosition.y);
+                }
             }));
+        
+        // out animation (move and fade)
+        for (int i = 0; i < firstPanelButtons.Length; i++) {
+            float atTime = animTime * (i * gapBetween);
+
+            seq.Insert(atTime, firstPanelButtons[i].rectTransform.DOLocalMoveX(-firstPanelButtons[i].rectTransform.rect.width / 2f, animTime));
+            seq.Insert(atTime, firstPanelButtons[i].canavasGroup.DOFade(0f, animTime));
+        }
+
+        // in animations (move and fade)
+        for (int i = 0; i < secondPanelButtons.Length; i++) {
+            float atTime = (animTime * (((firstPanelButtons.Length - 1 + i) * gapBetween) + inOtDelay));
+
+            seq.Insert(atTime, secondPanelButtons[i].rectTransform.DOLocalMoveX(0, animTime));
+            seq.Insert(atTime, secondPanelButtons[i].canavasGroup.DOFade(1f, animTime));
+        }
+    }
+
+    public void HideSecondPanel() {
+        if (!isSecondPanelShown) return;
+
+        isSecondPanelShown = false;
+
+        Sequence seq = DOTween.Sequence()
+            // Prepare for aniamtion
+            .OnStart(new TweenCallback(() => {
+                // Set all to starting pos and make it interactable
+                for (int i = 0; i < firstPanelButtons.Length; i++) {
+                    firstPanelButtons[i].rectTransform.localPosition = new Vector3(-firstPanelButtons[i].rectTransform.rect.width / 2f, firstPanelButtons[i].rectTransform.localPosition.y);
+                    firstPanelButtons[i].canavasGroup.interactable = true;
+                    firstPanelButtons[i].canavasGroup.blocksRaycasts = true;
+                }
+
+                // Set second buttons to uninteractable
+                for (int i = 0; i < secondPanelButtons.Length; i++) {
+                    secondPanelButtons[i].canavasGroup.interactable = false;
+                    secondPanelButtons[i].canavasGroup.blocksRaycasts = false;
+                }
+            }))
+
+
+            // Put everything in place - Afetr part
+            .OnComplete(new TweenCallback(() => {
+                for (int i = 0; i < secondPanelButtons.Length; i++) {
+                    secondPanelButtons[i].rectTransform.localPosition = new Vector3(0, secondPanelButtons[i].rectTransform.localPosition.y);
+                }
+            }));
+
+        // out animation (move and fade)
+        for (int i = 0; i < secondPanelButtons.Length; i++) {
+            float atTime = animTime * (i * gapBetween);
+
+            seq.Insert(atTime, secondPanelButtons[i].rectTransform.DOLocalMoveX(secondPanelButtons[i].rectTransform.rect.width / 2f, animTime));
+            seq.Insert(atTime, secondPanelButtons[i].canavasGroup.DOFade(0f, animTime));
+        }
+
+        // in animations (move and fade)
+        for (int i = 0; i < firstPanelButtons.Length; i++) {
+            float atTime = (animTime * (((secondPanelButtons.Length - 1 + i) * gapBetween) + inOtDelay));
+
+            seq.Insert(atTime, firstPanelButtons[i].rectTransform.DOLocalMoveX(0, animTime));
+            seq.Insert(atTime, firstPanelButtons[i].canavasGroup.DOFade(1f, animTime));
+        }
     }
 }
 
@@ -136,5 +189,25 @@ internal struct MenuButton {
     public MenuButton(RectTransform rectTransform, CanvasGroup canvasGroup) {
         this.rectTransform = rectTransform;
         this.canavasGroup = canvasGroup;
+    }
+
+    public static bool operator ==(MenuButton one, MenuButton two) {
+        return one.rectTransform.gameObject.name == two.rectTransform.gameObject.name;
+    }
+
+    public static bool operator !=(MenuButton one, MenuButton two) {
+        return one.rectTransform.gameObject.name != two.rectTransform.gameObject.name;
+    }
+
+    public override bool Equals(object obj) {
+        if (obj is MenuButton) {
+            return this == (MenuButton) obj;
+        }
+
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode() {
+        return base.GetHashCode();
     }
 }
