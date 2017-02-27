@@ -40,7 +40,7 @@ public class PopupManager : Singleton<PopupManager> {
     /// <summary>
     /// Popup with two buttons
     /// </summary>
-    public void PopUp(string text, string buttonOne, string buttonTwo) {
+    public void PopUp(PopUpTwoButton attributes) {
         if (!popupOut) return;
         popupOut = false;
 
@@ -50,30 +50,36 @@ public class PopupManager : Singleton<PopupManager> {
         twoButtonPanel.SetActive(true);
         oneButtonPanel.SetActive(false);
 
-        // Set text for buttons
-        popupInstanceButtonTwo[0].GetComponentInChildren<Text>().text = buttonOne;
-        popupInstanceButtonTwo[1].GetComponentInChildren<Text>().text = buttonTwo;
+        popupInstanceImage.color = attributes.backgroundColor;
+
+        for (int i = 0; i < 2; i++) {
+            Text text = popupInstanceButtonTwo[i].GetComponentInChildren<Text>();
+
+            text.text = attributes.buttonText[i];
+            text.color = attributes.buttonTextColor[i];
+
+            popupInstanceButtonTwo[i].GetComponent<Image>().color = attributes.buttonColor[i];
+            popupInstanceButtonTwo[i].onClick.AddListener(attributes.buttonPressed[i]);
+        }
 
         // Set text
-        popupInstanceText.text = text;
+        popupInstanceText.text = attributes.text;
+        popupInstanceText.color = attributes.textColor;
 
         StartPopUpAnimation();
     }
 
     /// <summary>
-    /// Show popup with two buttons with the given button colors
+    /// Popup with one button
     /// </summary>
-    public void PopUp(string text, string buttonOne, string buttonTwo, Color colorOne, Color colorTwo) {
-        PopUp(text, buttonOne, buttonTwo);
-
-        popupInstanceButtonTwo[0].GetComponent<Image>().color = colorOne;
-        popupInstanceButtonTwo[1].GetComponent<Image>().color = colorTwo;
+    public void PopUp(string text, string buttonText) {
+        PopUp(new PopUpOneButton(text, buttonText));
     }
 
     /// <summary>
     /// Create new popup
     /// </summary>
-    public void PopUp(string text, string buttonText) {
+    public void PopUp(PopUpOneButton attributes) {
         if (!popupOut) return;
         popupOut = false;
 
@@ -83,70 +89,29 @@ public class PopupManager : Singleton<PopupManager> {
         oneButtonPanel.SetActive(true);
         twoButtonPanel.SetActive(false);
 
+        popupInstanceImage.color = attributes.backgroundColor;
+
         // Set text for button
-        popupInstanceButtonOne.GetComponentInChildren<Text>().text = buttonText;
+        Text text = popupInstanceButtonOne.GetComponentInChildren<Text>();
+
+        text.text = attributes.buttonText;
+        text.color = attributes.buttonTextColor;
+
+        popupInstanceButtonOne.GetComponent<Image>().color = attributes.buttonColor;
+        popupInstanceButtonOne.onClick.AddListener(attributes.buttonPressed);
 
         // Set text
-        popupInstanceText.text = text;
+        popupInstanceText.text = attributes.text;
+        popupInstanceText.color = attributes.textColor;
 
         StartPopUpAnimation();
     }
 
     /// <summary>
-    /// Show popup with one button with the given button color
+    /// Popup with two buttons
     /// </summary>
-    public void PopUp(string text, string buttonText, Color color) {
-        PopUp(text, buttonText);
-
-        popupInstanceButtonOne.GetComponent<Image>().color = color;
-    }
-
-    /// <summary>
-    /// Makes popup
-    /// After button is pressed the callback happens
-    /// </summary>
-    public void PopUp(string text, string buttonText, UnityAction action) {
-        if (!popupOut) return;
-
-        PopUp(text, buttonText);
-        popupInstanceButtonOne.onClick.AddListener(() => {
-            action.Invoke();
-        });
-    }
-
-    /// <summary>
-    /// Show popup with one button with the given button color
-    /// </summary>
-    public void PopUp(string text, string buttonText, Color color, UnityAction action) {
-        PopUp(text, buttonText, action);
-        
-        popupInstanceButtonOne.GetComponent<Image>().color = color;
-    }
-
-    /// <summary>
-    /// Makes popup with two buttons
-    /// After button is pressed the callback happens
-    /// </summary>
-    public void PopUp(string text, string buttonOne, string buttonTwo, UnityAction action1, UnityAction action2) {
-        if (!popupOut) return;
-
-        PopUp(text, buttonOne, buttonTwo);
-        popupInstanceButtonTwo[0].onClick.AddListener(() => {
-            action1.Invoke();
-        });
-        popupInstanceButtonTwo[1].onClick.AddListener(() => {
-            action2.Invoke();
-        });
-    }
-
-    /// <summary>
-    /// Show popup with two buttons with the given button colors
-    /// </summary>
-    public void PopUp(string text, string buttonOne, string buttonTwo, Color colorOne, Color colorTwo, UnityAction action1, UnityAction action2) {
-        PopUp(text, buttonOne, buttonTwo, action1, action2);
-
-        popupInstanceButtonTwo[0].GetComponent<Image>().color = colorOne;
-        popupInstanceButtonTwo[1].GetComponent<Image>().color = colorTwo;
+    public void PopUp(string text, string buttonOne, string buttonTwo) {
+        PopUp(new PopUpTwoButton(text, buttonOne, buttonTwo));
     }
 
     private void StartPopUpAnimation() {
@@ -175,20 +140,103 @@ public class PopupManager : Singleton<PopupManager> {
             popupInstanceButtonOne = oneButtonPanel.transform.GetChild(0).GetComponent<Button>();
             popupInstanceButtonTwo[0] = twoButtonPanel.transform.GetChild(0).GetComponent<Button>();
             popupInstanceButtonTwo[1] = twoButtonPanel.transform.GetChild(1).GetComponent<Button>();
-
-            // Add fade out click actions
-            UnityAction action = () => {
-                popupInstanceGroup.DOFade(0f, 0.2f).OnComplete(() => {
-                    popupOut = true;
-                    popupInstanceGroup.interactable = false;
-                    popupInstanceGroup.blocksRaycasts = false;
-                });
-                popupInstanceImage.rectTransform.DOScale(0f, 0.4f);
-            };
-            popupInstanceButtonOne.onClick.AddListener(action);
-            popupInstanceButtonTwo[0].onClick.AddListener(action);
-            popupInstanceButtonTwo[1].onClick.AddListener(action);
         }
+
+
+        popupInstanceButtonOne.onClick.RemoveAllListeners();
+        popupInstanceButtonTwo[0].onClick.RemoveAllListeners();
+        popupInstanceButtonTwo[1].onClick.RemoveAllListeners();
+
+        // Add fade out click actions because we removed the listeners
+        UnityAction action = () => {
+            popupInstanceGroup.DOFade(0f, 0.2f).OnComplete(() => {
+                popupOut = true;
+                popupInstanceGroup.interactable = false;
+                popupInstanceGroup.blocksRaycasts = false;
+            });
+            popupInstanceImage.rectTransform.DOScale(0f, 0.4f);
+        };
+        popupInstanceButtonOne.onClick.AddListener(action);
+        popupInstanceButtonTwo[0].onClick.AddListener(action);
+        popupInstanceButtonTwo[1].onClick.AddListener(action);
     }
 
+}
+
+public class PopUpOneButton {
+    internal string text;
+    internal string buttonText;
+    internal Color buttonTextColor = new Color(0.14902f, 0.19608f, 0.21961f);
+    internal Color buttonColor = new Color(0.87843f, 0.87843f, 0.87843f);
+    internal Color textColor = new Color(0.14902f, 0.19608f, 0.21961f);
+    internal Color backgroundColor = Color.white;
+    internal UnityAction buttonPressed = () => { };
+
+    public PopUpOneButton(string text, string buttonText) {
+        this.text = text;
+        this.buttonText = buttonText;
+    }
+
+    public PopUpOneButton Builder() { return this; }
+    public PopUpOneButton SetButtonColor(Color buttonColor) {
+        this.buttonColor = buttonColor;
+        return this;
+    }
+    public PopUpOneButton SetButtonTextColor(Color buttonTextColor) {
+        this.buttonTextColor = buttonTextColor;
+        return this;
+    }
+    public PopUpOneButton SetBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        return this;
+    }
+    public PopUpOneButton SetTextColor(Color textColor) {
+        this.textColor = textColor;
+        return this;
+    }
+    public PopUpOneButton SetButtonPressAction(UnityAction action) {
+        this.buttonPressed = action;
+        return this;
+    }
+}
+
+public class PopUpTwoButton {
+    internal string text;
+    internal string[] buttonText = new string[2];
+    internal Color[] buttonTextColor = new Color[] { new Color(0.14902f, 0.19608f, 0.21961f), new Color(0.14902f, 0.19608f, 0.21961f) };
+    internal Color[] buttonColor = new Color[] { new Color(0.87843f, 0.87843f, 0.87843f), new Color(0.87843f, 0.87843f, 0.87843f) };
+    internal Color textColor = new Color(0.14902f, 0.19608f, 0.21961f);
+    internal Color backgroundColor = Color.white;
+    internal UnityAction[] buttonPressed = new UnityAction[] { () => { }, () => { } };
+
+    public PopUpTwoButton(string text, string buttonOne, string buttonTwo) {
+        this.text = text;
+        this.buttonText[0] = buttonOne;
+        this.buttonText[1] = buttonTwo;
+    }
+
+    public PopUpTwoButton Builder() { return this; }
+    public PopUpTwoButton SetButtonColors(Color buttonColorOne, Color buttonColorTwo) {
+        this.buttonColor[0] = buttonColorOne;
+        this.buttonColor[1] = buttonColorTwo;
+        return this;
+    }
+    public PopUpTwoButton SetButtonTextColors(Color buttonTextColorOne, Color buttonTextColorTwo) {
+        this.buttonTextColor[0] = buttonTextColorOne;
+        this.buttonTextColor[1] = buttonTextColorTwo;
+        return this;
+    }
+    public PopUpTwoButton SetBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        return this;
+    }
+    public PopUpTwoButton SetTextColor(Color textColor) {
+        this.textColor = textColor;
+        return this;
+    }
+    public PopUpTwoButton SetButtonPressActions(UnityAction action1, UnityAction action2) {
+        this.buttonPressed[0] = action1;
+        this.buttonPressed[1] = action2;
+        return this;
+    }
 }

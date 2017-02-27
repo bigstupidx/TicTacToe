@@ -283,9 +283,10 @@ public class BluetoothEventListener : MonoBehaviour {
                     bluetoothConnectionManager.NotConnectingAnymore();
                 } else { 
                     // We are in game
-                    PopupManager.Instance.PopUp("Lost connection!\n Going back to menu", "OK", () => {
+                    PopupManager.Instance.PopUp(new PopUpOneButton("Lost connection!\n Going back to menu", "OK").SetButtonPressAction(() => {
                         ScaneManager.Instance.GoToSceneWithErase("Menu");
-                    });
+                    }));
+                    
                 }
                 break;
         }
