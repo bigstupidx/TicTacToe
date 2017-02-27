@@ -122,6 +122,20 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public bool IsEmojiUnlocked(int idInEmojiSprites) {
         return emojisUnlocked[idInEmojiSprites];
     }
+
+    /// <summary>
+    /// How many unlocks the player gets at level
+    /// </summary>
+    public int GetUnlockCountAtLevel(int level) {
+        if (level <= 3) return 3;
+        if (level <= 7) {
+            if (level % 2 == 0) return 3;
+            else return 2;
+        }
+        if (level <= 15) return 2;
+
+        return 1;
+    }
     
     /// <summary>
     /// Returns the three unlocks that the given level has
@@ -129,6 +143,8 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public Unlockable[] GetUnlocks(int level) {
         // What kind of unlockables are left that should be given at random
         List<Unlockable> left = new List<Unlockable>();
+
+        int unlockCountAtLevel = GetUnlockCountAtLevel(level);
 
         for (int i = 0; i < emojisUnlocked.Length; i++)
             if (!emojisUnlocked[i])
@@ -150,15 +166,14 @@ public class PreferencesScript : Singleton<PreferencesScript> {
                 break;
         }
 
-        // there is nothing to unlock so get out of here
-        if (left.Count == 0 && unlockAt == 0) return new Unlockable[3];
-
-        while (unlockAt < 3) {
+        int fromLeftUnlockedNowCount = 0;
+        while (unlockAt < unlockCountAtLevel && left.Count - fromLeftUnlockedNowCount != 0) {
             Unlockable ul;
             do {
                 ul = left[UnityEngine.Random.Range(0, left.Count)];
             } while (ul.extra == "ITHASALREADYBEEN__!!/%/");
 
+            fromLeftUnlockedNowCount++;
             unlock[unlockAt] = new Unlockable(ul);
             ul.extra = "ITHASALREADYBEEN__!!/%/";
             unlockAt++;
