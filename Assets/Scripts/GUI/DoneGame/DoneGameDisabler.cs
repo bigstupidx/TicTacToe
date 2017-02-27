@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class DoneGameDisabler : MonoBehaviour {
 
     public string[] scenesOnWhichToShow = new string[] {
-        "Menu", "BluetoothConnect"
+        "Menu", "BluetoothConnect", "GooglePlayConnectScreen"
     };
 
     void Start() {

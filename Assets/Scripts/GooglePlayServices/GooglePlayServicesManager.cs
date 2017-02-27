@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
-using UnityEngine.SocialPlatforms;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 
 public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
 
-    public event InvitationReceivedDelegate InvitationOffScreenEvent = new InvitationReceivedDelegate((Invitation inv, bool imm) => {});
-    public event MatchDelegate MatchOffScreenDelegate = new MatchDelegate((TurnBasedMatch match, bool b) => { });
-
     void Start() {
+        if (FindObjectsOfType<GooglePlayServicesManager>().Length >= 2) {
+            Destroy(gameObject);
+
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
             // enables saving game progress.
             .EnableSavedGames()
             // registers a callback to handle game invitations received while the game is not running
-            .WithInvitationDelegate(InvitationOffScreenEvent)
+            .WithInvitationDelegate(OnInvitationReceived)
             // registers a callback for turn based match notifications received while the game is not running
-            .WithMatchDelegate(MatchOffScreenDelegate)
+            .WithMatchDelegate(OnGotMatch)
             .Build();
 
         // Activate play games platform and enable debugging
@@ -25,10 +29,20 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
         PlayGamesPlatform.Activate();
 
 
-        // authenticate user
-        Social.localUser.Authenticate((bool success) => {
+        if (PreferencesScript.Instance.GPCanAutoLogin()) { 
+            // authenticate user
+            Social.localUser.Authenticate((bool success) => {
             
-        });
+            });
+        }
     }
-	
+
+    private void OnInvitationReceived(Invitation invitation, bool shouldAutoAccept) {
+
+    }
+
+    private void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
+
+    }
+
 }

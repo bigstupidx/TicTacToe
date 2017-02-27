@@ -10,6 +10,12 @@ public class SignResourceStorage : MonoBehaviour {
 
 
     void Awake () {
+        if (FindObjectsOfType<SignResourceStorage>().Length >= 2) {
+            Destroy(gameObject);
+
+            return;
+        }
+
         LoadResources();
         DontDestroyOnLoad(gameObject);
     }

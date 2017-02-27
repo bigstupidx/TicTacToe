@@ -7,6 +7,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
     private const string FIRST_USE = "FirstUse";
     private const string TUTORIAL_COMPLETED = "TutCompleted";
+    private const string GOOGLE_PLAY_AUTO_LOGIN = "GPAutoLogin";
 
     private void Awake() {
         EmojiSprites.LoadEmojiSprites();
@@ -68,6 +69,20 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         yield return new WaitForSeconds(seconds);
 
         action.Invoke();
+    }
+
+    /// <summary>
+    /// Can player log in automatically?
+    /// </summary>
+    /// <returns></returns>
+    public bool GPCanAutoLogin() {
+        return PlayerPrefs.GetInt(GOOGLE_PLAY_AUTO_LOGIN) == 1;
+    }
+    /// <summary>
+    /// Call when the player accepts to login automatically
+    /// </summary>
+    public void GPFromNowCanAutoLogin() {
+        PlayerPrefs.SetInt(GOOGLE_PLAY_AUTO_LOGIN, 1);
     }
 
     // ____________________________________UNLOCKS_____________________________________

@@ -40,19 +40,16 @@ public class PopupManager : Singleton<PopupManager> {
 
         // Only instantiate new popup if the old one is destroyed
         if (popupInstance == null) { 
-            popupInstance = Instantiate(popupPrefab);
+            popupInstance = Instantiate(popupPrefab, GameObject.Find("Canvas").transform, false);
 
             // Get different parts of popup
             popupInstanceImage = popupInstance.GetComponent<Image>();
             popupInstanceText = popupInstance.transform.GetChild(0).GetComponent<Text>();
             popupInstanceButton = popupInstance.transform.GetChild(1).GetComponent<Button>();
 
-            // Set the parent of popuppanel to canvas of the current scene WHICH HAS TO BE CALLED CANVAS!!!!
-            popupInstance.transform.SetParent(GameObject.Find("Canvas").transform, false);
-
             // Set event of popup button
             popupInstanceButton.onClick.AddListener(() => {
-                popupInstanceImage.rectTransform.DOScale(0, 0.2f).OnComplete(() => {
+                popupInstanceImage.rectTransform.DOScale(0, 0.4f).OnComplete(() => {
                     popupOut = true;
                 });
                 popupInstanceButton.enabled = false;
@@ -63,7 +60,7 @@ public class PopupManager : Singleton<PopupManager> {
         popupInstanceButton.enabled = true;
 
         // Set starting position of popup
-        popupInstance.transform.position = new Vector2(Camera.main.pixelWidth / 2f, Camera.main.pixelHeight / 2f);
+        popupInstance.GetComponent<RectTransform>().anchoredPosition = new Vector2(Camera.main.pixelWidth / 2f, Camera.main.pixelHeight / 2f);
         
         // Set text for button
         popupInstanceButton.transform.GetChild(0).GetComponent<Text>().text = buttonText;
@@ -75,7 +72,7 @@ public class PopupManager : Singleton<PopupManager> {
 
         // Start animation
         popupInstanceImage.rectTransform.localScale = new Vector3();
-        popupInstanceImage.rectTransform.DOScale(1f, 0.2f).SetEase(Ease.OutBack);
+        popupInstanceImage.rectTransform.DOScale(1f, 0.4f).SetEase(Ease.OutBack);
     }
 
     /// <summary>
