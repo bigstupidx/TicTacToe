@@ -63,6 +63,14 @@ public class AIScript : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns whether the game is currently in progress
+    /// </summary>
+    /// <returns></returns>
+    public bool IsGameInProgress() {
+        return pointsInGame.Count > 0;
+    }
+
+    /// <summary>
     /// Event for when someone has won the game
     /// </summary>
     private void SomeoneWonGame(Cell.CellOcc type) {

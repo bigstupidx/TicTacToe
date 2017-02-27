@@ -27,7 +27,7 @@ public class BluetoothEventListener : MonoBehaviour {
         bluetoothConnectionManager = FindObjectOfType<BluetoothConnectionManager>();
 
         // Call the update function
-        if (isServer) InvokeRepeating("SendClientLastSign", 0f, 0.2f);
+        if (isServer) InvokeRepeating("SendClientUpdateMsg", 0f, 0.2f);
     }
 
     void OnApplicationPause(bool paused) {
@@ -296,6 +296,7 @@ public class BluetoothEventListener : MonoBehaviour {
     /// </summary>
     /// <param name="writeMessage"></param>
     void DoneSendingEvent(string writeMessage) {
+        Debug.Log("Bluetooth sent: " + writeMessage);
     }
 
     /// <summary>
@@ -304,6 +305,7 @@ public class BluetoothEventListener : MonoBehaviour {
     /// <param name="readMessage"></param>
     void DoneReadingEvent(string readMessage) {
         string[] differentMessages = readMessage.Split(new string[] { "|||" }, StringSplitOptions.None);
+        Debug.Log("Bluetooth read: " + readMessage);
 
         for (int i = 0; i < differentMessages.Length - 1; i++) {
             string[] splitMessage = differentMessages[i].Split('#');

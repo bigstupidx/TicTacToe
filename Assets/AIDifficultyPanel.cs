@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
 
 public class AIDifficultyPanel : MonoBehaviour {
@@ -7,19 +6,58 @@ public class AIDifficultyPanel : MonoBehaviour {
     private float animTime = 0.3f;
 
     private AIScript aiScript;
+    private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
     
 	void Start () {
+        canvasGroup = GetComponent<CanvasGroup>();
+        rectTransform = transform.GetChild(0).GetComponent<RectTransform>();
         aiScript = FindObjectOfType<AIScript>();
+
+        PopupDifficultyPanel();
 	}
 
-    public void SetDifficultyToEasy() { aiScript.SetDifficulty(1); }
-    public void SetDifficultyToNormal() { aiScript.SetDifficulty(2); }
-    public void SetDifficultyToHard() { aiScript.SetDifficulty(3); }
+    public void SetDifficultyToEasy() {
+        if (aiScript.IsGameInProgress()) {
+            PopUpThatGameIsInProgress();
+            return;
+        }
+        aiScript.SetDifficulty(1);
+    }
+    public void SetDifficultyToNormal() {
+        if (aiScript.IsGameInProgress()) {
+            PopUpThatGameIsInProgress();
+            return;
+        }
+        aiScript.SetDifficulty(2);
+    }
+    public void SetDifficultyToHard() {
+        if (aiScript.IsGameInProgress()) {
+            PopUpThatGameIsInProgress();
+            return;
+        }
+        aiScript.SetDifficulty(3);
+    }
+
+    private void PopUpThatGameIsInProgress() {
+        PopupManager.Instance.PopUp("Can't change difficulty\nwhile game is in progress!", "OK");
+    }
+
+    public void PopupDifficultyPanel() {
+
+        rectTransform.DOScale(1f, animTime).SetEase(Ease.OutBack).OnComplete(new TweenCallback(() => {
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.interactable = true;
+        }));
+        canvasGroup.DOFade(1f, animTime);
+    }
 
     public void DismissDifficultyPanel() {
-        transform.GetChild(0).GetComponent<RectTransform>().DOScale(0, animTime);
-        GetComponent<Image>().DOFade(0f, animTime).OnComplete(new TweenCallback(() => {
-            gameObject.SetActive(false);
+        rectTransform.DOScale(0, animTime).OnComplete(new TweenCallback(() => {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
         }));
+        canvasGroup.DOFade(0f, animTime);
+
     }
 }
