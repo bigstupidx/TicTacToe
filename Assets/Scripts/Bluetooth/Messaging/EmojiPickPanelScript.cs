@@ -9,6 +9,8 @@ public class EmojiPickPanelScript : MonoBehaviour {
 
     private float animationTime = 0.3f;
 
+    private BackButton backButton;
+
     private RectTransform rect;
     private EmojiSlotButtonGroupScript buttonGroup;
 
@@ -19,6 +21,7 @@ public class EmojiPickPanelScript : MonoBehaviour {
 	void Start () {
         rect = GetComponent<RectTransform>();
         buttonGroup = FindObjectOfType<EmojiSlotButtonGroupScript>();
+        backButton = FindObjectOfType<BackButton>();
 	}
     
     void Update() {
@@ -28,6 +31,12 @@ public class EmojiPickPanelScript : MonoBehaviour {
                 buttonGroup.SetEveryButtonToggleFalse();
                 buttonGroup.MakeEveryButtonNormal();
             }
+        }
+
+        if (isOpen && Input.GetKeyDown(KeyCode.Escape)) {
+            Close();
+            buttonGroup.SetEveryButtonToggleFalse();
+            buttonGroup.MakeEveryButtonNormal();
         }
     }
 	
@@ -39,6 +48,7 @@ public class EmojiPickPanelScript : MonoBehaviour {
         rect.DOSizeDelta(new Vector2(0, rect.sizeDelta.y), animationTime);
 
         isOpen = false;
+        backButton.enabled = true;
     }
 
     /// <summary>
@@ -49,6 +59,7 @@ public class EmojiPickPanelScript : MonoBehaviour {
         rect.DOSizeDelta(new Vector2(1759, rect.sizeDelta.y), animationTime);
 
         isOpen = true;
+        backButton.enabled = false;
     }
 
     public void Toggle() {

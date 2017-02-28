@@ -13,7 +13,7 @@ public class AIScript : MonoBehaviour {
     /// What's the chance that the ai simply skips a place where it could place, it just doesn't examine it. 
     /// It will also add some depending on the points in game (heuristic for the game's complexity)
     /// </summary>
-    private float leaveOutChance = 0.1f;
+    private float leaveOutChance = 0.25f;
 
     /// <summary>
     /// After how many sign the AI should miss 100%

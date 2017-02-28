@@ -2,6 +2,8 @@
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
+using System.Net;
+using System.IO;
 
 public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
 
@@ -19,8 +21,6 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
             .EnableSavedGames()
             // registers a callback to handle game invitations received while the game is not running
             .WithInvitationDelegate(OnInvitationReceived)
-            // registers a callback for turn based match notifications received while the game is not running
-            .WithMatchDelegate(OnGotMatch)
             .Build();
 
         // Activate play games platform and enable debugging
@@ -28,8 +28,17 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
 
-        if (!Social.localUser.authenticated) {
-            Debug.Log("Prompt player");
+        if (PreferencesScript.Instance.GPCanAutoLogin()) {
+            // authenticate user
+            Social.localUser.Authenticate((bool success) => {
+
+            });
+        }
+
+        // We check for internet connection
+        string htmlText = GetHtmlFromUri("http://google.com");
+        // this phrase is in the beginning of the google page
+        if (htmlText.Contains("schema.org/WebPage") && !Social.localUser.authenticated) {
             // the player is not signed in so prompt them to do so
             PopupManager.Instance.PopUp(new PopUpTwoButton(
                 "You are not signed in to Google Play.\nDo you want to sign in?", "No", "Sign in").Builder()
@@ -37,24 +46,52 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
                 .SetButtonTextColors(Color.white, Color.white)
                 .SetButtonPressActions(() => { }, () => {
                     PreferencesScript.Instance.GPFromNowCanAutoLogin();
+                    Social.localUser.Authenticate((bool success) => { });
                 })
             );
         }
 
-        if (PreferencesScript.Instance.GPCanAutoLogin()) { 
-            // authenticate user
-            Social.localUser.Authenticate((bool success) => {
-            
-            });
-        }
+        
     }
 
     private void OnInvitationReceived(Invitation invitation, bool shouldAutoAccept) {
-
+        if (shouldAutoAccept) {
+            PopupManager.Instance.PopUp(
+                new PopUpTwoButton(invitation.Inviter.DisplayName + "\nwould like to play with you!", "Decline", "Accept")
+                    .SetButtonColors(new Color(0.95686f, 0.26275f, 0.21176f), new Color(0.29804f, 0.68627f, 0.31373f))
+                    .SetButtonTextColors(Color.white, Color.white)
+                    .SetButtonPressActions(() => { }, () => {
+                        ScaneManager.Instance.GoToSceneThenDo("GooglePlayConnectScreen", () => {
+                            PlayGamesPlatform.Instance.RealTime.AcceptInvitation(invitation.InvitationId, FindObjectOfType<GooglePlayGameManager>());
+                        });
+                    })
+                );
+        }
     }
 
-    private void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
-
+    public static string GetHtmlFromUri(string resource) {
+        string html = string.Empty;
+        HttpWebRequest req = (HttpWebRequest) WebRequest.Create(resource);
+        try {
+            using (HttpWebResponse resp = (HttpWebResponse) req.GetResponse()) {
+                bool isSuccess = (int) resp.StatusCode < 299 && (int) resp.StatusCode >= 200;
+                if (isSuccess) {
+                    using (StreamReader reader = new StreamReader(resp.GetResponseStream())) {
+                        //We are limiting the array to 80 so we don't have
+                        //to parse the entire html document feel free to 
+                        //adjust (probably stay under 300)
+                        char[] cs = new char[80];
+                        reader.Read(cs, 0, cs.Length);
+                        foreach (char ch in cs) {
+                            html += ch;
+                        }
+                    }
+                }
+            }
+        } catch {
+            return "";
+        }
+        return html;
     }
 
 }
