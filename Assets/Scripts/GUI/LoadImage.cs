@@ -24,11 +24,11 @@ public class LoadImage : MonoBehaviour {
 
     public void StartLoading() {
         loading = true;
-        image.DOColor(new Color(0.21569f, 0.27843f, 0.3098f), 0.2f);
+        image.DOFade(0.5f, 0.2f);
         
     }
     public void StopLoading() {
         loading = false;
-        image.DOColor(Color.black, 0.2f);
+        image.DOFade(1f, 0.2f);
     }
 }

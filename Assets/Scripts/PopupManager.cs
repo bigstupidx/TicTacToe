@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.Events;
+using TMPro;
 
 public class PopupManager : Singleton<PopupManager> {
     
@@ -10,7 +11,7 @@ public class PopupManager : Singleton<PopupManager> {
 
     private static CanvasGroup popupInstanceGroup;
     private static Image popupInstanceImage;
-    private static Text popupInstanceText;
+    private static TextMeshProUGUI popupInstanceText;
 
     private static Button popupInstanceButtonOne;
     private static Button[] popupInstanceButtonTwo = new Button[2];
@@ -132,7 +133,7 @@ public class PopupManager : Singleton<PopupManager> {
             // Get different parts of popup
             popupInstanceGroup = popupInstance.GetComponent<CanvasGroup>();
             popupInstanceImage = popupInstance.transform.GetChild(0).GetComponent<Image>();
-            popupInstanceText = popupInstanceImage.transform.GetChild(0).GetComponent<Text>();
+            popupInstanceText = popupInstanceImage.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
             oneButtonPanel = popupInstanceImage.transform.GetChild(1).gameObject;
             twoButtonPanel = popupInstanceImage.transform.GetChild(2).gameObject;
 

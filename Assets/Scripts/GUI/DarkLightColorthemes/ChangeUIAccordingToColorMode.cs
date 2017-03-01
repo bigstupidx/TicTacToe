@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
+using TMPro;
 
 public class ChangeUIAccordingToColorMode : MonoBehaviour {
 
@@ -21,18 +22,27 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     [SerializeField]
     protected List<Text> updateToColorModesTxt = new List<Text>();
 
+    [SerializeField]
+    protected List<TextMeshProUGUI> updateToColorTextMeshPro = new List<TextMeshProUGUI>();
+
     void Start() { // Thee can only be done in start
         // Add every image that has a darklightcolor component
         foreach (Image img in FindObjectsOfType<Image>()) {
-            if (img.GetComponent<DarkLightColor>() != null && !updateToColorModesImg.Contains(img)) {
+            if (!updateToColorModesImg.Contains(img) && img.GetComponent<DarkLightColor>() != null) {
                 updateToColorModesImg.Add(img);
             }
         }
 
         // Add every text that has a darklightcolor component
         foreach (Text txt in FindObjectsOfType<Text>()) {
-            if (txt.GetComponent<DarkLightColor>() != null && !updateToColorModesTxt.Contains(txt)) {
+            if (!updateToColorModesTxt.Contains(txt) && txt.GetComponent<DarkLightColor>() != null) {
                 updateToColorModesTxt.Add(txt);
+            }
+        }
+
+        foreach (TextMeshProUGUI text in FindObjectsOfType<TextMeshProUGUI>()) {
+            if (!updateToColorTextMeshPro.Contains(text) && text.GetComponent<DarkLightColor>() != null) {
+                updateToColorTextMeshPro.Add(text);
             }
         }
 
@@ -78,6 +88,22 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
                 updateToColorModesTxt[i].DOColor(lightModeColor, time);
             }
         }
+
+        for (int i = updateToColorTextMeshPro.Count - 1; i >= 0; i--) {
+            if (updateToColorTextMeshPro[i] == null) {
+                updateToColorTextMeshPro.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorTextMeshPro[i].GetComponent<DarkLightColor>();
+
+            // text is exactly opposite color
+            if (dlc != null) {
+                updateToColorTextMeshPro[i].DOColor(dlc.lightModeColor, time);
+            } else {
+                updateToColorTextMeshPro[i].DOColor(lightModeColor, time);
+            }
+        }
     }
     /// <summary>
     /// Changes everything that we told it to to dark mode
@@ -111,6 +137,22 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
                 updateToColorModesTxt[i].DOColor(dlc.darkModeColor, time);
             } else {
                 updateToColorModesTxt[i].DOColor(darkModeColor, time);
+            }
+        }
+
+        for (int i = updateToColorTextMeshPro.Count - 1; i >= 0; i--) {
+            if (updateToColorTextMeshPro[i] == null) {
+                updateToColorTextMeshPro.RemoveAt(i);
+                continue;
+            }
+
+            DarkLightColor dlc = updateToColorTextMeshPro[i].GetComponent<DarkLightColor>();
+
+            // text is exactly opposite color
+            if (dlc != null) {
+                updateToColorTextMeshPro[i].DOColor(dlc.darkModeColor, time);
+            } else {
+                updateToColorTextMeshPro[i].DOColor(darkModeColor, time);
             }
         }
     }

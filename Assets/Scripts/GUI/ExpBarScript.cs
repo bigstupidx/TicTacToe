@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class ExpBarScript : MonoBehaviour {
 
@@ -8,10 +9,10 @@ public class ExpBarScript : MonoBehaviour {
     public bool IsPulledDown { get { return isPulledDown; } }
 
     private RectTransform rectTransform;
-    public Text levelText;
-    public Text maxExpText;
-    public Text currExpText;
-    public Text addExpText;
+    public TextMeshProUGUI levelText;
+    public TextMeshProUGUI maxExpText;
+    public TextMeshProUGUI currExpText;
+    public TextMeshProUGUI addExpText;
     public Slider expSlider;
     
 	void Start() {

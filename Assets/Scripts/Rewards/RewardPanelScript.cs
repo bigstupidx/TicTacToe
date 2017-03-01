@@ -3,13 +3,14 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
 using System;
+using TMPro;
 
 public class RewardPanelScript : MonoBehaviour {
 
     private CanvasScaler canvasScaler;
 
     public Image firstPanel;
-    public Text pressToContinue;
+    public TextMeshProUGUI pressToContinue;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
 
@@ -29,7 +30,7 @@ public class RewardPanelScript : MonoBehaviour {
         canvasGroup.DOFade(1f, 0.3f)
             .OnComplete(new TweenCallback(() => {
                 // Set level text correctly
-                firstPanel.transform.FindChild("LevelText").GetComponent<Text>().text = "Level " + PreferencesScript.Instance.PlayerLevel;
+                firstPanel.transform.FindChild("LevelText").GetComponent<TextMeshProUGUI>().text = "Level " + PreferencesScript.Instance.PlayerLevel;
 
                 // Start press to coninue animation
                 DOTween.Sequence()
@@ -89,7 +90,6 @@ public class RewardPanelScript : MonoBehaviour {
     }
 
     private void HidePanel() {
-        rectTransform.localScale = new Vector3(0, 0, 1);
 
         pressToContinue.DOKill();
         // Destroy crates
@@ -103,11 +103,13 @@ public class RewardPanelScript : MonoBehaviour {
         firstPanel.rectTransform.anchoredPosition = new Vector2(0, 0);
 
 
-        rectTransform.DOScale(0f, 0.6f);
+        rectTransform.DOScale(0f, 0.4f);
+        canvasGroup.DOFade(0f, 0.4f);
     }
 
     private IEnumerator AfterAllCratesBroken() {
         bool allBroken = false;
+        if (crates.Length == 0) allBroken = true;
         while (!allBroken) { 
             if (crates == null) yield return null;
 
