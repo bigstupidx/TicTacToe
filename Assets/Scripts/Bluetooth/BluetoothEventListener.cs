@@ -187,7 +187,7 @@ public class BluetoothEventListener : MonoBehaviour {
                 "#",
                 GameLogic.OScore.ToString()
             });
-
+            
             Bluetooth.Instance().Send(sent);
         }
     }
@@ -212,12 +212,15 @@ public class BluetoothEventListener : MonoBehaviour {
     /// <summary>
     /// Event for the end of the search devices and there is zero device
     /// </summary>
-    void FoundZeroDeviceEvent() { }
+    void FoundZeroDeviceEvent() {
+        Debug.Log("Found zero device");
+    }
 
     /// <summary>
     /// Event for the end of the current search
     /// </summary>
     void ScanFinishEvent() {
+        Debug.Log("Scan finished");
         GameObject.Find("LoadImage").GetComponent<LoadImage>().StopLoading();
     }
 
@@ -228,6 +231,8 @@ public class BluetoothEventListener : MonoBehaviour {
     void FoundDeviceEvent(string Device) {
         // split up data
         string[] data = Device.Split(new string[] { ",\n" }, StringSplitOptions.None);
+        if (data[0] == "null") return; // Bug in bluetooth plugin
+
         Bluetooth.Instance().MacAddresses.Add(Device); // Add to list in bluetooth
 
         // Create new GUI for device
@@ -266,6 +271,7 @@ public class BluetoothEventListener : MonoBehaviour {
     //----------------------------
 
     void ConnectionStateEvent(string state) {
+        Debug.Log("Connection state " + state);
         //Connection State event this is the result of the connection fire after you try to Connect
         switch (state) {
             case "STATE_CONNECTED":
@@ -297,7 +303,6 @@ public class BluetoothEventListener : MonoBehaviour {
     /// </summary>
     /// <param name="writeMessage"></param>
     void DoneSendingEvent(string writeMessage) {
-        Debug.Log("Bluetooth sent: " + writeMessage);
     }
 
     /// <summary>
@@ -306,7 +311,6 @@ public class BluetoothEventListener : MonoBehaviour {
     /// <param name="readMessage"></param>
     void DoneReadingEvent(string readMessage) {
         string[] differentMessages = readMessage.Split(new string[] { "|||" }, StringSplitOptions.None);
-        Debug.Log("Bluetooth read: " + readMessage);
 
         for (int i = 0; i < differentMessages.Length - 1; i++) {
             string[] splitMessage = differentMessages[i].Split('#');
@@ -323,7 +327,7 @@ public class BluetoothEventListener : MonoBehaviour {
                     case "TRYPLACEAT": // client is trying to place at pos
                         Vector2 pos = new Vector2(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]));
 
-                        // Is it's not server's turn try placing at pos
+                        // If it's not server's turn try placing at pos
                         if (!GameLogic.IsItServersTurn())
                             GameLogic.WantToPlaceAt(pos);
                         break;
@@ -332,11 +336,6 @@ public class BluetoothEventListener : MonoBehaviour {
                         break;
                     case "SMB": // Client is asking for latest border data
                         Bluetooth.Instance().Send(BluetoothMessageStrings.ADD_BORDER + "#" + lastBorder.ToString() + "#" + lastBorderID);
-                        break;
-                    case "RLS": // Client is asking to remove last sign placed
-                        if (gameLogic.IsItServersTurn()) { // only do it if it is server's turn because we know then that the client placed last
-                            Grid.RemoveLastSign();
-                        }
                         break;
                 }
 

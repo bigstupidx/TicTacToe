@@ -151,7 +151,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
                 left.Add(new Unlockable(UnlockableType.Emoji, EmojiSprites.emojiPaths[i]));
 
         // There are going to be 3 of them
-        Unlockable[] unlock = new Unlockable[3];
+        Unlockable[] unlock = new Unlockable[unlockCountAtLevel];
         int unlockAt = 0;
 
         // assign the ones that we have to

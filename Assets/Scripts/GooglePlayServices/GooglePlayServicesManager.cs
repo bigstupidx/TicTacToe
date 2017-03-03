@@ -4,8 +4,13 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 using System.Net;
 using System.IO;
+using System.Threading;
+using System.Collections;
 
 public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
+
+    private Thread checkThread;
+    private string htmlText = string.Empty;
 
     void Start() {
         if (FindObjectsOfType<GooglePlayServicesManager>().Length >= 2) {
@@ -35,8 +40,18 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
             });
         }
 
-        // We check for internet connection
-        string htmlText = GetHtmlFromUri("http://google.com");
+        checkThread = new Thread(new ThreadStart(() => {
+            // We check for internet connection
+            htmlText = GetHtmlFromUri("http://google.com");
+        }));
+        checkThread.Start();
+
+        StartCoroutine(CheckForGooglePlaySignedIn());
+    }
+
+    private IEnumerator CheckForGooglePlaySignedIn() {
+        yield return new WaitUntil(() => htmlText == string.Empty);
+
         // this phrase is in the beginning of the google page
         if (htmlText.Contains("schema.org/WebPage") && !Social.localUser.authenticated) {
             // the player is not signed in so prompt them to do so
@@ -50,12 +65,11 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
                 })
             );
         }
-
-        
     }
 
     private void OnInvitationReceived(Invitation invitation, bool shouldAutoAccept) {
-        if (shouldAutoAccept) {
+        Debug.Log("Invitation recieved");
+        if (shouldAutoAccept && !shouldAutoAccept) {
             PopupManager.Instance.PopUp(
                 new PopUpTwoButton(invitation.Inviter.DisplayName + "\nwould like to play with you!", "Decline", "Accept")
                     .SetButtonColors(new Color(0.95686f, 0.26275f, 0.21176f), new Color(0.29804f, 0.68627f, 0.31373f))

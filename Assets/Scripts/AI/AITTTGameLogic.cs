@@ -71,6 +71,12 @@ public class AITTTGameLogic : TTTGameLogic {
 
     private void ProcessAIData(int[] pos) {
         WantToPlaceAt(new Vector2(pos[0], pos[1]));
+
+        // If it's out of camera's bounds move camera there
+        if (!grid.IsInCameraSight(pos)) {
+            // Move camera there
+            Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 0.2f);
+        }
     }
 
     private IEnumerator ProcessAIData(float delayTime, int[] pos) {

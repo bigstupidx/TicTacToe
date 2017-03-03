@@ -13,7 +13,7 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     /// <summary>
     /// Which type the server uses
     /// </summary>
-    public Cell.CellOcc serverType = Cell.CellOcc.X;
+    public Cell.CellOcc serverType;
 
     /// <summary>
     /// Where last sign was placed
@@ -32,6 +32,8 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
         bluetoothEventListener = FindObjectOfType<BluetoothEventListener>();
 
         scoring = FindObjectOfType<ScoringScript>();
+        serverType = Cell.CellOcc.X;
+        whoseTurn = Cell.CellOcc.X;
     }
 
     public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {
@@ -72,6 +74,7 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     }
 
     public bool IsItServersTurn() {
+        Debug.Log("Is it servers turn? " + serverType + " whose turn: " + WhoseTurn);
         return WhoseTurn == serverType;
     }
 

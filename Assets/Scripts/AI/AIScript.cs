@@ -50,6 +50,8 @@ public class AIScript : MonoBehaviour {
     /// </summary>
     private IntVector2 topRightPosOfField;
 
+    private bool gameInProgress = false;
+
     void Start() {
         rand = new System.Random();
         grid = GetComponent<Grid>();
@@ -67,13 +69,15 @@ public class AIScript : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     public bool IsGameInProgress() {
-        return pointsInGame.Count > 0;
+        return pointsInGame.Count > 1 && gameInProgress;
     }
 
     /// <summary>
     /// Event for when someone has won the game
     /// </summary>
     private void SomeoneWonGame(Cell.CellOcc type) {
+        gameInProgress = false;
+
         if (type == HumanType) {
             PreferencesScript.Instance.PullExpBarThenAdd((int) GetGameWonExp());
         } else {
@@ -157,6 +161,8 @@ public class AIScript : MonoBehaviour {
     private void SignWasAdded(int[] gridPos, Cell.CellOcc type) {
         // first point placed in this game
         if (firstPointInGame == null) {
+            gameInProgress = true;
+
             SetLocalGridDisabled(new int[] { gridPos[0] - gameField.GetLength(0) / 2, gridPos[1] - gameField.GetLength(1) / 2 });
         }
 

@@ -151,6 +151,14 @@ public class Grid : MonoBehaviour {
     }
 
     /// <summary>
+    /// Is the given gridpos in the camera's sight
+    /// </summary>
+    public bool IsInCameraSight(int[] gridPos) {
+        return gridPos[0] >= cameraCurrPosLB[0] && gridPos[0] <= cameraCurrPosTR[0] &&
+            gridPos[1] >= cameraCurrPosLB[1] && gridPos[1] <= cameraCurrPosTR[1];
+    }
+
+    /// <summary>
     /// This is called from the ui
     /// </summary>
     public void RemoveLastSignUI() {

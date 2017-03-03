@@ -39,7 +39,7 @@ public class ExpBarScript : MonoBehaviour {
     public void AddExpAnimation(int addExp) {
         GameObject go = Instantiate(addExpText.gameObject, transform, false);
 
-        Text aeText = go.GetComponent<Text>();
+        TextMeshProUGUI aeText = go.GetComponent<TextMeshProUGUI>();
         aeText.text = "+" + addExp;
         DOTween.Sequence()
             .Insert(0f, aeText.DOFade(1f, 0f))
