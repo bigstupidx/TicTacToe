@@ -90,7 +90,7 @@ public class AIScript : MonoBehaviour {
         { 0, 0, 0 },
         { 0, 0, 0 },
         { 75, 20, 5 },
-        { 150, 45, 15 }
+        { 100, 45, 15 }
     };
     /// <summary>
     /// How much exp the player gets for winning this game
@@ -114,7 +114,7 @@ public class AIScript : MonoBehaviour {
         }
 
         // Difficulty
-        return exp * (1f - Mathf.Min(leaveOutChance * 1.8f, 1f));
+        return exp * (1f - Mathf.Min(leaveOutChance * 1.7f, 1f));
     }
 
     /// <summary>

@@ -21,6 +21,7 @@ public class BluetoothEventListener : MonoBehaviour {
 
     void Start() {
         DontDestroyOnLoad(gameObject);
+        ScaneManager.OnScreenChange += ScreenChanged;
 
         LoadResources();
 
@@ -28,6 +29,16 @@ public class BluetoothEventListener : MonoBehaviour {
 
         // Call the update function
         if (isServer) InvokeRepeating("SendClientUpdateMsg", 0f, 0.2f);
+    }
+
+    private void ScreenChanged(string from, string to) {
+        // We changed to a non bluetooth scene
+        // We can only change to these from the connection screen
+        if (to != "ClientBluetoothGame" && to != "ServerBluetoothGame") {
+            ScaneManager.OnScreenChange -= ScreenChanged;
+
+            Destroy(gameObject);
+        }
     }
 
     void OnApplicationPause(bool paused) {

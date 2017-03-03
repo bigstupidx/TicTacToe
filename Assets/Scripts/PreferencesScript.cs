@@ -43,7 +43,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         for (int i = 0; i < EmojiSprites.emojiPaths.Length; i++)
             PlayerPrefs.SetInt(IS_UNLOCKED + EmojiSprites.emojiPaths[i], 0);
-        PlayerPrefs.SetInt(PLAYER_EXP, 0);
 
         PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
         PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
@@ -57,6 +56,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
 
         PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+        PlayerPrefs.SetInt(PLAYER_EXP, 0);
         PlayerPrefs.Save();
     }
 

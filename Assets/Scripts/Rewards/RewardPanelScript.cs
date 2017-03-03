@@ -15,6 +15,10 @@ public class RewardPanelScript : MonoBehaviour {
     private CanvasGroup canvasGroup;
 
     private GameObject rewardInstancePrefab;
+    public Canvas crateCanvas;
+
+    public GameObject[] confettis;
+    private Coroutine confettiCoroutine;
     
 	void Start() {
         rewardInstancePrefab = Resources.Load<GameObject>("Prefabs/Rewards/RewardInstance");
@@ -29,6 +33,8 @@ public class RewardPanelScript : MonoBehaviour {
         rectTransform.localScale = new Vector3(1, 1, 1);
         canvasGroup.DOFade(1f, 0.3f)
             .OnComplete(new TweenCallback(() => {
+                confettiCoroutine = StartCoroutine(PlayConfettis());
+
                 // Set level text correctly
                 firstPanel.transform.FindChild("LevelText").GetComponent<TextMeshProUGUI>().text = "Level " + PreferencesScript.Instance.PlayerLevel;
 
@@ -41,7 +47,7 @@ public class RewardPanelScript : MonoBehaviour {
                 // needs to be here because we want to start it as a coroutine in firstpanel sequence
                 Action showRewards = new Action(() => {
                     pressToContinue.DOFade(0f, 0.2f);
-
+                    
                     // First panel goes up
                     DOTween.Sequence()
                         .Append(firstPanel.rectTransform.DOScale(1f, firstPanelAnim * 0.7f))
@@ -63,6 +69,18 @@ public class RewardPanelScript : MonoBehaviour {
             }));
     }
 
+    private IEnumerator PlayConfettis() {
+        do {
+            RectTransform confetti = Instantiate(confettis[UnityEngine.Random.Range(0, confettis.Length)], transform, false).GetComponent<RectTransform>();
+            confetti.localPosition = new Vector3(UnityEngine.Random.Range(0f, Camera.main.pixelWidth) - Camera.main.pixelWidth / 2f, UnityEngine.Random.Range(0f, Camera.main.pixelHeight) - Camera.main.pixelHeight / 2f);
+
+            float widthHeight = Camera.main.pixelHeight * UnityEngine.Random.Range(0.2f, 0.3f);
+            confetti.localScale = new Vector3(widthHeight, widthHeight, widthHeight);
+
+            yield return new WaitForSeconds(UnityEngine.Random.value * 2f);
+        } while (true);
+    }
+
     private RewardInstanceScript[] crates;
     private void BringInCrates() {
         Unlockable[] unlocks = PreferencesScript.Instance.GetUnlocksForLevelAndUnlock(PreferencesScript.Instance.PlayerLevel);
@@ -75,7 +93,7 @@ public class RewardPanelScript : MonoBehaviour {
         crates = new RewardInstanceScript[unlockCount];
         
         for (int i = 0; i < unlockCount; i++) {
-            RectTransform crate = Instantiate(rewardInstancePrefab, transform, false).GetComponent<RectTransform>();
+            RectTransform crate = Instantiate(rewardInstancePrefab, crateCanvas.transform, false).GetComponent<RectTransform>();
 
             crates[i] = crate.GetComponent<RewardInstanceScript>();
             crates[i].SetUnlockable(unlocks[i]);
@@ -90,7 +108,7 @@ public class RewardPanelScript : MonoBehaviour {
     }
 
     private void HidePanel() {
-
+        StopCoroutine(confettiCoroutine);
         pressToContinue.DOKill();
         // Destroy crates
         for (int i = 0; i < crates.Length; i++) {

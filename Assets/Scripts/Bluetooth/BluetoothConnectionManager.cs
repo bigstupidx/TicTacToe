@@ -141,6 +141,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
     /// <param name="address"></param>
     public void ConnectTo(string address) {
         Bluetooth.Instance().Stop();
+        Debug.Log("Stated connecting. Is connected? " + Bluetooth.Instance().IsConnected());
         Bluetooth.Instance().Connect(address);
         serverConnectPanel.rectTransform.DOMoveY(37.5f, 0.3f);
     }
@@ -208,7 +209,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
 
         UpdateBluetoothGUI();
 
-        bluetoothNameText.text = Bluetooth.Instance().DeviceName();
+        // bluetoothNameText.text = Bluetooth.Instance().DeviceName();
     }
 
     /// <summary>
