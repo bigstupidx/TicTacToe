@@ -73,6 +73,7 @@ public class RewardPanelScript : MonoBehaviour {
         do {
             RectTransform confetti = Instantiate(confettis[UnityEngine.Random.Range(0, confettis.Length)], transform, false).GetComponent<RectTransform>();
             confetti.localPosition = new Vector3(UnityEngine.Random.Range(0f, Camera.main.pixelWidth) - Camera.main.pixelWidth / 2f, UnityEngine.Random.Range(0f, Camera.main.pixelHeight) - Camera.main.pixelHeight / 2f);
+            confetti.eulerAngles= new Vector3(UnityEngine.Random.Range(0f, 360f), confetti.eulerAngles.y, confetti.eulerAngles.z);
 
             float widthHeight = Camera.main.pixelHeight * UnityEngine.Random.Range(0.2f, 0.3f);
             confetti.localScale = new Vector3(widthHeight, widthHeight, widthHeight);
@@ -90,6 +91,10 @@ public class RewardPanelScript : MonoBehaviour {
         for (int i = 0; i < unlocks.Length && unlocks[i] != null; i++)
             unlockCount++;
 
+        if (unlockCount == 0) {
+            return;
+        }
+
         crates = new RewardInstanceScript[unlockCount];
         
         for (int i = 0; i < unlockCount; i++) {
@@ -98,10 +103,14 @@ public class RewardPanelScript : MonoBehaviour {
             crates[i] = crate.GetComponent<RewardInstanceScript>();
             crates[i].SetUnlockable(unlocks[i]);
 
+            int at = i; // used in callback
             crate.anchoredPosition = new Vector2((canvasScaler.referenceResolution.x + crate.rect.width) / 2f, canvasScaler.referenceResolution.y * -0.1f);
             crate
                 .DOAnchorPosX(((canvasScaler.referenceResolution.x - unlockCount * crate.rect.width) / (unlockCount + 1f) * (i + 1) + crate.rect.width * i) - canvasScaler.referenceResolution.x / 2f, 1f)
-                .SetDelay(i * 0.3f);
+                .SetDelay(i * 0.3f)
+                .OnComplete(new TweenCallback(() => {
+                    crates[at].CrateBroughtIn();
+                }));
         }
 
         StartCoroutine(AfterAllCratesBroken());

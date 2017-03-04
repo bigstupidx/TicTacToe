@@ -53,7 +53,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         PlayerPrefs.SetInt(IS_UNLOCKED + "fistBumpEmoji", 1);
         PlayerPrefs.SetInt(IS_UNLOCKED + "thinkingEmoji", 1);
 
-        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
+        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
 
         PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
         PlayerPrefs.SetInt(PLAYER_EXP, 0);
@@ -187,7 +187,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// </summary>
     public void Unlock(Unlockable[] unlocks) {
         for (int i = 0; i < unlocks.Length; i++) {
-            Debug.Log(unlocks[i].extra);
             if (unlocks[i] != null) { 
                 switch (unlocks[i].type) {
                     case UnlockableType.Bluetooth: PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 1); break;

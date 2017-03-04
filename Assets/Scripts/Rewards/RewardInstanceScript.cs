@@ -2,14 +2,17 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using TMPro;
 
 public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
 
+    private Image sunRayImage;
     private Image crateImage;
     private Image rewardImage;
     private ParticleSystem breakParticle;
     private ParticleSystem brokenParticle;
     private ParticleSystem openParticle;
+    private TextMeshProUGUI text;
 
     private int clickCount = 0;
 
@@ -19,12 +22,18 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
     public bool IsBroken() { return clickCount >= crateCracks.Length; }
 
     void Awake() {
-        crateImage = transform.GetChild(1).GetComponent<Image>();
-        breakParticle = transform.GetChild(2).GetComponent<ParticleSystem>();
-        brokenParticle = transform.GetChild(3).GetComponent<ParticleSystem>();
+        sunRayImage = transform.GetChild(0).GetComponent<Image>();
+        sunRayImage.rectTransform.localScale = new Vector3();
 
-        rewardImage = transform.GetChild(0).GetComponent<Image>();
+        rewardImage = transform.GetChild(1).GetComponent<Image>();
         rewardImage.DOFade(0f, 0f);
+        crateImage = transform.GetChild(2).GetComponent<Image>();
+        breakParticle = transform.GetChild(3).GetComponent<ParticleSystem>();
+        brokenParticle = transform.GetChild(4).GetComponent<ParticleSystem>();
+
+        text = transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+        text.color = text.GetComponent<DarkLightColor>().GetColorOfMode(PreferencesScript.Instance.currentMode);
+        text.DOFade(0f, 0f);
 
         // load sprites
         crateCracks = Resources.LoadAll<Sprite>("Textures/CrateCrack");
@@ -42,6 +51,7 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
                     .GetComponent<ParticleSystem>();
 
                 rewardImage.sprite = EmojiSprites.GetEmoji(unlockable.extra);
+                text.text = "New emoji!";
                 break;
             case UnlockableType.Bluetooth:
                 openParticle = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BluetoothParticle"), brokenParticle.gameObject.transform, false)
@@ -49,6 +59,7 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
 
                 rewardImage.sprite = Resources.Load<Sprite>("Textures/GUI/BluetoothIcob");
                 rewardImage.color = new Color(0.24706f, 0.31765f, 0.7098f);
+                text.text = "Bluetooth mode unlocked!";
                 break;
             // TODO change this to something else because this sucks
             case UnlockableType.LocalMulti:
@@ -57,8 +68,16 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
 
                 rewardImage.sprite = Resources.Load<Sprite>("Textures/GUI/personIcon");
                 rewardImage.color = new Color(0.24706f, 0.31765f, 0.7098f);
+                text.text = "Local multiplayer unlocked!";
                 break;
         }
+    }
+
+    /// <summary>
+    /// Called when the crate has been brought in
+    /// </summary>
+    public void CrateBroughtIn() {
+        sunRayImage.rectTransform.DOScale(1f, 0.2f);
     }
 
     private float shakeTime = 0.1f;
@@ -68,6 +87,11 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
         // We have broken the crate
         if (clickCount > crateCracks.Length) return;
 
+        // We don't care if it breaks, do this everytime
+        DOTween.Sequence()
+            .Append(sunRayImage.rectTransform.DOScale(1.1f, shakeTime))
+            .Append(sunRayImage.rectTransform.DOScale(1f, shakeTime));
+
         // Break
         if (clickCount == crateCracks.Length) {
             brokenParticle.Play(true);
@@ -76,6 +100,7 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
             crateImage.gameObject.SetActive(false);
 
             rewardImage.DOFade(1f, 0.2f);
+            text.DOFade(1f, 0.2f);
             return;
         }
         crateImage.sprite = crateCracks[clickCount];
