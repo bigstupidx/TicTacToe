@@ -21,6 +21,7 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
     public CanvasGroup roomMakingCanvasGroup;
 
     private bool isServer = false;
+    private bool isQuickMatch = false;
 
     // ******************************************CLIENTSTUFF************************************************
     private ClientCellStorage clientCellStorage;
@@ -76,19 +77,6 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
         usernameText.text = PlayGamesPlatform.Instance.GetUserDisplayName();
     }
 
-    public void AdvertiseNearbyConnection() {
-        try {
-            List<string> ids = new List<string>();
-            ids.Add(PlayGamesPlatform.Nearby.GetAppBundleId());
-
-            Debug.Log(ids[0] + " ");
-            PlayGamesPlatform.Nearby.StartAdvertising(PlayGamesPlatform.Instance.GetUserDisplayName(), ids, System.TimeSpan.FromSeconds(0),
-                    (AdvertisingResult result) => { }, (ConnectionRequest request) => { });
-        } catch (System.Exception e) {
-            Debug.Log(e.Message + " " + e.StackTrace);
-        }
-    }
-
     /// <summary>
     /// Destroys this gameobject when we get to a scene which does not belong to the googplay group
     /// </summary>
@@ -127,6 +115,14 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
 	public void StartWithInvitation() {
         PlayGamesPlatform.Instance.RealTime.CreateWithInvitationScreen(1, 1, 0, this);
         isServer = true;
+        isQuickMatch = false;
+
+        ShowRoomMakingPanel();
+    }
+
+    public void StartWithQuickMatch() {
+        PlayGamesPlatform.Instance.RealTime.CreateQuickGame(1, 1, 0, this);
+        isQuickMatch = true;
 
         ShowRoomMakingPanel();
     }
@@ -161,13 +157,33 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
     }
 
     /// <summary>
-    /// Called when the connection to the room append, successful or not
+    /// Called when the connection to the room happend, successful or not
     /// </summary>
     public void OnRoomConnected(bool success) {
         if (!success) {
             isServer = false;
             PopupManager.Instance.PopUp("Failed to make room!", "OK");
+            HideRoomMakingPanel();
         } else {
+            // if we are in quick match decide who the server should be
+            if (isQuickMatch) {
+                string myID = PlayGamesPlatform.Instance.RealTime.GetSelf().ParticipantId;
+                string otherPlayerID = "";
+
+                foreach (Participant p in PlayGamesPlatform.Instance.RealTime.GetConnectedParticipants()) {
+                    // We are searching for the other player so their id cant match
+                    if (p.ParticipantId.CompareTo(myID) != 0) {
+                        otherPlayerID = p.ParticipantId;
+                    }
+                }
+                Debug.Log("My id is " + myID + "  other id it " + otherPlayerID);
+
+                // So my id preceeds the other player's id: i'm the server, he is not
+                if (myID.CompareTo(otherPlayerID) < 0) {
+                    isServer = true;
+                }
+            }
+
             if (isServer) { 
                 ScaneManager.Instance.GoToScene(SERVER_SCENE);
             } else {

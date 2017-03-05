@@ -12,6 +12,7 @@ public class RewardPanelScript : MonoBehaviour {
     public Image firstPanel;
     private TextMeshProUGUI firstPanelStaticText;
     private TextMeshProUGUI levelUpText;
+    Coroutine textAnimationCoroutine;
 
     public TextMeshProUGUI pressToContinue;
     private RectTransform rectTransform;
@@ -20,6 +21,7 @@ public class RewardPanelScript : MonoBehaviour {
     private GameObject rewardInstancePrefab;
     public Canvas crateCanvas;
 
+    Coroutine confettiCoroutine;
     public GameObject[] confettis;
     
 	void Start() {
@@ -35,12 +37,12 @@ public class RewardPanelScript : MonoBehaviour {
 
     private float firstPanelAnim = 1f;
     public void LevelUpAnimation() {
-        StartCoroutine(PlayTextAniamtion());
+        textAnimationCoroutine = StartCoroutine(PlayTextAniamtion());
 
         rectTransform.localScale = new Vector3(1, 1, 1);
         canvasGroup.DOFade(1f, 0.3f)
             .OnComplete(new TweenCallback(() => {
-                StartCoroutine(PlayConfettis());
+                confettiCoroutine = StartCoroutine(PlayConfettis());
 
                 // Set level text correctly
                 levelUpText.text = "Level " + PreferencesScript.Instance.PlayerLevel;
@@ -137,7 +139,9 @@ public class RewardPanelScript : MonoBehaviour {
     }
 
     private void HidePanel() {
-        StopAllCoroutines();
+        StopCoroutine(textAnimationCoroutine);
+        StopCoroutine(confettiCoroutine);
+
         pressToContinue.DOKill();
         // Destroy crates
         for (int i = 0; i < crates.Length; i++) {

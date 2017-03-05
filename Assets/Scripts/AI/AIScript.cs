@@ -114,7 +114,7 @@ public class AIScript : MonoBehaviour {
         }
 
         // Difficulty
-        return exp * (1f - Mathf.Min(leaveOutChance * 1.7f, 1f));
+        return exp * (1f - Mathf.Min(leaveOutChance * 1.6f, 1f));
     }
 
     /// <summary>
@@ -550,8 +550,6 @@ public class AIScript : MonoBehaviour {
             float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x) * 2f;
 
             Vector2 vect = UnityEngine.Random.insideUnitCircle * (r - innerR) + new Vector2(innerR, innerR);
-            vect.x *= rand.NextDouble() < 0.5 ? -1 : 1;
-            vect.y *= rand.NextDouble() < 0.5 ? -1 : 1;
             pos = topRightPosOfField + new IntVector2((int) vect.x, (int) vect.y);
 
             ch = grid.GetCellHolderAtGridPos(LocalAIToGridPos(pos.x, pos.y));
