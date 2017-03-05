@@ -9,29 +9,48 @@ public class ExpBarScript : MonoBehaviour {
     public bool IsPulledDown { get { return isPulledDown; } }
 
     private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI maxExpText;
     public TextMeshProUGUI currExpText;
     public TextMeshProUGUI addExpText;
     public Slider expSlider;
+
+    [SerializeField]
+    private string[] disableOnScreens;
     
 	void Start() {
-        if (FindObjectsOfType<ExpBarScript>().Length > 1) {
-            Destroy(transform.parent.gameObject);
-            return;
-        }
-
-        // move parent canvas to dondestroyonload
-        DontDestroyOnLoad(transform.parent.gameObject);
+        if (FindObjectsOfType<ExpBarScript>().Length >= 2) return;
 
         // Inits
         rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
 
         // Set starting values
         UpdateLevelText(PreferencesScript.Instance.PlayerLevel);
         UpdateMaxExpText(PreferencesScript.Instance.ExpForNextLevel());
         UpdateCurrExp(PreferencesScript.Instance.PlayerEXP, PreferencesScript.Instance.ExpForNextLevel(), false);
+
+        ScaneManager.OnScreenChange += OnScreenChange;
 	}
+
+    private void OnScreenChange(string from, string to) {
+        if (disableOnScreens == null) return;
+
+        for (int i = 0; i < disableOnScreens.Length; i++) {
+            if (to == disableOnScreens[i]) {
+                canvasGroup.alpha = 0f;
+                canvasGroup.blocksRaycasts = false;
+                canvasGroup.interactable = false;
+                return;
+            }
+        }
+
+        canvasGroup.alpha = 1f;
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
+    }
 
     /// <summary>
     /// Only displays the little text thingy, doesn't update other text or the expbar

@@ -55,7 +55,10 @@ public class ScaneManager : Singleton<ScaneManager> {
     }
 
     public void GoToPreviousSene() {
-        SceneManager.LoadScene(prevScenes.Pop());
+        string to = prevScenes.Pop(), from = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(to);
+
+        StartCoroutine(SceneLoaded(from, to));
     }
 
 }

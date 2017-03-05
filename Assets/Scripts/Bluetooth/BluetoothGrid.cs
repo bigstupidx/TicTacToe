@@ -1,4 +1,4 @@
-﻿
+
 public class BluetoothGrid : Grid {
 
     public int[] LastSignPos {
@@ -15,11 +15,6 @@ public class BluetoothGrid : Grid {
         base.Awake();
         
         gameLogic = FindObjectOfType<BluetoothTTTGameLogic>();
-    }
-    
-
-    public override void SetCameraToPreviousSign() {
-        base.SetCameraToPreviousSign();
     }
 
     public override void LoadFromFile() { }

@@ -78,7 +78,7 @@ public class RewardPanelScript : MonoBehaviour {
             float widthHeight = Camera.main.pixelHeight * UnityEngine.Random.Range(0.2f, 0.3f);
             confetti.localScale = new Vector3(widthHeight, widthHeight, widthHeight);
 
-            yield return new WaitForSeconds(UnityEngine.Random.value * 2f);
+            yield return new WaitForSeconds(UnityEngine.Random.value);
         } while (true);
     }
 

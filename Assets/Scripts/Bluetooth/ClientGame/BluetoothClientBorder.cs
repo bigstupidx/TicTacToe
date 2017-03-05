@@ -1,4 +1,4 @@
-﻿public class BluetoothClientBorder : Border {
+public class BluetoothClientBorder : Border {
 
     public new void Start() {
         base.Start();

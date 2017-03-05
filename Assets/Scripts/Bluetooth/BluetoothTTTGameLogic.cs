@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using DG.Tweening;
 
 public class BluetoothTTTGameLogic : TTTGameLogic {
@@ -63,7 +63,7 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
             // If server is starting new turn
             if (WhoseTurn == serverType) {
                 // Send jump command to client
-                Bluetooth.Instance().Send("JPT#" + gridPos[0] + "#" + gridPos[1]);
+                Bluetooth.Instance().Send(BluetoothMessageStrings.JUMP_TO + "#" + gridPos[0] + "#" + gridPos[1]);
             } else {
                 // Client placed so jump server to pos
                 JumpCameraTo(gridPos);
@@ -74,7 +74,6 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     }
 
     public bool IsItServersTurn() {
-        Debug.Log("Is it servers turn? " + serverType + " whose turn: " + WhoseTurn);
         return WhoseTurn == serverType;
     }
 

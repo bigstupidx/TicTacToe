@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine.UI;
@@ -27,7 +27,7 @@ public class BluetoothMessageManager : MonoBehaviour {
 
         // If we don't know the size of the message yet store it
         if (messageHeight == -1) {
-            messageHeight = go.GetComponent<RectTransform>().rect.height;
+            messageHeight = go.GetComponent<RectTransform>().rect.height * (Camera.main.pixelHeight / 1080f);
         }
 
         // Move every message down

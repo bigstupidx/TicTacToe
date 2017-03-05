@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class BluetoothClientUIInScript : UIInScript {
@@ -7,6 +7,7 @@ public class BluetoothClientUIInScript : UIInScript {
         base.Start();
 
         currentSign = GameObject.Find("CurrentImage").GetComponent<Image>();
+        UpdateImage(Cell.CellOcc.O);
     }
     private new void Update() { }
     

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
@@ -155,7 +155,7 @@ public class MessagePicker : MonoBehaviour {
     /// <summary>
     /// Send a message via bluetooth
     /// </summary>
-    private void SendMessage(MessagePickerMessageWithUI mpm) {
+    public virtual void SendMessage(MessagePickerMessageWithUI mpm) {
         // Show it for yourself
         // Not emoji -> show text message
         BluetoothMessageManager.ShowEmojiMessage(EmojiSprites.GetEmoji(mpm.message), true);

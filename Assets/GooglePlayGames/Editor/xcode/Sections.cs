@@ -1,4 +1,4 @@
-﻿/// <summary>
+/// <summary>
 /// Xcode PBX support library.  This is from the Unity open source.
 /// https://bitbucket.org/Unity-Technologies/xcodeapi/overview
 /// </summary>

@@ -1,4 +1,4 @@
-﻿using UnityEngine.UI;
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;

@@ -1,4 +1,4 @@
-﻿
+
 public class BluetoothDrawGrid : DrawGrid {
 
     public override void Start() {

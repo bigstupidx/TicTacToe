@@ -40,6 +40,10 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
             });
         }
 
+        Invoke("StartCheckingWhetherSignedIn", 15f);
+    }
+
+    private void StartCheckingWhetherSignedIn() {
         checkThread = new Thread(new ThreadStart(() => {
             // We check for internet connection
             htmlText = GetHtmlFromUri("http://google.com");
@@ -68,17 +72,26 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
     }
 
     private void OnInvitationReceived(Invitation invitation, bool shouldAutoAccept) {
-        Debug.Log("Invitation recieved");
-        if (shouldAutoAccept && !shouldAutoAccept) {
+        Debug.Log("Invitation recieved " + shouldAutoAccept + " " + invitation.Inviter.DisplayName);
+
+        // We use it to automatically to invoke what we want to do or have the user decide
+        UnityEngine.Events.UnityAction action = () => {
+            ScaneManager.Instance.GoToSceneThenDo("GooglePlayConnectScreen", () => {
+                GooglePlayGameManager manager = FindObjectOfType<GooglePlayGameManager>();
+
+                PlayGamesPlatform.Instance.RealTime.AcceptInvitation(invitation.InvitationId, manager);
+                manager.ShowRoomMakingPanel();
+            });
+        };
+
+        if (shouldAutoAccept) {
+            action.Invoke();
+        } else { 
             PopupManager.Instance.PopUp(
                 new PopUpTwoButton(invitation.Inviter.DisplayName + "\nwould like to play with you!", "Decline", "Accept")
                     .SetButtonColors(new Color(0.95686f, 0.26275f, 0.21176f), new Color(0.29804f, 0.68627f, 0.31373f))
                     .SetButtonTextColors(Color.white, Color.white)
-                    .SetButtonPressActions(() => { }, () => {
-                        ScaneManager.Instance.GoToSceneThenDo("GooglePlayConnectScreen", () => {
-                            PlayGamesPlatform.Instance.RealTime.AcceptInvitation(invitation.InvitationId, FindObjectOfType<GooglePlayGameManager>());
-                        });
-                    })
+                    .SetButtonPressActions(() => { }, action)
                 );
         }
     }
