@@ -10,6 +10,9 @@ public class RewardPanelScript : MonoBehaviour {
     private CanvasScaler canvasScaler;
 
     public Image firstPanel;
+    private TextMeshProUGUI firstPanelStaticText;
+    private TextMeshProUGUI levelUpText;
+
     public TextMeshProUGUI pressToContinue;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
@@ -18,9 +21,11 @@ public class RewardPanelScript : MonoBehaviour {
     public Canvas crateCanvas;
 
     public GameObject[] confettis;
-    private Coroutine confettiCoroutine;
     
 	void Start() {
+        firstPanelStaticText = firstPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        levelUpText = firstPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
         rewardInstancePrefab = Resources.Load<GameObject>("Prefabs/Rewards/RewardInstance");
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
@@ -30,13 +35,15 @@ public class RewardPanelScript : MonoBehaviour {
 
     private float firstPanelAnim = 1f;
     public void LevelUpAnimation() {
+        StartCoroutine(PlayTextAniamtion());
+
         rectTransform.localScale = new Vector3(1, 1, 1);
         canvasGroup.DOFade(1f, 0.3f)
             .OnComplete(new TweenCallback(() => {
-                confettiCoroutine = StartCoroutine(PlayConfettis());
+                StartCoroutine(PlayConfettis());
 
                 // Set level text correctly
-                firstPanel.transform.FindChild("LevelText").GetComponent<TextMeshProUGUI>().text = "Level " + PreferencesScript.Instance.PlayerLevel;
+                levelUpText.text = "Level " + PreferencesScript.Instance.PlayerLevel;
 
                 // Start press to coninue animation
                 DOTween.Sequence()
@@ -51,7 +58,7 @@ public class RewardPanelScript : MonoBehaviour {
                     // First panel goes up
                     DOTween.Sequence()
                         .Append(firstPanel.rectTransform.DOScale(1f, firstPanelAnim * 0.7f))
-                        .Append(firstPanel.rectTransform.DOAnchorPosY((canvasScaler.referenceResolution.y - firstPanel.rectTransform.rect.height) / 2f, firstPanelAnim * 0.7f))
+                        .Append(firstPanel.rectTransform.DOAnchorPosY((canvasScaler.referenceResolution.y - firstPanel.rectTransform.rect.height) * 0.4f, firstPanelAnim * 0.7f))
 
                         // Bring in the crates
                         .OnComplete(new TweenCallback(() => {
@@ -67,6 +74,19 @@ public class RewardPanelScript : MonoBehaviour {
                     .AppendCallback(new TweenCallback(() => StartCoroutine(ExecuteAfterScreenPressed(showRewards))))
                     .Append(pressToContinue.DOFade(1f, 0.1f));
             }));
+    }
+
+    private IEnumerator PlayTextAniamtion() {
+        while (true) {
+            float h, s, v;
+            Color.RGBToHSV(firstPanelStaticText.outlineColor, out h, out s, out v);
+            firstPanelStaticText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
+            
+            Color.RGBToHSV(levelUpText.outlineColor, out h, out s, out v);
+            levelUpText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
+
+            yield return null;
+        }
     }
 
     private IEnumerator PlayConfettis() {
@@ -117,7 +137,7 @@ public class RewardPanelScript : MonoBehaviour {
     }
 
     private void HidePanel() {
-        StopCoroutine(confettiCoroutine);
+        StopAllCoroutines();
         pressToContinue.DOKill();
         // Destroy crates
         for (int i = 0; i < crates.Length; i++) {
@@ -128,9 +148,7 @@ public class RewardPanelScript : MonoBehaviour {
         // reset firstpanel
         firstPanel.rectTransform.localScale = new Vector3(0f, 0f, 1f);
         firstPanel.rectTransform.anchoredPosition = new Vector2(0, 0);
-
-
-        rectTransform.DOScale(0f, 0.4f);
+        
         canvasGroup.DOFade(0f, 0.4f);
     }
 
