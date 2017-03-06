@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 /// <summary>
 /// This is the logical class of emoji panel
@@ -26,6 +27,7 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
     private RectTransform rect;
     private ScrollRect scrollRect;
     private GameObject currentlyEnabled;
+    private TextMeshProUGUI emojisByText;
     private int currentSlot = 0;
 
     /// <summary>
@@ -34,10 +36,11 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
     public delegate void EmojiChosen(Sprite emoji, int number);
     public event EmojiChosen OnEmojiChosen;
     
-	void Start () {
+	void Start() {
         rect = GetComponent<RectTransform>();
         messageOnDrawerPrefab = Resources.Load<GameObject>("Prefabs/Bluetooth/Messaging/MessageOnDrawer");
         scrollRect = transform.parent.GetComponent<ScrollRect>();
+        emojisByText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
         // adding images to drawer fomr here
         // only include unlocked emojis
@@ -52,7 +55,8 @@ public class EmojiPickPanelContentScript : MonoBehaviour {
         colCount = (int) (rect.rect.width / widthHeight) - 1; // -1 so we can have some padding around the images
         rowCount = Mathf.CeilToInt((float) unlockedEmojis.Count / colCount);
 
-        realHeight = (rowCount + 1) * (widthHeight + imagePadding) + imagePadding;
+        // Height of whole thing
+        realHeight = (rowCount + 1) * widthHeight + emojisByText.rectTransform.rect.height;
 
         rect.sizeDelta = new Vector2(rect.rect.width, realHeight);
 

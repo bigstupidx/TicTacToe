@@ -10,12 +10,17 @@ public class EmojiSlotButtonGroupScript : MonoBehaviour {
     private RectTransform[] buttonRects;
 
 	void Start () {
-        buttons = new BluetoothEmojiSlotButton[transform.childCount];
-        buttonRects = new RectTransform[transform.childCount];
+        buttons = new BluetoothEmojiSlotButton[PreferencesScript.Instance.EMOJI_COUNT];
+        buttonRects = new RectTransform[buttons.Length];
 
-        for (int i = 0; i < transform.childCount; i++) {
+        for (int i = 0; i < buttons.Length; i++) {
             buttons[i] = transform.GetChild(i).GetComponent<BluetoothEmojiSlotButton>();
             buttonRects[i] = transform.GetChild(i).GetComponent<RectTransform>();
+        }
+
+        // because the childs are in order we need to disable the remainig one we don't use because they are not unlocked yet
+        for (int i = buttons.Length; i < transform.childCount; i++) {
+            transform.GetChild(i).gameObject.SetActive(false);
         }
     }
 	

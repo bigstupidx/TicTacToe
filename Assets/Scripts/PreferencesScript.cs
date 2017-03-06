@@ -38,6 +38,10 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     }
 
     public void ResetPreferences() {
+        PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 0);
+        PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 0);
+        PlayerPrefs.SetInt(IS_GOOGLE_PLAY_UNLOCKED, 0);
+
         PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
         PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
 
@@ -47,11 +51,14 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         PlayerPrefs.SetString(EMOJI_NAME + "0", "smilingEmoji");
         PlayerPrefs.SetString(EMOJI_NAME + "1", "angryEmoji");
         PlayerPrefs.SetString(EMOJI_NAME + "2", "fistBumpEmoji");
-        PlayerPrefs.SetString(EMOJI_NAME + "3", "thinkingEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "3", "smilingEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "4", "angryEmoji");
+        PlayerPrefs.SetString(EMOJI_NAME + "5", "fistBumpEmoji");
         PlayerPrefs.SetInt(IS_UNLOCKED + "smilingEmoji", 1);
         PlayerPrefs.SetInt(IS_UNLOCKED + "angryEmoji", 1);
         PlayerPrefs.SetInt(IS_UNLOCKED + "fistBumpEmoji", 1);
-        PlayerPrefs.SetInt(IS_UNLOCKED + "thinkingEmoji", 1);
+
+        PlayerPrefs.SetInt(EMOJI_SLOT_COUNT, 3);
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
 
@@ -93,6 +100,21 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     private const string IS_UNLOCKED = "unlocked";
     private const string IS_BLUETOOTH_UNLOCKED = "BluetoothUnlocked";
     private const string IS_LOCAL_MULTI_UNLOCKED = "LocalMultiUnlocked";
+    private const string IS_GOOGLE_PLAY_UNLOCKED = "GooglePlayUnlocked";
+    private const string EMOJI_SLOT_COUNT = "EmojiSlotCount";
+
+    /// <summary>
+    /// At which level bluetooth is unlocked
+    /// </summary>
+    public const int bluetoothUnlockAtLevel = 5;
+    /// <summary>
+    /// At which level local multi is unlocked
+    /// </summary>
+    public const int localMultiUnlockAtLevel = 2;
+    /// <summary>
+    /// At which level google play multi is unlocked
+    /// </summary>
+    public const int gpMultiUnlockAtLevel = 6;
 
     /// <summary>
     /// These correspond to the one in EmojiSprites
@@ -129,14 +151,15 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public int GetUnlockCountAtLevel(int level) {
         if (level <= 3) return 3;
         if (level <= 7) {
-            if (level % 2 == 0) return 3;
+            if (level % 2 == 1) return 3;
             else return 2;
         }
-        if (level <= 15) return 2;
+        if (level <= 22) return 2;
+        if (level <= 30) return 1;
 
-        return 1;
+        return 0;
     }
-    
+
     /// <summary>
     /// Returns the three unlocks that the given level has
     /// </summary>
@@ -156,12 +179,22 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         // assign the ones that we have to
         switch (level) {
-            case 2:
+            case localMultiUnlockAtLevel:
                 unlock[0] = new Unlockable(UnlockableType.LocalMulti, "");
                 unlockAt++;
                 break;
-            case 5:
+            case bluetoothUnlockAtLevel:
                 unlock[0] = new Unlockable(UnlockableType.Bluetooth, "");
+                unlockAt++;
+                break;
+            case 15:
+            case 10:
+            case 7:
+                unlock[0] = new Unlockable(UnlockableType.EmojiSlot, "");
+                unlockAt++;
+                break;
+            case gpMultiUnlockAtLevel:
+                unlock[0] = new Unlockable(UnlockableType.GooglePlay, "");
                 unlockAt++;
                 break;
         }
@@ -187,11 +220,18 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// </summary>
     public void Unlock(Unlockable[] unlocks) {
         for (int i = 0; i < unlocks.Length; i++) {
-            if (unlocks[i] != null) { 
+            if (unlocks[i] != null) {
                 switch (unlocks[i].type) {
                     case UnlockableType.Bluetooth: PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 1); break;
                     case UnlockableType.LocalMulti: PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 1); break;
                     case UnlockableType.Emoji: PlayerPrefs.SetInt(IS_UNLOCKED + unlocks[i].extra, 1); break;
+                    case UnlockableType.EmojiSlot:
+                        int curr = PlayerPrefs.GetInt(EMOJI_SLOT_COUNT);
+                        if (curr <= 6) {
+                            PlayerPrefs.SetInt(EMOJI_SLOT_COUNT, curr + 1);
+                        }
+                        break;
+                    case UnlockableType.GooglePlay: PlayerPrefs.SetInt(IS_GOOGLE_PLAY_UNLOCKED, 1); break;
                 }
             }
         }
@@ -256,7 +296,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public void PullExpBarThenAdd(int exp) {
         if (expBarScript.IsPulledDown) {
             AddEXP(exp);
-        } else { 
+        } else {
             expBarScript.PullDownExpBar(new DG.Tweening.TweenCallback(() => {
                 StartCoroutine(ExecuteAfterSeconds(0.2f, new Action(() => {
                     AddEXP(exp);
@@ -337,7 +377,12 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// </summary>
     private const string EMOJI_NAME = "EmojiName";
 
-    public readonly int EMOJI_COUNT = 4;
+    public int EMOJI_COUNT {
+        get {
+            return PlayerPrefs.GetInt(EMOJI_SLOT_COUNT);
+        }
+    }
+    
 
     public string[] GetEmojiNames() {
         string[] s = new string[EMOJI_COUNT];
@@ -484,5 +529,5 @@ public class Unlockable {
 }
 
 public enum UnlockableType {
-    Emoji, Bluetooth, LocalMulti
+    Emoji, Bluetooth, LocalMulti, EmojiSlot, GooglePlay
 }

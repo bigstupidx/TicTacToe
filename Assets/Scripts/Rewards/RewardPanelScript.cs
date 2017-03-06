@@ -39,43 +39,54 @@ public class RewardPanelScript : MonoBehaviour {
     public void LevelUpAnimation() {
         textAnimationCoroutine = StartCoroutine(PlayTextAniamtion());
 
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
         rectTransform.localScale = new Vector3(1, 1, 1);
-        canvasGroup.DOFade(1f, 0.3f)
-            .OnComplete(new TweenCallback(() => {
-                confettiCoroutine = StartCoroutine(PlayConfettis());
 
-                // Set level text correctly
-                levelUpText.text = "Level " + PreferencesScript.Instance.PlayerLevel;
+        int unlockCount = PreferencesScript.Instance.GetUnlockCountAtLevel(PreferencesScript.Instance.PlayerLevel);
+        // If there are unlocks left
+        if (unlockCount != 0) { 
+            canvasGroup.DOFade(1f, 0.3f)
+                .OnComplete(new TweenCallback(() => {
+                    confettiCoroutine = StartCoroutine(PlayConfettis());
 
-                // Start press to coninue animation
-                DOTween.Sequence()
-                    .Append(pressToContinue.rectTransform.DOScale(1.1f, 0.4f).SetEase(Ease.InSine))
-                    .Append(pressToContinue.rectTransform.DOScale(1.0f, 0.4f).SetEase(Ease.OutSine))
-                    .SetLoops(20, LoopType.Yoyo);
+                    // Set level text correctly
+                    levelUpText.text = "Level " + PreferencesScript.Instance.PlayerLevel;
 
-                // needs to be here because we want to start it as a coroutine in firstpanel sequence
-                Action showRewards = new Action(() => {
-                    pressToContinue.DOFade(0f, 0.2f);
-                    
-                    // First panel goes up
+                    // Start press to coninue animation
                     DOTween.Sequence()
-                        .Append(firstPanel.rectTransform.DOScale(1f, firstPanelAnim * 0.7f))
-                        .Append(firstPanel.rectTransform.DOAnchorPosY((canvasScaler.referenceResolution.y - firstPanel.rectTransform.rect.height) * 0.4f, firstPanelAnim * 0.7f))
+                        .Append(pressToContinue.rectTransform.DOScale(1.1f, 0.4f).SetEase(Ease.InSine))
+                        .Append(pressToContinue.rectTransform.DOScale(1.0f, 0.4f).SetEase(Ease.OutSine))
+                        .SetLoops(20, LoopType.Yoyo);
 
-                        // Bring in the crates
-                        .OnComplete(new TweenCallback(() => {
-                            BringInCrates();
-                        }));
-                });
+                    // needs to be here because we want to start it as a coroutine in firstpanel sequence
+                    Action showRewards = new Action(() => {
+                        pressToContinue.DOFade(0f, 0.2f);
+                    
+                        // First panel goes up
+                        DOTween.Sequence()
+                            .Append(firstPanel.rectTransform.DOScale(1f, firstPanelAnim * 0.7f))
+                            .Append(firstPanel.rectTransform.DOAnchorPosY((canvasScaler.referenceResolution.y - firstPanel.rectTransform.rect.height) * 0.4f, firstPanelAnim * 0.7f))
 
-                // First panel
-                DOTween.Sequence()
-                    .Insert(0f, firstPanel.rectTransform.DOScaleX(1.7f, firstPanelAnim * 0.8f).SetEase(Ease.OutBounce))
-                    .Insert(0f, firstPanel.rectTransform.DOScaleY(1.7f, firstPanelAnim * 1.2f).SetEase(Ease.OutBounce))
+                            // Bring in the crates
+                            .OnComplete(new TweenCallback(() => {
+                                BringInCrates();
+                            }));
+                    });
 
-                    .AppendCallback(new TweenCallback(() => StartCoroutine(ExecuteAfterScreenPressed(showRewards))))
-                    .Append(pressToContinue.DOFade(1f, 0.1f));
+                    // First panel
+                    DOTween.Sequence()
+                        .Insert(0f, firstPanel.rectTransform.DOScaleX(1.7f, firstPanelAnim * 0.8f).SetEase(Ease.OutBounce))
+                        .Insert(0f, firstPanel.rectTransform.DOScaleY(1.7f, firstPanelAnim * 1.2f).SetEase(Ease.OutBounce))
+
+                        .AppendCallback(new TweenCallback(() => StartCoroutine(ExecuteAfterScreenPressed(showRewards))))
+                        .Append(pressToContinue.DOFade(1f, 0.1f));
+                }));
+        } else { // There are no unlocks left
+            StartCoroutine(ExecuteAfterScreenPressed(() => {
+                HidePanel();
             }));
+        }
     }
 
     private IEnumerator PlayTextAniamtion() {
@@ -83,6 +94,7 @@ public class RewardPanelScript : MonoBehaviour {
             float h, s, v;
             Color.RGBToHSV(firstPanelStaticText.outlineColor, out h, out s, out v);
             firstPanelStaticText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
+            Debug.Log("From hsv " + h + " " + s + " " + v + " to " + firstPanelStaticText.outlineColor);
             
             Color.RGBToHSV(levelUpText.outlineColor, out h, out s, out v);
             levelUpText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
@@ -152,7 +164,9 @@ public class RewardPanelScript : MonoBehaviour {
         // reset firstpanel
         firstPanel.rectTransform.localScale = new Vector3(0f, 0f, 1f);
         firstPanel.rectTransform.anchoredPosition = new Vector2(0, 0);
-        
+
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
         canvasGroup.DOFade(0f, 0.4f);
     }
 

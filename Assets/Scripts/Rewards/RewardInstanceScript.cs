@@ -61,14 +61,23 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
                 rewardImage.color = new Color(0.24706f, 0.31765f, 0.7098f);
                 text.text = "Bluetooth mode unlocked!";
                 break;
-            // TODO change this to something else because this sucks
-            case UnlockableType.LocalMulti:
+            // TODO change these to something else because this sucks
+            case UnlockableType.EmojiSlot:
                 openParticle = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/EmojiParticle"), brokenParticle.gameObject.transform, false)
                     .GetComponent<ParticleSystem>();
 
-                rewardImage.sprite = Resources.Load<Sprite>("Textures/GUI/personIcon");
-                rewardImage.color = new Color(0.24706f, 0.31765f, 0.7098f);
+                rewardImage.sprite = Resources.Load<Sprite>("Textures/emojiSlotUnlock");
+                text.text = "New slot for emojis!";
+                break;
+            case UnlockableType.LocalMulti:
+                rewardImage.sprite = Resources.Load<Sprite>("Textures/localMultiUnlock");
+                rewardImage.color = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.DARK ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
                 text.text = "Local multiplayer unlocked!";
+                break;
+            case UnlockableType.GooglePlay:
+                rewardImage.sprite = Resources.Load<Sprite>("Textures/gpUnlock");
+                rewardImage.color = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.DARK ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
+                text.text = "Google play multiplayer unlocked!";
                 break;
         }
     }
