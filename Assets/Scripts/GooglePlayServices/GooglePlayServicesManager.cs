@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
