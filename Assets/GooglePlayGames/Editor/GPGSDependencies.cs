@@ -1,4 +1,4 @@
-// <copyright file="GPGSDependencies.cs" company="Google Inc.">
+﻿// <copyright file="GPGSDependencies.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,25 +13,46 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if UNITY_ANDROID
 
-namespace GooglePlayGames.Editor
-{
+namespace GooglePlayGames.Editor {
 
-using System;
-using System.Collections.Generic;
-using UnityEditor;
+    using System;
+    using System.Collections.Generic;
+    using Google.JarResolver;
+    using UnityEditor;
 
-/// AdMob dependencies file.
-[InitializeOnLoad]
-public class GPGSDependencies : AssetPostprocessor
-{
+    /// AdMob dependencies file.
+    [InitializeOnLoad]
+    public class GPGSDependencies : AssetPostprocessor { 
 #if UNITY_ANDROID
         /// <summary>Instance of the PlayServicesSupport resolver</summary>
         public static object svcSupport;
 #endif  // UNITY_ANDROID
+        
+        private static readonly string PluginName = "AppodealUnity";
 
         /// Initializes static members of the class.
-        static GPGSDependencies() { RegisterDependencies(); }
+        static GPGSDependencies() {
+            RegisterDependencies();
+
+            PlayServicesSupport svcSupport = PlayServicesSupport.CreateInstance(
+                PluginName,
+                EditorPrefs.GetString("AndroidSdkRoot"),
+                "ProjectSettings");
+
+            svcSupport.DependOn("com.google.android.gms",
+                                "play-services-ads",
+                                "LATEST");
+
+            svcSupport.DependOn("com.google.android.gms",
+                                "play-services-location",
+                                "LATEST");
+
+            svcSupport.DependOn("com.android.support",
+                                "support-v4",
+                                "23.1+");
+        }
 
         public static void RegisterDependencies() {
 #if UNITY_ANDROID
@@ -76,8 +97,7 @@ public class GPGSDependencies : AssetPostprocessor
             });
 
             // if google+ is needed, add it
-            if (GameInfo.RequireGooglePlus())
-            {
+            if (GameInfo.RequireGooglePlus()) {
                 Google.VersionHandler.InvokeInstanceMethod(
                         svcSupport, "DependOn",
                         new object[] { "com.google.android.gms", "play-services-plus",
@@ -133,6 +153,7 @@ public class GPGSDependencies : AssetPostprocessor
                 }
             }
         }
-}
 
+    }
 }
+#endif
