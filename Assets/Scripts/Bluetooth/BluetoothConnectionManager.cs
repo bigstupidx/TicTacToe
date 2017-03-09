@@ -28,7 +28,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
     public GameObject lobbyPanel;
     public Image bluetoothEnabledImage;
     public Image serverConnectPanel;
-    public Text bluetoothNameText;
 
     // Prefabs for server and client
     public GameObject serverListenerPrefab;
@@ -44,7 +43,6 @@ public class BluetoothConnectionManager : MonoBehaviour {
     void Start() {
         // Log if something has been missed in unity explorer
         if (!bluetoothEnabledImage) Debug.Log("Bluetooth enabled image missing!");
-        if (!bluetoothNameText) Debug.Log("Bluetooth name text missing!");
         if (!startPanel) Debug.Log("Start panel missing!");
         if (!serverPanel) Debug.Log("Server panel missing!");
         if (!clientPanel) Debug.Log("Client panel missing!");
@@ -53,6 +51,7 @@ public class BluetoothConnectionManager : MonoBehaviour {
         InitGUI();
         
         bluetoothColors = bluetoothEnabledImage.GetComponent<DarkLightColor>();
+        currentMode = PreferencesScript.Instance.currentMode; // We only eed to get it here, because it can't change on this scene
 
         //TODO find out why we can't connect
         // Disable bluetooth because we can't connect to anything otherwise
@@ -208,13 +207,12 @@ public class BluetoothConnectionManager : MonoBehaviour {
         lobbyPanel.SetActive(false);
 
         UpdateBluetoothGUI();
-
-        // bluetoothNameText.text = Bluetooth.Instance().DeviceName();
     }
 
     /// <summary>
     /// If on turns it off, if off turns it on
     /// Couldn't remember what to call it exactly
+    /// Used on button click callback
     /// </summary>
     public void SwitchBluetoothEnabled() {
         if (Bluetooth.Instance().IsEnabled()) {
@@ -224,12 +222,13 @@ public class BluetoothConnectionManager : MonoBehaviour {
         }
     }
 
+    private PreferencesScript.ColorMode currentMode;
     // Makes it visible in the GUI that the bluetooth is enabled or not
     public void UpdateBluetoothGUI() {
         if (Bluetooth.Instance().IsEnabled()) {
             bluetoothEnabledImage.color = new Color(0.055f, 0.2265f, 0.5549f);
         } else {
-            bluetoothEnabledImage.color = bluetoothColors.GetColorOfMode(PreferencesScript.Instance.currentMode);
+            bluetoothEnabledImage.color = bluetoothColors.GetColorOfMode(currentMode);
         }
     }
 	

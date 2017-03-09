@@ -38,10 +38,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     }
 
     public void ResetPreferences() {
-        PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 0);
-        PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 0);
-        PlayerPrefs.SetInt(IS_GOOGLE_PLAY_UNLOCKED, 0);
-
         PlayerPrefs.SetString(COLOR_MODE, ColorMode.LIGHT.ToString());
         PlayerPrefs.SetString(THEME_MODE, "DefaultTheme");
 
@@ -62,7 +58,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
 
-        PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 20);
         PlayerPrefs.SetInt(PLAYER_EXP, 0);
         PlayerPrefs.Save();
     }
@@ -98,10 +94,11 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     /// Concat a string at the end about which item you want the information
     /// </summary>
     private const string IS_UNLOCKED = "unlocked";
-    private const string IS_BLUETOOTH_UNLOCKED = "BluetoothUnlocked";
-    private const string IS_LOCAL_MULTI_UNLOCKED = "LocalMultiUnlocked";
-    private const string IS_GOOGLE_PLAY_UNLOCKED = "GooglePlayUnlocked";
     private const string EMOJI_SLOT_COUNT = "EmojiSlotCount";
+
+    public bool IsBluetoothUnlocked() { return PlayerLevel >= bluetoothUnlockAtLevel; }
+    public bool IsLocalMultiUnlocked() { return PlayerLevel >= localMultiUnlockAtLevel; }
+    public bool IsGPMultiUnlocked() { return PlayerLevel >= gpMultiUnlockAtLevel; }
 
     /// <summary>
     /// At which level bluetooth is unlocked
@@ -222,8 +219,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         for (int i = 0; i < unlocks.Length; i++) {
             if (unlocks[i] != null) {
                 switch (unlocks[i].type) {
-                    case UnlockableType.Bluetooth: PlayerPrefs.SetInt(IS_BLUETOOTH_UNLOCKED, 1); break;
-                    case UnlockableType.LocalMulti: PlayerPrefs.SetInt(IS_LOCAL_MULTI_UNLOCKED, 1); break;
                     case UnlockableType.Emoji: PlayerPrefs.SetInt(IS_UNLOCKED + unlocks[i].extra, 1); break;
                     case UnlockableType.EmojiSlot:
                         int curr = PlayerPrefs.GetInt(EMOJI_SLOT_COUNT);
@@ -231,7 +226,6 @@ public class PreferencesScript : Singleton<PreferencesScript> {
                             PlayerPrefs.SetInt(EMOJI_SLOT_COUNT, curr + 1);
                         }
                         break;
-                    case UnlockableType.GooglePlay: PlayerPrefs.SetInt(IS_GOOGLE_PLAY_UNLOCKED, 1); break;
                 }
             }
         }

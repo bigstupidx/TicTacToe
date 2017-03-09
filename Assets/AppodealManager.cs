@@ -1,8 +1,14 @@
 using AppodealAds.Unity.Api;
 using AppodealAds.Unity.Common;
+using UnityEngine;
 
 public class AppodealManager : Singleton<AppodealManager> {
-    
+
+    /// <summary>
+    /// After how many games we should show an ad
+    /// </summary>
+    [HideInInspector]
+    public int afterGameCountShowAd = 10;
     public string[] hideOnScreens;
 
 	void Start() {
@@ -23,6 +29,11 @@ public class AppodealManager : Singleton<AppodealManager> {
     }
 
     private void OnScreenChange(string from, string to) {
+        if (to == "Game" || to == "GameAI") {
+            gameCounter = 0;
+            FindObjectOfType<TTTGameLogic>().SomeoneWonGame += GameEndAd;
+        }
+
         for (int i = 0; i < hideOnScreens.Length; i++) {
             if (hideOnScreens[i] == to) {
                 Appodeal.hide(Appodeal.BANNER_BOTTOM);
@@ -31,5 +42,14 @@ public class AppodealManager : Singleton<AppodealManager> {
         }
 
         Appodeal.show(Appodeal.BANNER_BOTTOM);
+    }
+
+    int gameCounter = 0;
+    private void GameEndAd(Cell.CellOcc type) {
+        gameCounter++;
+
+        if (gameCounter == afterGameCountShowAd) {
+            Appodeal.show(Appodeal.INTERSTITIAL);
+        }
     }
 }

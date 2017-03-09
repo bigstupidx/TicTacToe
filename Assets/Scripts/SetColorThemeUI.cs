@@ -19,7 +19,7 @@ public class SetColorThemeUI : MonoBehaviour {
 
     private ColorThemesUIHandler colorThemesHandler;
 
-    public Color clickedColor = new Color(0.32941f, 0.43137f, 0.47843f);
+    public Color clickedColor = new Color(0.47059f, 0.56471f, 0.61176f);
 
     void Awake () {
         // We need to do this in awake because in start which lightdark to use will be set

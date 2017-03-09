@@ -87,7 +87,7 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
 
             ScaneManager.OnScreenChange -= OnSreenChanged;
 
-            DestroyImmediate(gameObject);
+            Destroy(gameObject);
         }
     }
 

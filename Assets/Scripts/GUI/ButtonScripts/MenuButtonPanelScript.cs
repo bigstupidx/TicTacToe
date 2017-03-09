@@ -12,22 +12,18 @@ public class MenuButtonPanelScript : MonoBehaviour {
     float inOtDelay = 0.2f;
     // The time gap between the buttons going in and out
     float gapBetween = 0.2f;
-
-    [SerializeField]
+    
     [Tooltip("Which button is pressed in order to birng out second panel")]
-    private MenuButton mainButton;
-
-    [SerializeField]
+    public MenuButton mainButton;
+    
     [Tooltip("The back button of the second panel")]
-    private MenuButton backButton;
-
-    [SerializeField]
+    public MenuButton backButton;
+    
     [Tooltip("All of the buttons of the main button panel")]
-    private MenuButton[] firstPanelButtons;
-
-    [SerializeField]
+    public MenuButton[] firstPanelButtons;
+    
     [Tooltip("The buttons to bring out")]
-    private MenuButton[] secondPanelButtons;
+    public MenuButton[] secondPanelButtons;
 
     private bool isSecondPanelShown = false;
 
@@ -181,7 +177,7 @@ public class MenuButtonPanelScript : MonoBehaviour {
 }
 
 [Serializable]
-internal struct MenuButton {
+public struct MenuButton {
     public RectTransform rectTransform;
     [HideInInspector]
     public CanvasGroup canavasGroup;
