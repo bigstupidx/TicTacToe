@@ -50,8 +50,8 @@ public class FirstGameManager : MonoBehaviour {
         aiScript.SetDifficulty(4);
 
         // subscribe to placed sign event
-        grid.SignWasPlaced += SignWasPlayed;
-        gameLogic.SomeoneWonGame += SomeoneWonGame;
+        grid.SignWasPlacedEvent += SignWasPlayed;
+        gameLogic.SomeoneWonGameEvent += SomeoneWonGame;
 
         clickImge.DOFade(1f, 0.2f);
         clickImge.rectTransform.DOScale(1.1f, 0.6f).SetLoops(-1, LoopType.Yoyo);

@@ -1,13 +1,60 @@
 using UnityEngine;
 
-public class SignResourceStorage : MonoBehaviour {
+public class SignResourceStorage : Singleton<SignResourceStorage> {
     
-    public static Color oColor = Color.blue;
-    public static Color xColor = Color.red;
+    public Color oColor = Color.blue;
+    public Color xColor = Color.red;
 
-    private static Sprite oSprite;
-    private static Sprite xSprite;
+    private const string soundPath = "Sounds/Drawing/";
+    private AudioClip[] oPlaceSounds;
+    /// <summary>
+    /// Add to this to add a new o place sound
+    /// </summary>
+    private string[] oPlaceSoundNames = new string[] {
+        "oPlaceSound1",
+        "oPlaceSound2",
+        "oPlaceSound3",
+        "oPlaceSound4"
+    };
+    private AudioClip[] xPlaceSounds;
+    /// <summary>
+    /// Add to this to add a new x place sound
+    /// </summary>
+    private string[] xPlaceSoundNames = new string[] {
+        "xPlaceSound1",
+        "xPlaceSound2",
+        "xPlaceSound3",
+        "xPlaceSound4"
+    };
 
+
+    public AudioClip XRandomPlaceSound {
+        get {
+            return xPlaceSounds[Random.Range(0, xPlaceSounds.Length)];
+        }
+    }
+
+    public AudioClip ORandomPlaceSound {
+        get {
+            return oPlaceSounds[Random.Range(0, oPlaceSounds.Length)];
+        }
+    }
+
+    /// <summary>
+    /// If not given X or O it will return null
+    /// </summary>
+    public AudioClip GetRandomSoundFor(Cell.CellOcc type) {
+        switch (type) {
+            case Cell.CellOcc.X: return XRandomPlaceSound;
+            case Cell.CellOcc.O: return ORandomPlaceSound;
+        }
+
+        return null;
+    }
+
+
+    private Sprite oSprite;
+    private Sprite xSprite;
 
     void Awake () {
         if (FindObjectsOfType<SignResourceStorage>().Length >= 2) {
@@ -33,6 +80,18 @@ public class SignResourceStorage : MonoBehaviour {
 
         allSprites = Resources.LoadAll<Sprite>("Textures/Animation/O/OAnimation0");
         oSprite = allSprites[allSprites.Length - 1];
+
+        // Load sounds
+        oPlaceSounds = new AudioClip[oPlaceSoundNames.Length];
+        xPlaceSounds = new AudioClip[xPlaceSoundNames.Length];
+
+        for (int i = 0; i < oPlaceSoundNames.Length; i++) {
+            oPlaceSounds[i] = Resources.Load<AudioClip>(soundPath + oPlaceSoundNames[i]);
+        }
+
+        for (int i = 0; i < xPlaceSoundNames.Length; i++) {
+            xPlaceSounds[i] = Resources.Load<AudioClip>(soundPath + xPlaceSoundNames[i]);
+        }
     }
 
     /// <summary>
@@ -40,7 +99,7 @@ public class SignResourceStorage : MonoBehaviour {
     /// </summary>
     /// <param name="cellType"></param>
     /// <returns>may return null</returns>
-    public static Sprite GetSpriteRelatedTo(Cell.CellOcc cellType) {
+    public Sprite GetSpriteRelatedTo(Cell.CellOcc cellType) {
         switch (cellType) {
             case Cell.CellOcc.X:
                 return xSprite;
@@ -54,7 +113,7 @@ public class SignResourceStorage : MonoBehaviour {
     /// <summary>
     /// Returns the color of the cellType
     /// </summary>
-    public static Color GetColorRelatedTo(Cell.CellOcc cellType) {
+    public Color GetColorRelatedTo(Cell.CellOcc cellType) {
         switch (cellType) {
             case Cell.CellOcc.X: return xColor;
             case Cell.CellOcc.O: return oColor;
@@ -66,7 +125,7 @@ public class SignResourceStorage : MonoBehaviour {
     /// <summary>
     /// Changes colors of signs to the given color mode
     /// </summary>
-    public static void ChangeToColorMode(Color xColorNew, Color oColorNew) {
+    public void ChangeToColorMode(Color xColorNew, Color oColorNew) {
         xColor = xColorNew;
         oColor = oColorNew;
     }

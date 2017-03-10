@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class TTTGameLogic : MonoBehaviour {
 
     public delegate void GameWon(Cell.CellOcc type);
-    public event GameWon SomeoneWonGame;
+    public event GameWon SomeoneWonGameEvent;
 
     public static bool ResetFiles = false;
 
@@ -77,7 +77,7 @@ public class TTTGameLogic : MonoBehaviour {
             cellWon = grid.StopCurrentGame(cellWon);
             gameStarted = false;
 
-            if (SomeoneWonGame != null) SomeoneWonGame(cellWon.winType);
+            if (SomeoneWonGameEvent != null) SomeoneWonGameEvent(cellWon.winType);
             
             StartCoroutine("DrawBorderToGame", cellWon);
         }
@@ -146,7 +146,7 @@ public class TTTGameLogic : MonoBehaviour {
     /// </summary>
     /// <returns>May return null in case of apocalypse</returns>
     public Sprite GetCurrentSprite() {
-        return SignResourceStorage.GetSpriteRelatedTo(whoseTurn);
+        return SignResourceStorage.Instance.GetSpriteRelatedTo(whoseTurn);
     }
 
     public class GameWonData {

@@ -95,7 +95,7 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
     /// The sign in button was pressed so sign in
     /// </summary>
     public void SignInButtonPressed() {
-        Social.localUser.Authenticate((bool success) => {
+        GooglePlayServicesManager.Instance.LogInUser((bool success) => {
             if (success) {
                 PreferencesScript.Instance.GPFromNowCanAutoLogin();
 
@@ -260,6 +260,9 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
                 Cell.CellOcc winType = (Cell.CellOcc) System.Enum.Parse(typeof(Cell.CellOcc), splitMessage[6 + countOfPoints * 2]);
 
                 BluetoothClientBorder.AddBorderPoints(points, winLine, winType);
+
+                // Someone won the game so call it in clientcellstorage
+                ClientCellStorage.SomeoneWon(winType);
 
                 break;
             case GPMessageStrings.SEND_SCORE: // Server sends score

@@ -17,8 +17,8 @@ public class DoneGameScript : MonoBehaviour {
         signParent = transform.FindChild("Signs").gameObject;
         childrenSR = signParent.GetComponentsInChildren<SpriteRenderer>();
 
-        UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
-        UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, 0f);
+        UpdateBordercolor(SignResourceStorage.Instance.GetColorRelatedTo(winType));
+        UpdateSignsColor(SignResourceStorage.Instance.xColor, SignResourceStorage.Instance.oColor, 0f);
     }
 
     void OnEnable() {
@@ -32,8 +32,8 @@ public class DoneGameScript : MonoBehaviour {
     }
 
     public void ChangeToColorMode(PreferencesScript.ColorMode colorMode, float time) {
-        StartCoroutine(UpdateSignsColor(SignResourceStorage.xColor, SignResourceStorage.oColor, time, Random.Range(0f, 0.5f)));
-        UpdateBordercolor(SignResourceStorage.GetColorRelatedTo(winType));
+        StartCoroutine(UpdateSignsColor(SignResourceStorage.Instance.xColor, SignResourceStorage.Instance.oColor, time, Random.Range(0f, 0.5f)));
+        UpdateBordercolor(SignResourceStorage.Instance.GetColorRelatedTo(winType));
     }
 
     public void ChangeToColorTheme(PreferencesScript.ColorTheme theme, float time) {

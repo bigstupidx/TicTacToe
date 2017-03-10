@@ -411,6 +411,9 @@ public class BluetoothEventListener : MonoBehaviour {
 
                         BluetoothClientBorder.AddBorderPoints(points, winLine, winType);
 
+                        // Because a border was added someone won the game so call the event
+                        ClientCellStrg.SomeoneWon(winType);
+
                         break;
                     case "JPT": // Server sends to jump to this pos because new game has been started
                         Vector3 jumpTo = new Vector3(int.Parse(splitMessage[1]), int.Parse(splitMessage[2]), Camera.main.transform.position.z);

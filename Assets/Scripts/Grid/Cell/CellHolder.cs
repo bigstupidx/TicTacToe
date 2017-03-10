@@ -88,7 +88,7 @@ public class CellHolder {
 
             SpriteRenderer sprR = cellGameObject.GetComponent<SpriteRenderer>();
             sprR.sortingLayerName = "Signs" + cellType.ToString(); // Set sorting layer for dynamic batching
-            sprR.color = SignResourceStorage.GetColorRelatedTo(cellType);
+            sprR.color = SignResourceStorage.Instance.GetColorRelatedTo(cellType);
 
             if (Grid.cellParent != null) { 
                 cellGameObject.transform.parent = Grid.cellParent.transform;

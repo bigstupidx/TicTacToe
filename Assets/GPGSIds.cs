@@ -24,7 +24,39 @@
 
 public static class GPGSIds
 {
+        public const string achievement_fifty_games_against_ai = "CgkIu5mLkuoXEAIQBw"; // <GPGSID>
+        public const string achievement_bluetooth_mode = "CgkIu5mLkuoXEAIQBA"; // <GPGSID>
+        public const string achievement_10_wins_against_the_ai = "CgkIu5mLkuoXEAIQCg"; // <GPGSID>
+        public const string achievement_play_50_games = "CgkIu5mLkuoXEAIQHQ"; // <GPGSID>
+        public const string achievement_50_wins_against_the_ai = "CgkIu5mLkuoXEAIQCw"; // <GPGSID>
+        public const string achievement_level_30 = "CgkIu5mLkuoXEAIQEQ"; // <GPGSID>
+        public const string achievement_google_play_multiplayer_mode = "CgkIu5mLkuoXEAIQBQ"; // <GPGSID>
+        public const string achievement_play_100_games = "CgkIu5mLkuoXEAIQHg"; // <GPGSID>
+        public const string achievement_play_10000_games = "CgkIu5mLkuoXEAIQIg"; // <GPGSID>
+        public const string achievement_100_wins_against_the_ai = "CgkIu5mLkuoXEAIQDQ"; // <GPGSID>
+        public const string achievement_win_50_times_against_hard_ai = "CgkIu5mLkuoXEAIQFg"; // <GPGSID>
+        public const string achievement_is_it_only_an_eggplant_wink_wink = "CgkIu5mLkuoXEAIQGg"; // <GPGSID>
+        public const string achievement_rekt = "CgkIu5mLkuoXEAIQGw"; // <GPGSID>
+        public const string achievement_1000_games_against_the_ai = "CgkIu5mLkuoXEAIQCQ"; // <GPGSID>
+        public const string achievement_noobnoobnoobnoobnoobnoobnoob = "CgkIu5mLkuoXEAIQHA"; // <GPGSID>
+        public const string achievement_play_500_games = "CgkIu5mLkuoXEAIQHw"; // <GPGSID>
+        public const string achievement_the_superior_color_mode = "CgkIu5mLkuoXEAIQGQ"; // <GPGSID>
+        public const string achievement_apprentice_spammer = "CgkIu5mLkuoXEAIQEw"; // <GPGSID>
+        public const string achievement_1000_wins_against_the_ai = "CgkIu5mLkuoXEAIQDg"; // <GPGSID>
+        public const string achievement_win_1000_times_against_the_hard_ai = "CgkIu5mLkuoXEAIQGA"; // <GPGSID>
+        public const string achievement_100_games_against_ai = "CgkIu5mLkuoXEAIQCA"; // <GPGSID>
         public const string achievement_first_win = "CgkIu5mLkuoXEAIQAg"; // <GPGSID>
+        public const string achievement_win_250_times_against_the_hard_ai = "CgkIu5mLkuoXEAIQFw"; // <GPGSID>
+        public const string achievement_play_5000_games = "CgkIu5mLkuoXEAIQIQ"; // <GPGSID>
+        public const string achievement_level_15 = "CgkIu5mLkuoXEAIQEA"; // <GPGSID>
+        public const string achievement_250_wins_against_the_ai = "CgkIu5mLkuoXEAIQDA"; // <GPGSID>
+        public const string achievement_level_50 = "CgkIu5mLkuoXEAIQEg"; // <GPGSID>
+        public const string achievement_fabulous = "CgkIu5mLkuoXEAIQFQ"; // <GPGSID>
+        public const string achievement_level_5 = "CgkIu5mLkuoXEAIQDw"; // <GPGSID>
+        public const string achievement_local_multiplayer_mode = "CgkIu5mLkuoXEAIQAw"; // <GPGSID>
+        public const string achievement_play_1000_games = "CgkIu5mLkuoXEAIQIA"; // <GPGSID>
+        public const string achievement_master_spammer = "CgkIu5mLkuoXEAIQFA"; // <GPGSID>
+        public const string achievement_ten_games_against_ai = "CgkIu5mLkuoXEAIQBg"; // <GPGSID>
 
 }
 

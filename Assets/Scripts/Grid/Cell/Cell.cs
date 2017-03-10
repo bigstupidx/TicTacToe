@@ -13,11 +13,14 @@ public class Cell : MonoBehaviour {
     }
     
     private Animator animator;
+    private AudioSource audioSource;
 
     void Awake() {
         cellOcc = CellOcc.NONE;
         
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = PreferencesScript.Instance.GetSoundVolume();
     }
 
     /// <summary>
@@ -32,8 +35,11 @@ public class Cell : MonoBehaviour {
     /// Triggers draw in animator
     /// </summary>
     public void TriggerDraw() {
-        if (animator != null)
+        if (animator != null) {
             animator.SetTrigger("Draw" + cellOcc.ToString());
+            audioSource.clip = SignResourceStorage.Instance.GetRandomSoundFor(cellType);
+            audioSource.Play();
+        }
     }
 
     /// <summary>

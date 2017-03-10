@@ -8,7 +8,7 @@ public class AppodealManager : Singleton<AppodealManager> {
     /// After how many games we should show an ad
     /// </summary>
     [HideInInspector]
-    public int afterGameCountShowAd = 10;
+    private int afterGameCountShowAd = 5;
     public string[] hideOnScreens;
 
 	void Start() {
@@ -29,9 +29,10 @@ public class AppodealManager : Singleton<AppodealManager> {
     }
 
     private void OnScreenChange(string from, string to) {
+        Debug.Log("Screen change detected in appodeal " + from + " " + to);
         if (to == "Game" || to == "GameAI") {
             gameCounter = 0;
-            FindObjectOfType<TTTGameLogic>().SomeoneWonGame += GameEndAd;
+            FindObjectOfType<TTTGameLogic>().SomeoneWonGameEvent += GameEndAd;
         }
 
         for (int i = 0; i < hideOnScreens.Length; i++) {
@@ -47,9 +48,11 @@ public class AppodealManager : Singleton<AppodealManager> {
     int gameCounter = 0;
     private void GameEndAd(Cell.CellOcc type) {
         gameCounter++;
+        Debug.Log("incremented gamendthing in appodeal " + gameCounter + " " + afterGameCountShowAd);
 
         if (gameCounter == afterGameCountShowAd) {
             Appodeal.show(Appodeal.INTERSTITIAL);
+            gameCounter = 0;
         }
     }
 }

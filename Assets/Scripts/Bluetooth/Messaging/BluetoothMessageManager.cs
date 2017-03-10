@@ -61,6 +61,12 @@ public class BluetoothMessageManager : MonoBehaviour {
 }
 
 public static class EmojiSprites {
+    // These are here because I needed to expose them for achievements
+    public const string UnicornEmoji = "unicornEmoji";
+    public const string EggplantEmoji = "aubergineEmoji";
+    public const string RektEmoji = "rektEmoji";
+    public const string NoobEmoji = "noobEmoji";
+
     public static string[] emojiPaths = new string[] {
         "smilingEmoji",
         "angryEmoji",
@@ -79,12 +85,12 @@ public static class EmojiSprites {
         "thatpEmoji",
         "thinkingEmoji",
         "trophyEmoji",
-        "unicornEmoji",
+        UnicornEmoji,
         "upsidedownEmoji",
         "cryingEmoji",
         "hundredEmoji",
-        "rektEmoji",
-        "noobEmoji",
+        RektEmoji,
+        NoobEmoji,
         "kissEmoji",
         "realAngryEmoji",
         "catEmoji",
@@ -108,7 +114,7 @@ public static class EmojiSprites {
         "tearsOfJoyEmoji",
         "zzzEmoji",
         "droolingEmoji",
-        "aubergineEmoji",
+        EggplantEmoji,
         "toastEmoji",
         "clapEmoji",
         "likeEmoji",

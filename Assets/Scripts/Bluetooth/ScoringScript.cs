@@ -20,8 +20,8 @@ public class ScoringScript : MonoBehaviour {
 
         height = oText.rectTransform.rect.height;
 
-        transform.FindChild("XImage").GetComponent<Image>().color = SignResourceStorage.xColor;
-        transform.FindChild("OImage").GetComponent<Image>().color = SignResourceStorage.oColor;
+        transform.FindChild("XImage").GetComponent<Image>().color = SignResourceStorage.Instance.xColor;
+        transform.FindChild("OImage").GetComponent<Image>().color = SignResourceStorage.Instance.oColor;
     }
 
     public void SetScore(int x, int o) {

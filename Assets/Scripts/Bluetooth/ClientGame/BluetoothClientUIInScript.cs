@@ -14,8 +14,8 @@ public class BluetoothClientUIInScript : UIInScript {
     public void UpdateImage(Cell.CellOcc newType) {
         currentlyDisplayed = newType;
 
-        currentSign.sprite = SignResourceStorage.GetSpriteRelatedTo(newType);
-        currentSign.color = SignResourceStorage.GetColorRelatedTo(newType);
+        currentSign.sprite = SignResourceStorage.Instance.GetSpriteRelatedTo(newType);
+        currentSign.color = SignResourceStorage.Instance.GetColorRelatedTo(newType);
 
         if (newType != currentlyDisplayed)
             PlayCursorSpriteUpdateAnimation();

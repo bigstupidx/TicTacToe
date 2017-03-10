@@ -239,11 +239,11 @@ public class Border : MonoBehaviour {
                 lr.SetPosition(i, bsl.GetPosAt(i));
         }
 
-        lr.material.SetColor("_EmissionColor", SignResourceStorage.GetColorRelatedTo(bsl.WinType));
+        lr.material.SetColor("_EmissionColor", SignResourceStorage.Instance.GetColorRelatedTo(bsl.WinType));
 
         // Set color
-        lr.startColor = SignResourceStorage.GetColorRelatedTo(bsl.WinType);
-        lr.endColor = SignResourceStorage.GetColorRelatedTo(bsl.WinType);
+        lr.startColor = SignResourceStorage.Instance.GetColorRelatedTo(bsl.WinType);
+        lr.endColor = SignResourceStorage.Instance.GetColorRelatedTo(bsl.WinType);
 
         // Win Line Animation
         AnimatedLineRenderer winLineRenderer = borderObject.transform.GetChild(0).gameObject.GetComponent<AnimatedLineRenderer>();

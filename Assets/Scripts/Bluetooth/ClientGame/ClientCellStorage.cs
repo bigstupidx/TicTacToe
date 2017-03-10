@@ -4,6 +4,9 @@ using DG.Tweening;
 
 public class ClientCellStorage : MonoBehaviour {
 
+    public delegate void WinDelegate(Cell.CellOcc type);
+    public static event WinDelegate SomeoneWonEvent;
+
     protected const int SHOW_BORDER = 40; // Border around camera in cells in which we should show cells
 
     // Camera size in world units
@@ -28,6 +31,11 @@ public class ClientCellStorage : MonoBehaviour {
         cameraHalfSize[0] = (int) ((float) Camera.main.pixelWidth / Camera.main.pixelHeight) * cameraHalfSize[1];
 
         InvokeRepeating("ShowOnlyVisibleCells", 0f, 0.3f);
+    }
+
+    // Called when someone wins the game
+    public void SomeoneWon(Cell.CellOcc type) {
+        if (SomeoneWonEvent != null) SomeoneWonEvent(type);
     }
 
     private void ShowOnlyVisibleCells() {
@@ -67,7 +75,7 @@ public class ClientCellStorage : MonoBehaviour {
         ch.NewCell(type);
         visibleCells.Add(ch);
         lastSign = new int[2] { gridPos[0], gridPos[1] };
-        lastPlaced.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.GetColorRelatedTo(type == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
+        lastPlaced.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.Instance.GetColorRelatedTo(type == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
     }
 
     /// <summary>

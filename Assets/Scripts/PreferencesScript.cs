@@ -2,8 +2,14 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GooglePlayGames;
 
 public class PreferencesScript : Singleton<PreferencesScript> {
+
+    public delegate void UnlockDelegate(Unlockable unlocked);
+    public static event UnlockDelegate SomethingUnlockedEvent;
+    public delegate void LevelUpDelegate(int level);
+    public static event LevelUpDelegate LevelUpEvent;
 
     private const string FIRST_USE = "FirstUse";
     private const string TUTORIAL_COMPLETED = "TutCompleted";
@@ -32,9 +38,16 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         for (int i = 2; i <= maxPlayerLevel; i++)
             expNeededForLevel[i] = ExpNeededForLevel(i);
-
+        
         // Unlocks
         UpdateEmojiUnlocks();
+
+        GPAchievements.Init();
+    }
+    
+    new void OnDestroy() {
+        base.OnDestroy();
+        PlayerPrefs.Save();
     }
 
     public void ResetPreferences() {
@@ -56,11 +69,21 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         PlayerPrefs.SetInt(EMOJI_SLOT_COUNT, 3);
 
-        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
+        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
 
-        PlayerPrefs.SetInt(PLAYER_LEVEL, 20);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 0);
         PlayerPrefs.SetInt(PLAYER_EXP, 0);
+
+        PlayerPrefs.SetInt(SOUND_LEVEL, 100);
+        PlayerPrefs.SetInt(MUSIC_LEVEL, 100);
         PlayerPrefs.Save();
+    }
+
+    public void ResetForDebugPrefs() {
+        ResetPreferences();
+
+        PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 20);
     }
 
     public bool IsTutorialCompleted() {
@@ -87,6 +110,17 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public void GPFromNowCanAutoLogin() {
         PlayerPrefs.SetInt(GOOGLE_PLAY_AUTO_LOGIN, 1);
     }
+
+    // ________________________________________SOUND/MUSIC______________________________
+
+    private const string MUSIC_LEVEL = "MusicLevel";
+    private const string SOUND_LEVEL = "SoundLevel";
+
+    public int GetMusicVolume() { return PlayerPrefs.GetInt(MUSIC_LEVEL); }
+    public int GetSoundVolume() { return PlayerPrefs.GetInt(SOUND_LEVEL); }
+
+    public void SetMusicVolume(int volume) { PlayerPrefs.SetInt(MUSIC_LEVEL, volume); }
+    public void SetSoundVolume(int volume) { PlayerPrefs.SetInt(SOUND_LEVEL, volume); }
 
     // ____________________________________UNLOCKS_____________________________________
 
@@ -218,6 +252,10 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     public void Unlock(Unlockable[] unlocks) {
         for (int i = 0; i < unlocks.Length; i++) {
             if (unlocks[i] != null) {
+                if (SomethingUnlockedEvent != null) {
+                    SomethingUnlockedEvent(unlocks[i]);
+                }
+
                 switch (unlocks[i].type) {
                     case UnlockableType.Emoji: PlayerPrefs.SetInt(IS_UNLOCKED + unlocks[i].extra, 1); break;
                     case UnlockableType.EmojiSlot:
@@ -318,6 +356,8 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         PlayerPrefs.SetInt(PLAYER_LEVEL, playerLevel);
         PlayerPrefs.SetInt(PLAYER_EXP, playerExp);
+
+        if (LevelUpEvent != null) LevelUpEvent(playerLevel);
     }
 
     private const int maxPlayerLevel = 30;
@@ -460,7 +500,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     }
 	
     private void UpdateSignResourceStrgColors() {
-        SignResourceStorage.ChangeToColorMode(currentTheme.GetXColorOfMode(currentMode), currentTheme.GetOColorOfMode(currentMode));
+        SignResourceStorage.Instance.ChangeToColorMode(currentTheme.GetXColorOfMode(currentMode), currentTheme.GetOColorOfMode(currentMode));
     }
 
 
@@ -504,7 +544,187 @@ public class PreferencesScript : Singleton<PreferencesScript> {
             return Color.blue;
         }
     }
+}
 
+public class GPAchievements {
+    public const string achievementFirstWin = "CgkIu5mLkuoXEAIQAg";
+
+    public const string achievementLocalMultiplayerMode = "CgkIu5mLkuoXEAIQAw"; // Implemented
+    public const string achievementBluetoothMode = "CgkIu5mLkuoXEAIQBA"; // Implemented
+    public const string achievementGooglePlayMultiplayerMode = "CgkIu5mLkuoXEAIQBQ"; // Implemented
+
+    public const string achievementLevel5 = "CgkIu5mLkuoXEAIQDw"; // Implemented
+    public const string achievementLevel15 = "CgkIu5mLkuoXEAIQEA"; // Implemented
+    public const string achievementLevel30 = "CgkIu5mLkuoXEAIQEQ"; // Implemented
+    public const string achievementLevel50 = "CgkIu5mLkuoXEAIQEg"; // Implemented
+
+    public const string achievementTenGamesAgainstAi = "CgkIu5mLkuoXEAIQBg"; // Implemented
+    public const string achievementFiftyGamesAgainstAi = "CgkIu5mLkuoXEAIQBw"; // Implemented
+    public const string achievement100GamesAgainstAi = "CgkIu5mLkuoXEAIQCA"; // Implemented
+    public const string achievement1000GamesAgainstTheAi = "CgkIu5mLkuoXEAIQCQ"; // Implemented
+
+    public const string achievement10WinsAgainstTheAi = "CgkIu5mLkuoXEAIQCg"; // Implemented
+    public const string achievement50WinsAgainstTheAi = "CgkIu5mLkuoXEAIQCw"; // Implemented
+    public const string achievement100WinsAgainstTheAi = "CgkIu5mLkuoXEAIQDQ"; // Implemented
+    public const string achievement250WinsAgainstTheAi = "CgkIu5mLkuoXEAIQDA"; // Implemented
+    public const string achievement1000WinsAgainstTheAi = "CgkIu5mLkuoXEAIQDg"; // Implemented
+
+    public const string achievementWin50TimesAgainstHardAi = "CgkIu5mLkuoXEAIQFg"; // Implemented
+    public const string achievementWin250TimesAgainstTheHardAi = "CgkIu5mLkuoXEAIQFw"; // Implemented
+    public const string achievementWin1000TimesAgainstTheHardAi = "CgkIu5mLkuoXEAIQGA"; // Implemented
+
+    public const string achievementPlay50Games = "CgkIu5mLkuoXEAIQHQ"; // Implemented
+    public const string achievementPlay100Games = "CgkIu5mLkuoXEAIQHg"; // Implemented
+    public const string achievementPlay500Games = "CgkIu5mLkuoXEAIQHw"; // Implemented
+    public const string achievementPlay1000Games = "CgkIu5mLkuoXEAIQIA"; // Implemented
+    public const string achievementPlay5000Games = "CgkIu5mLkuoXEAIQIQ"; // Implemented
+    public const string achievementPlay10000Games = "CgkIu5mLkuoXEAIQIg"; // Implemented
+
+    public const string achievementTheSuperiorColorMode = "CgkIu5mLkuoXEAIQGQ";
+    public const string achievementApprenticeSpammer = "CgkIu5mLkuoXEAIQEw";
+    public const string achievementMasterSpammer = "CgkIu5mLkuoXEAIQFA";
+
+    public const string achievementFabulous = "CgkIu5mLkuoXEAIQFQ"; // Implemented
+    public const string achievementIsItOnlyAnEggplantwinkwink = "CgkIu5mLkuoXEAIQGg"; // Implemented
+    public const string achievementrekt = "CgkIu5mLkuoXEAIQGw"; // Implemented
+    public const string achievementNoobnoobnoobnoobnoobnoobnoob = "CgkIu5mLkuoXEAIQHA"; // Implemented
+
+    private const string allAchievementsUnlocked = "AllAchievementsUnlocked";
+
+    /// <summary>
+    /// Called from playerprefs awake. Inits this class, so everything connected to achievements stays here and they are not littered all over the other classes
+    /// </summary>
+    public static void Init() {
+        PreferencesScript.SomethingUnlockedEvent += NewUnlock;
+        PreferencesScript.LevelUpEvent += LevelUp;
+        ScaneManager.OnScreenChange += ScreenChanged;
+    }
+
+    /// <summary>
+    /// Called when scene is changed
+    /// </summary>
+    private static void ScreenChanged(string from, string to) {
+        TTTGameLogic gameLogic = GameObject.FindObjectOfType<TTTGameLogic>();
+        ClientCellStorage clientCellStrg = GameObject.FindObjectOfType<ClientCellStorage>();
+
+        // if we found one of those abve we are on a game screen
+        if (gameLogic != null) {
+            if (to == "GameAI") {
+                gameLogic.SomeoneWonGameEvent += GameWonAI;
+            } else {
+                gameLogic.SomeoneWonGameEvent += GameWon;
+            }
+        } else if (clientCellStrg != null) {
+            ClientCellStorage.SomeoneWonEvent += GameWon;
+        }
+    }
+
+    /// <summary>
+    /// Called when someone won the game
+    /// </summary>
+    private static void GameWon(Cell.CellOcc type) {
+        // Player hasn't won yet
+        if (PlayerPrefs.GetInt(achievementFirstWin) == 0) {
+            UnlockAchievement(achievementFirstWin);
+        }
+
+        IncrementAchievement(achievementPlay50Games);
+        IncrementAchievement(achievementPlay100Games);
+        IncrementAchievement(achievementPlay500Games);
+        IncrementAchievement(achievementPlay1000Games);
+        IncrementAchievement(achievementPlay5000Games);
+        IncrementAchievement(achievementPlay10000Games);
+    }
+
+    /// <summary>
+    /// Called when someone won the game on AI screen
+    /// </summary>
+    private static void GameWonAI(Cell.CellOcc type) {
+        AIScript ai = GameObject.FindObjectOfType<AIScript>();
+
+        IncrementAchievement(achievementTenGamesAgainstAi);
+        IncrementAchievement(achievementFiftyGamesAgainstAi);
+        IncrementAchievement(achievement100GamesAgainstAi);
+        IncrementAchievement(achievement1000GamesAgainstTheAi);
+
+        // Player won
+        if (type != AIScript.AIType) {
+            IncrementAchievement(achievement10WinsAgainstTheAi);
+            IncrementAchievement(achievement50WinsAgainstTheAi);
+            IncrementAchievement(achievement100WinsAgainstTheAi);
+            IncrementAchievement(achievement250WinsAgainstTheAi);
+            IncrementAchievement(achievement1000WinsAgainstTheAi);
+
+            // won against hard difficulty
+            if (ai.Difficulty == 3) {
+                IncrementAchievement(achievementWin50TimesAgainstHardAi);
+                IncrementAchievement(achievementWin250TimesAgainstTheHardAi);
+                IncrementAchievement(achievementWin1000TimesAgainstTheHardAi);
+            }
+        }
+
+        GameWon(type);
+    }
+
+    /// <summary>
+    /// Called when player levels up
+    /// </summary>
+    private static void LevelUp(int level) {
+        switch (level) {
+            case 5: UnlockAchievement(achievementLevel5); break;
+            case 15: UnlockAchievement(achievementLevel15); break;
+            case 30: UnlockAchievement(achievementLevel30); break;
+            case 50: UnlockAchievement(achievementLevel50); break;
+        }
+    }
+
+    /// <summary>
+    /// Called when something is unlocked
+    /// </summary>
+    private static void NewUnlock(Unlockable unlock) {
+        switch (unlock.type) {
+            case UnlockableType.Bluetooth: UnlockAchievement(achievementBluetoothMode); break;
+            case UnlockableType.LocalMulti: UnlockAchievement(achievementLocalMultiplayerMode); break;
+            case UnlockableType.GooglePlay: UnlockAchievement(achievementGooglePlayMultiplayerMode); break;
+            case UnlockableType.Emoji:
+                switch (unlock.extra) {
+                    case EmojiSprites.UnicornEmoji: UnlockAchievement(achievementFabulous); break;
+                    case EmojiSprites.EggplantEmoji: UnlockAchievement(achievementIsItOnlyAnEggplantwinkwink); break;
+                    case EmojiSprites.RektEmoji: UnlockAchievement(achievementrekt); break;
+                    case EmojiSprites.NoobEmoji: UnlockAchievement(achievementNoobnoobnoobnoobnoobnoobnoob); break;
+                }
+                break;
+        }
+    }
+
+    public static void IncrementAchievement(string name, int amount = 1) {
+        PlayGamesPlatform.Instance.IncrementAchievement(name, amount, null);
+        PlayerPrefs.SetInt(name, PlayerPrefs.GetInt(name) + amount);
+    }
+
+    public static void UnlockAchievement(string name) {
+        // we don't already have it there
+        if (!DoesAllAchievementsContain(name)) {
+            PlayerPrefs.SetString(allAchievementsUnlocked, PlayerPrefs.GetString(allAchievementsUnlocked) + "|" + name);
+            PlayerPrefs.SetInt(name, 1);
+
+            Social.ReportProgress(name, 100, (bool success) => { });
+        }
+    }
+
+    public static string[] GetAllUnlockedAchievemnts() {
+        return PlayerPrefs.GetString(allAchievementsUnlocked).Split('|');
+    }
+
+    private static bool DoesAllAchievementsContain(string name) {
+        string[] splitAll = GetAllUnlockedAchievemnts();
+
+        for (int i = 0; i < splitAll.Length; i++)
+            if (splitAll[i] == name)
+                return true;
+
+        return false;
+    }
 }
 
 public class Unlockable {

@@ -34,7 +34,7 @@ public class UIInScript : MonoBehaviour {
     protected void UpdateSprite() {
         // Updates the sign next to the cursor
         currentSign.sprite = gameLogic.GetCurrentSprite();
-        currentSign.color = SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn);
+        currentSign.color = SignResourceStorage.Instance.GetColorRelatedTo(gameLogic.WhoseTurn);
     }
 
     protected void PlayCursorSpriteUpdateAnimation() {

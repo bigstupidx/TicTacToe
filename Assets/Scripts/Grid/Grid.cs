@@ -6,14 +6,15 @@ using DG.Tweening;
 public class Grid : MonoBehaviour {
 
     public delegate void SignPlaced(int[] pos, Cell.CellOcc type);
-    public event SignPlaced SignWasPlaced;
+    public event SignPlaced SignWasPlacedEvent;
     public delegate void SignRemoved(int[] pos);
-    public event SignRemoved SignWasRemoved;
+    public event SignRemoved SignWasRemovedEvent;
 
     // How many need for a win
     public static int WIN_CONDITION = 5;
     protected const float UPDATE_SHOWN_TIME = .3f;
-    protected const int SHOW_BORDER = 40; // Border around camera in cells in which we should show cells
+    protected const int SHOW_BORDER = 35; // Border around camera in cells in which we should show cells
+    [HideInInspector]
     public string FILE_PATH; // where it should be saved
 
     // Camera size in world units
@@ -176,14 +177,14 @@ public class Grid : MonoBehaviour {
         if (!cellHolder.IsFull()) return false; // Return if we don't have a sign there
 
         // At this point we surely are going to remove the sign
-        if (SignWasRemoved != null)
-            SignWasRemoved(previousGridPos);
+        if (SignWasRemovedEvent != null)
+            SignWasRemovedEvent(previousGridPos);
 
         cellHolder.RemoveCurrentCellWithoutStoring();
 
         // move marker, do this before changin turns because we want the color to be the exact opposite of the sign at secondToPrevious pos
         if (lastPlacedMarker != null)
-            lastPlacedMarker.MoveMarkerTo(new Vector2(secondToPreviousGridPos[0], secondToPreviousGridPos[1]), SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn));
+            lastPlacedMarker.MoveMarkerTo(new Vector2(secondToPreviousGridPos[0], secondToPreviousGridPos[1]), SignResourceStorage.Instance.GetColorRelatedTo(gameLogic.WhoseTurn));
 
         // Revert back to previous turn in gamelogic
         gameLogic.SetPreviousTurn();
@@ -335,10 +336,10 @@ public class Grid : MonoBehaviour {
 
             // move marker
             if (lastPlacedMarker != null)
-                lastPlacedMarker.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.GetColorRelatedTo(gameLogic.WhoseTurn == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
+                lastPlacedMarker.MoveMarkerTo(new Vector2(gridPos[0], gridPos[1]), SignResourceStorage.Instance.GetColorRelatedTo(gameLogic.WhoseTurn == Cell.CellOcc.X ? Cell.CellOcc.O : Cell.CellOcc.X));
 
-            if (SignWasPlaced != null)
-                SignWasPlaced(gridPos, cellType);
+            if (SignWasPlacedEvent != null)
+                SignWasPlacedEvent(gridPos, cellType);
         }
         return couldBePlaced;
     }

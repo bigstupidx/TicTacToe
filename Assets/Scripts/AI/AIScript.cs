@@ -9,6 +9,9 @@ public class AIScript : MonoBehaviour {
     public static Cell.CellOcc HumanType = Cell.CellOcc.O;
     [HideInInspector]
     private int DIFFICULTY = 2;
+    public int Difficulty { get { return DIFFICULTY; } }
+
+    private int DEEP_MAX = 2;
     /// <summary>
     /// What's the chance that the ai simply skips a place where it could place, it just doesn't examine it. 
     /// It will also add some depending on the points in game (heuristic for the game's complexity)
@@ -59,9 +62,9 @@ public class AIScript : MonoBehaviour {
         Reset();
 
         // subscribe to events
-        grid.SignWasPlaced += SignWasAdded;
-        grid.SignWasRemoved += SignWasRemoved;
-        gameLogic.SomeoneWonGame += SomeoneWonGame;
+        grid.SignWasPlacedEvent += SignWasAdded;
+        grid.SignWasRemovedEvent += SignWasRemoved;
+        gameLogic.SomeoneWonGameEvent += SomeoneWonGame;
     }
 
     /// <summary>
@@ -100,15 +103,17 @@ public class AIScript : MonoBehaviour {
         float exp = pointsInGame.Count * 1.7f;
 
         // Add for base for playing/winning
-        exp += 200;
+        exp += 300;
 
         // Add for every player's signinarow
         for (int i = 0; i < pointsInGame.Count; i++) {
             foreach (SignInARow signInARow in gameField[pointsInGame[i].x, pointsInGame[i].y].signsInARow) {
-                if (signInARow.Type == HumanType) {
-                    int length = signInARow.Length;
+                int length = signInARow.Length;
 
+                if (signInARow.Type == HumanType) {
                     if (length >= 3 && length <= 4) exp += playerExpTable[length, signInARow.BlockCount()];
+                } else {
+                    exp += signInARow.BlockCount() * 2 * length; // Add for every blocked
                 }
             }
         }
@@ -129,6 +134,7 @@ public class AIScript : MonoBehaviour {
     /// 0 - Baby; 1 - Easy; 2 - Normal; 3 - Hard; 4 - Impossible
     /// </summary>
     public void SetDifficulty(int diff) {
+        DIFFICULTY = diff;
         switch (diff) {
             case 0:
                 leaveOutChance = 0.8f;
@@ -367,7 +373,7 @@ public class AIScript : MonoBehaviour {
 
                         // Go recursively until DIFFICULTY
                         EvaluationResult evalResult;
-                        if (deepCount == DIFFICULTY) {
+                        if (deepCount == DEEP_MAX) {
                             float aiPoint, humanPoint;
                             GetPointsFromSignsInARow(field, pointsInGame, pos, out aiPoint, out humanPoint);
 
