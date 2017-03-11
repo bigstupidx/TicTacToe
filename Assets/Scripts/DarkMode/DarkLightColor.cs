@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class DarkLightColor : MonoBehaviour {
 
@@ -11,6 +13,32 @@ public class DarkLightColor : MonoBehaviour {
             case PreferencesScript.ColorMode.LIGHT: return lightModeColor;
         }
         return Color.magenta;
+    }
+
+    /// <summary>
+    /// It tries to set it's proper component to the proper color. It tries it in this order: image, text mesh pro, text.
+    /// </summary>
+    public void SetColorToCurrentColorMode() {
+        Image img = GetComponent<Image>();
+
+        if (img != null) {
+            img.color = GetColorOfMode(PreferencesScript.Instance.currentMode);
+            return;
+        }
+
+        TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
+
+        if (text != null) {
+            text.color = GetColorOfMode(PreferencesScript.Instance.currentMode);
+            return;
+        }
+
+        Text txt = GetComponent<Text>();
+
+        if (txt != null) {
+            txt.color = GetColorOfMode(PreferencesScript.Instance.currentMode);
+            return;
+        }
     }
 
 }

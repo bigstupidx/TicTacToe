@@ -46,28 +46,6 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
     public void LogInUser(UnityAction<bool> successful = null) {
         // authenticate user
         Social.localUser.Authenticate((bool success) => {
-
-            if (success) {
-                // Go throught the achievements stored in playerprefs to see whether any of it is not unlocked
-                // If it's not unlocked unlock it
-                Social.LoadAchievements((IAchievement[] achs) => {
-                    string[] localAchs = GPAchievements.GetAllUnlockedAchievemnts();
-
-                    // all of the localachs are in the onlineachs so sort both of them
-                    // now localachs are in the onlineachs in the same order but there are some other achievements between them
-                    IAchievement[] onlineAchs = achs.OrderBy(ach => ach.id).ToArray();
-                    System.Array.Sort(localAchs);
-
-                    for (int o = 0, l = 0; o < onlineAchs.Length; o++) {
-                        Debug.Log("Online " + onlineAchs[o].id + "   local " + localAchs[l]);
-                        if (localAchs[l] == onlineAchs[o].id) {
-                            Social.ReportProgress(localAchs[l], 100f, null);
-                            l++;
-                        }
-                    }
-                });
-            }
-
             if (successful != null) successful.Invoke(success);
         });
     }
