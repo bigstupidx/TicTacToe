@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 using System;
@@ -8,7 +9,9 @@ public class MenuSettingsPanel : MonoBehaviour {
     [SerializeField]
     private Button settingsButton;
     [SerializeField]
-    private RectTransform mainMenuPanel;
+    private RectTransform mainUIPanel;
+    [SerializeField]
+    private Image mainUIPanelImage;
     [SerializeField]
     private Slider soundVolumeSlider;
     [SerializeField]
@@ -27,8 +30,9 @@ public class MenuSettingsPanel : MonoBehaviour {
     private RectTransform rectTransform;
     private float animTime = 0.3f;
     private bool isOpen = false;
+    private int backButtonActionId;
 
-	void Awake() {
+    void Awake() {
         if (FindObjectsOfType<MenuSettingsPanel>().Length > 1) return;
         // add ids
         for (int i = 0; i < changePanels.Length; i++) changePanels[i].id = i;
@@ -48,14 +52,19 @@ public class MenuSettingsPanel : MonoBehaviour {
         InstantiateChangePanel(changePanels[1]);
 
         ScaneManager.OnScreenChange += OnScreenChanged;
+        OnScreenChanged("", "Menu");
     }
 
     private void OnScreenChanged(string from, string to) {
+        CloseSettingsPanel();
+
         SettingsButton sB = FindObjectOfType<SettingsButton>();
         if (sB == null) return; // We have no button -> no settings panel needed
 
         // Assign all variables
-        mainMenuPanel = FindObjectOfType<MainUIPanel>().GetComponent<RectTransform>();
+        mainUIPanel = FindObjectOfType<MainUIPanel>().GetComponent<RectTransform>();
+        mainUIPanelImage = mainUIPanel.GetComponent<Image>();
+        mainUIPanelImage.raycastTarget = false;
 
         settingsButton = sB.GetComponent<Button>();
         settingsButton.onClick.AddListener(() => {
@@ -87,13 +96,6 @@ public class MenuSettingsPanel : MonoBehaviour {
         
         foreach (DarkLightColor c in obj.transform.GetComponentsInChildren<DarkLightColor>())
             c.SetColorToCurrentColorMode();
-    } 
-
-    void Update() {
-        // close panel on back button on click of screen
-        if (isOpen && ((Input.touchCount > 0 && !GridClickHandler.IsPointerOverUIObject()) || Input.GetKeyDown(KeyCode.Escape))) {
-            CloseSettingsPanel();
-        }
     }
 
     /// <summary>
@@ -114,9 +116,14 @@ public class MenuSettingsPanel : MonoBehaviour {
         if (isOpen) return;
 
         isOpen = true;
-        
-        mainMenuPanel.DOAnchorPosX(mainMenuPanel.anchoredPosition.x - rectTransform.rect.width, animTime);
+
+        if (mainUIPanel != null) mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x - rectTransform.rect.width, animTime);
         rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime);
+
+        mainUIPanelImage.raycastTarget = true;
+
+        // add to backbutton callback
+        backButtonActionId = ScaneManager.Instance.AddToBackStack(() => { CloseSettingsPanel(); });
     }
 
     /// <summary>
@@ -127,8 +134,12 @@ public class MenuSettingsPanel : MonoBehaviour {
 
         isOpen = false;
 
-        mainMenuPanel.DOAnchorPosX(mainMenuPanel.anchoredPosition.x + rectTransform.rect.width, animTime);
+        if (mainUIPanel != null) mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x + rectTransform.rect.width, animTime);
         rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x + rectTransform.rect.width, animTime);
+
+        mainUIPanelImage.raycastTarget = false;
+
+        ScaneManager.Instance.RemoveFromBackStack(backButtonActionId);
     }
 }
 

@@ -26,6 +26,7 @@ public class MenuButtonPanelScript : MonoBehaviour {
     public MenuButton[] secondPanelButtons;
 
     private bool isSecondPanelShown = false;
+    private int backButtonStackActionId;
 
     void Awake() {
         // If we haven't completed the tutorial don't bring in the menus
@@ -126,6 +127,8 @@ public class MenuButtonPanelScript : MonoBehaviour {
             seq.Insert(atTime, secondPanelButtons[i].rectTransform.DOLocalMoveX(0, animTime));
             seq.Insert(atTime, secondPanelButtons[i].canavasGroup.DOFade(1f, animTime));
         }
+
+        backButtonStackActionId = ScaneManager.Instance.AddToBackStack(() => { HideSecondPanel(); });
     }
 
     public void HideSecondPanel() {
@@ -173,6 +176,8 @@ public class MenuButtonPanelScript : MonoBehaviour {
             seq.Insert(atTime, firstPanelButtons[i].rectTransform.DOLocalMoveX(0, animTime));
             seq.Insert(atTime, firstPanelButtons[i].canavasGroup.DOFade(1f, animTime));
         }
+
+        ScaneManager.Instance.RemoveFromBackStack(backButtonStackActionId);
     }
 }
 

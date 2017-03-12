@@ -9,7 +9,6 @@ public class FirstGameManager : MonoBehaviour {
     private CanvasScaler canvasScaler;
 
     public RectTransform scoringRect;
-    public GameObject backButton;
     public Image clickImge;
     public Image topLeftCorner;
     public Image bottomRightCorner;
@@ -55,6 +54,8 @@ public class FirstGameManager : MonoBehaviour {
 
         clickImge.DOFade(1f, 0.2f);
         clickImge.rectTransform.DOScale(1.1f, 0.6f).SetLoops(-1, LoopType.Yoyo);
+
+        ScaneManager.Instance.backButtonEnabled = false;
 	}
 
     private void SomeoneWonGame(Cell.CellOcc type) {
@@ -77,7 +78,7 @@ public class FirstGameManager : MonoBehaviour {
             helpText.text = "Good job!\n Now you can go back to menu with the back button on you phone!";
             ShowThenHideHelpText(5f);
 
-            backButton.SetActive(true);
+            ScaneManager.Instance.backButtonEnabled = true;
             PreferencesScript.Instance.SetTutorialToCompleted();
             aiScript.SetDifficulty(1);
         } else if (humanWinCount == 2) {

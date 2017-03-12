@@ -103,7 +103,7 @@ public class AIScript : MonoBehaviour {
         float exp = pointsInGame.Count * 1.7f;
 
         // Add for base for playing/winning
-        exp += 300;
+        exp += 270;
 
         // Add for every player's signinarow
         for (int i = 0; i < pointsInGame.Count; i++) {
@@ -113,7 +113,7 @@ public class AIScript : MonoBehaviour {
                 if (signInARow.Type == HumanType) {
                     if (length >= 3 && length <= 4) exp += playerExpTable[length, signInARow.BlockCount()];
                 } else {
-                    exp += signInARow.BlockCount() * 2 * length; // Add for every blocked
+                    exp += signInARow.BlockCount() * 0.5f * length; // Add for every blocked
                 }
             }
         }

@@ -25,7 +25,7 @@ public class AppodealManager : Singleton<AppodealManager> {
         Appodeal.disableLocationPermissionCheck();
         Appodeal.initialize(appKey, Appodeal.INTERSTITIAL | Appodeal.BANNER);
 
-        ScaneManager.OnScreenChange += OnScreenChange;
+        // ScaneManager.OnScreenChange += OnScreenChange;
     }
 
     private void OnScreenChange(string from, string to) {

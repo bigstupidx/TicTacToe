@@ -1,4 +1,8 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
-public class MainUIPanel : MonoBehaviour { }
+[RequireComponent(typeof(Image))]
+public class MainUIPanel : MonoBehaviour {
+
+}

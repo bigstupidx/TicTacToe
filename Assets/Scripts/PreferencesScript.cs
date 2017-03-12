@@ -83,7 +83,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         ResetPreferences();
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
-        PlayerPrefs.SetInt(PLAYER_LEVEL, 20);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
     }
 
     public bool IsTutorialCompleted() {

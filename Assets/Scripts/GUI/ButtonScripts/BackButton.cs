@@ -12,14 +12,11 @@ public class BackButton : MonoBehaviour {
 
         buttonScript.onClick.AddListener(() => {
             if (disabled) return;
-
-            ScaneManager.Instance.GoToPreviousSene();
+            
 
             // Do something based on which screen we backed from
             switch (SceneManager.GetActiveScene().name) {
-                case "Game":
-                    GameObject.Find("GameManager").GetComponent<SaveLoadGame>().WriteEverything();
-                    break;
+                
             }
         });
     }

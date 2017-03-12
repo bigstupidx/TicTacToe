@@ -15,6 +15,7 @@ public class GridClickHandler : MonoBehaviour {
 
     protected float fingerMoveMin; // How much the finger needs to move in pixels in order for the camera to be moved
     protected bool zooming = false;
+    protected bool currentTouchOverUI = false;
 
     public virtual void Start() {
         gameLogic = FindObjectOfType<TTTGameLogic>();
@@ -26,9 +27,6 @@ public class GridClickHandler : MonoBehaviour {
     Vector3 fingerPrevPos;
 
     public virtual void Update() {
-        if (GridClickHandler.IsPointerOverUIObject())
-            return;
-
         // Ended zooming
         if (Input.touchCount == 0 && zooming) zooming = false;
 
@@ -58,10 +56,13 @@ public class GridClickHandler : MonoBehaviour {
         } else if (Input.touchCount == 1 && !zooming) {
             Touch touch = new Touch();
             touch = Input.GetTouch(0);
+
+            if (!currentTouchOverUI && IsPointerOverUIObject()) currentTouchOverUI = true;
             
             if (touch.phase == TouchPhase.Began) {
                 moveAmount.x = 0; moveAmount.y = 0;
                 fingerPrevPos = Camera.main.ScreenToViewportPoint(touch.position);
+
                 // Move grid
             } else if (touch.phase == TouchPhase.Moved && Input.touchCount == 1) {
                 moveAmount += new Vector2(Mathf.Abs(touch.deltaPosition.x), Mathf.Abs(touch.deltaPosition.y));
@@ -76,19 +77,20 @@ public class GridClickHandler : MonoBehaviour {
                     // Set finger's prev pos in viewport coords
                     fingerPrevPos = Camera.main.ScreenToViewportPoint(touch.position);
                 }
-
             } else if (Input.touchCount == 1 && touch.phase == TouchPhase.Ended) {
                 // Not moved finger
-                if (moveAmount.x <= fingerMoveMin && moveAmount.y <= fingerMoveMin) {
+                if (moveAmount.x <= fingerMoveMin && moveAmount.y <= fingerMoveMin && !currentTouchOverUI) {
                     Vector2 clickPos = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
 
                     ClickedAt(clickPos);
                 }
+
+                currentTouchOverUI = false;
             }
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
-        if (Input.GetMouseButtonUp(0)) {
+        if (Input.GetMouseButtonDown(0)) {
             Vector2 clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             ClickedAt(clickPos);
         }
@@ -100,10 +102,16 @@ public class GridClickHandler : MonoBehaviour {
     }
 
     public static bool IsPointerOverUIObject() {
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        return results.Count > 0;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (Input.touchCount == 0) return false;
+
+        return EventSystem.current.IsPointerOverGameObject(0);
+#endif
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+        if (!Input.GetMouseButton(0)) return false;
+
+        return EventSystem.current.IsPointerOverGameObject();
+#endif
     }
 }

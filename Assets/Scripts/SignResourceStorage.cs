@@ -11,8 +11,6 @@ public class SignResourceStorage : Singleton<SignResourceStorage> {
     /// Add to this to add a new o place sound
     /// </summary>
     private string[] oPlaceSoundNames = new string[] {
-        "oPlaceSound1",
-        "oPlaceSound2",
         "oPlaceSound3",
         "oPlaceSound4"
     };
