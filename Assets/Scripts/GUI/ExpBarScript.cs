@@ -7,6 +7,7 @@ public class ExpBarScript : MonoBehaviour {
 
     private bool isPulledDown = false;
     public bool IsPulledDown { get { return isPulledDown; } }
+    private int backButtonStackId;
 
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
@@ -106,7 +107,10 @@ public class ExpBarScript : MonoBehaviour {
     public void PullDownExpBar(TweenCallback callback) {
         rectTransform.DOAnchorPosY(-rectTransform.rect.height / 2f, 0.3f)
             .OnComplete(callback);
+
         isPulledDown = true;
+
+        backButtonStackId = ScaneManager.Instance.AddToBackStack(() => { PushUpExpBar(); }, false);
     }
 
     public void PullDownExpBar() {
@@ -117,6 +121,8 @@ public class ExpBarScript : MonoBehaviour {
         rectTransform.DOAnchorPosY(rectTransform.rect.height / 2f, 0.3f)
             .OnComplete(callback);
         isPulledDown = false;
+
+        ScaneManager.Instance.RemoveFromBackStack(backButtonStackId);
     }
 
     public void PushUpExpBar() {

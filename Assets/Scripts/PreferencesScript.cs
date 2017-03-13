@@ -71,7 +71,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
 
-        PlayerPrefs.SetInt(PLAYER_LEVEL, 0);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
         PlayerPrefs.SetInt(PLAYER_EXP, 0);
 
         PlayerPrefs.SetInt(SOUND_LEVEL, 100);
@@ -83,7 +83,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         ResetPreferences();
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 1);
-        PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
+        PlayerPrefs.SetInt(PLAYER_LEVEL, 20);
     }
 
     public bool IsTutorialCompleted() {

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
 public class GridClickHandler : MonoBehaviour {

@@ -55,6 +55,29 @@ public class ChangeUIAccordingToColorMode : MonoBehaviour {
     }
 
     /// <summary>
+    /// Adds the possible component from the gamobject to the proper lists
+    /// </summary>
+    public void AddGameObject(GameObject obj) {
+        Image img = obj.GetComponent<Image>();
+        Text txt = obj.GetComponent<Text>();
+        TextMeshProUGUI txtMP = obj.GetComponent<TextMeshProUGUI>();
+
+        if (img != null) updateToColorModesImg.Add(img);
+        else if (txt != null) updateToColorModesTxt.Add(txt);
+        else if (txtMP != null) updateToColorTextMeshPro.Add(txtMP);
+    }
+
+    /// <summary>
+    /// Simply ads it to the correct list but does not check whether it is in that list
+    /// </summary>
+    /// <param name="obj"></param>
+    public void AddObject(object obj) {
+        if (obj is Image) updateToColorModesImg.Add((Image) obj);
+        else if (obj is Text) updateToColorModesTxt.Add((Text) obj);
+        else if (obj is TextMeshProUGUI) updateToColorTextMeshPro.Add((TextMeshProUGUI) obj);
+    }
+
+    /// <summary>
     /// Changes everything that we told it to to light mode
     /// </summary>
     public void ChangeToLightMode(float time) {

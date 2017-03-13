@@ -29,8 +29,6 @@ public class ScaneManager : Singleton<ScaneManager> {
                 BackButtonAction backButtonAction = backButtonStack[backButtonStack.Count - 1];
                 backButtonStack.RemoveAt(backButtonStack.Count - 1);
 
-                Debug.Log("Back button action stack count " + backButtonStack.Count);
-
                 backButtonAction.action.Invoke();
                 if (backButtonAction.callback != null) backButtonAction.callback.Invoke();
             } else if(prevScenes.Count > 0 && backButtonEnabled) { // we have a screen to go back to

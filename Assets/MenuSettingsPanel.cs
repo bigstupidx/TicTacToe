@@ -25,7 +25,7 @@ public class MenuSettingsPanel : MonoBehaviour {
     [Tooltip("On what screens to change the screenChangePanel. If the screen is not in this array then the very first element will be added.")]
     [SerializeField]
     private SettingsChangePanel[] changePanels;
-    private int currentChangePanel;
+    private int currentChangePanel = -1;
     
     private RectTransform rectTransform;
     private float animTime = 0.3f;
@@ -48,9 +48,6 @@ public class MenuSettingsPanel : MonoBehaviour {
         soundVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetSoundVolume((int)value); });
         musicVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetMusicVolume((int) value); });
 
-        // Instantiate the screen change for the menu screen
-        InstantiateChangePanel(changePanels[1]);
-
         ScaneManager.OnScreenChange += OnScreenChanged;
         OnScreenChanged("", "Menu");
     }
@@ -58,33 +55,36 @@ public class MenuSettingsPanel : MonoBehaviour {
     private void OnScreenChanged(string from, string to) {
         CloseSettingsPanel();
 
-        SettingsButton sB = FindObjectOfType<SettingsButton>();
-        if (sB == null) return; // We have no button -> no settings panel needed
 
         // Assign all variables
         mainUIPanel = FindObjectOfType<MainUIPanel>().GetComponent<RectTransform>();
         mainUIPanelImage = mainUIPanel.GetComponent<Image>();
         mainUIPanelImage.raycastTarget = false;
 
-        settingsButton = sB.GetComponent<Button>();
-        settingsButton.onClick.AddListener(() => {
-            ToggleSettingsPanel();
-        });
-
+        bool panelInstantiated = false;
         for (int i = 0; i < changePanels.Length; i++) {
             if (changePanels[i].screenName == to) {
                 // We already have the one we needed to instantiated
-                if (currentChangePanel == i) return;
+                if (currentChangePanel == i) break;
 
                 InstantiateChangePanel(changePanels[i]);
-                return;
+                panelInstantiated = true;
+                break;
             }
         }
 
         // If we found no screens in changePanels instantiate the very first element
-        if (currentChangePanel == 0) return; // We already have it instatiated
+        if (!panelInstantiated) { // We already have it instatiated
+            InstantiateChangePanel(changePanels[0]);
+        }
 
-        InstantiateChangePanel(changePanels[0]);
+        SettingsButton sB = FindObjectOfType<SettingsButton>();
+        if (sB == null) return; // We have no button -> no setup of button needed
+
+        settingsButton = sB.GetComponent<Button>();
+        settingsButton.onClick.AddListener(() => {
+            ToggleSettingsPanel();
+        });
     }
 
     private void InstantiateChangePanel(SettingsChangePanel changePanel) {
@@ -93,9 +93,12 @@ public class MenuSettingsPanel : MonoBehaviour {
         GameObject obj = Instantiate(changePanel.prefab, screenChangePanel.transform, false);
         currentChangePanel = changePanel.id;
         obj.name = changePanel.screenName + "ChangePanel";
-        
-        foreach (DarkLightColor c in obj.transform.GetComponentsInChildren<DarkLightColor>())
+
+        ChangeUIAccordingToColorMode cuiatcc = FindObjectOfType<ChangeUIAccordingToColorMode>();
+        foreach (DarkLightColor c in obj.transform.GetComponentsInChildren<DarkLightColor>()) { 
             c.SetColorToCurrentColorMode();
+            cuiatcc.AddGameObject(c.gameObject);
+        }
     }
 
     /// <summary>

@@ -32,7 +32,6 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
         brokenParticle = transform.GetChild(4).GetComponent<ParticleSystem>();
 
         text = transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-        text.color = text.GetComponent<DarkLightColor>().GetColorOfMode(PreferencesScript.Instance.currentMode);
         text.DOFade(0f, 0f);
 
         // load sprites
