@@ -6,7 +6,15 @@ using DG.Tweening;
 
 public class ScaneManager : Singleton<ScaneManager> {
 
-    private Stack<string> prevScenes = new Stack<string>();
+    /// <summary>
+    /// From which screen we need confrimation to come back from and what the text should be
+    /// </summary>
+    private string[,] backConfirmation = new string[,] {
+        { "ClientBluetoothGame", "Are you sure you want to disconnect?" },
+        { "ServerBluetoothGame", "Are you sure you want to disconnect?" },
+        { "GooglePlayGameClient", "Are you sure you want to disconnect?" },
+        { "GooglePlayGameServer", "Are you sure you want to disconnect?" }
+    };
 
     public delegate void ScreenChange(string from, string to);
     public static event ScreenChange OnScreenChange;
@@ -31,15 +39,35 @@ public class ScaneManager : Singleton<ScaneManager> {
 
                 backButtonAction.action.Invoke();
                 if (backButtonAction.callback != null) backButtonAction.callback.Invoke();
-            } else if(prevScenes.Count > 0 && backButtonEnabled) { // we have a screen to go back to
-                // Do something based on which screen we are on
-                switch (SceneManager.GetActiveScene().name) {
-                    case "Game":
-                        GameObject.Find("GameManager").GetComponent<SaveLoadGame>().WriteEverything();
-                        break;
+            } else if (SceneManager.GetActiveScene().name != "Menu" && backButtonEnabled) { // we have a screen to go back to
+                string currentScene = SceneManager.GetActiveScene().name;
+
+                UnityAction backAction = () => {
+                    // Do something based on which screen we are on
+                    switch (SceneManager.GetActiveScene().name) {
+                        case "Game":
+                            GameObject.Find("GameManager").GetComponent<SaveLoadGame>().WriteEverything();
+                            break;
+                    }
+
+                    GoToScene("Menu");
+                };
+
+                // go through the scenes that need confirmation, and if they do make a popup that asks for conf
+                bool foundConfScreen = false;
+                for (int i = 0; i < backConfirmation.GetLength(0) && !foundConfScreen; i++) {
+                    if (currentScene == backConfirmation[i, 0]) {
+                        PopupManager.Instance.PopUp(
+                            new PopUpTwoButton(backConfirmation[i, 1], "Go back", "Stay")
+                                .SetButtonPressActions(backAction, () => { })
+                        );
+
+                        foundConfScreen = true;
+                    }
                 }
 
-                GoToSceneWithoutAddingToStack(prevScenes.Pop());
+                // The scene we want to go to does not need confirmation
+                if (!foundConfScreen) backAction.Invoke();
             }
         }
     }
@@ -53,9 +81,11 @@ public class ScaneManager : Singleton<ScaneManager> {
     }
 
 	public void GoToScene(string name) {
-        prevScenes.Push(SceneManager.GetActiveScene().name);
+        string from = SceneManager.GetActiveScene().name;
 
-        GoToSceneWithoutAddingToStack(name);
+        SceneManager.LoadScene(name, LoadSceneMode.Single);
+
+        StartCoroutine(SceneLoaded(from, name));
     }
 
     private System.Collections.IEnumerator SceneLoaded(string from, string name) {
@@ -83,16 +113,7 @@ public class ScaneManager : Singleton<ScaneManager> {
     /// </summary>
     /// <param name="name"></param>
     public void GoToSceneWithErase(string name) {
-        prevScenes.Clear();
         GoToScene(name);
-    }
-
-    public void GoToSceneWithoutAddingToStack(string name) {
-        string from = SceneManager.GetActiveScene().name;
-
-        SceneManager.LoadScene(name, LoadSceneMode.Single);
-
-        StartCoroutine(SceneLoaded(from, name));
     }
 
     /// <summary>

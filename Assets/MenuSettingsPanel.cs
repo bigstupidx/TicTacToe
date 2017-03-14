@@ -61,6 +61,17 @@ public class MenuSettingsPanel : MonoBehaviour {
         mainUIPanelImage = mainUIPanel.GetComponent<Image>();
         mainUIPanelImage.raycastTarget = false;
 
+        // add callback to main ui panel, so when we click on it it close the settingspanel
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        entry.callback.AddListener((eventData) => {
+            CloseSettingsPanel();
+        });
+        EventTrigger eventTrigger = mainUIPanel.GetComponent<EventTrigger>();
+        if (eventTrigger == null) // We don't have an eventtrigger on it so add one
+            eventTrigger = mainUIPanel.gameObject.AddComponent<EventTrigger>();
+        eventTrigger.triggers.Add(entry);
+
         bool panelInstantiated = false;
         for (int i = 0; i < changePanels.Length; i++) {
             if (changePanels[i].screenName == to) {

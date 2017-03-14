@@ -70,12 +70,12 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
                 break;
             case UnlockableType.LocalMulti:
                 rewardImage.sprite = Resources.Load<Sprite>("Textures/localMultiUnlock");
-                rewardImage.color = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.DARK ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
+                rewardImage.color = Color.white;
                 text.text = "Local multiplayer unlocked!";
                 break;
             case UnlockableType.GooglePlay:
                 rewardImage.sprite = Resources.Load<Sprite>("Textures/gpUnlock");
-                rewardImage.color = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.DARK ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
+                rewardImage.color = Color.white;
                 text.text = "Google play multiplayer unlocked!";
                 break;
         }

@@ -30,19 +30,27 @@ public class AppodealManager : Singleton<AppodealManager> {
 
     private void OnScreenChange(string from, string to) {
         Debug.Log("Screen change detected in appodeal " + from + " " + to);
-        if (to == "Game" || to == "GameAI") {
+        if (to == "Game" || to == "GameAI" || to == "ServerBluetoothGame" || to == "GooglePlayGameServer") {
             gameCounter = 0;
             FindObjectOfType<TTTGameLogic>().SomeoneWonGameEvent += GameEndAd;
+        } else if (to == "GooglePlayGameClient" || to == "ClientBluetoothGame") {
+            gameCounter = 0;
+            ClientCellStorage.SomeoneWonEvent += GameEndAd;
+        } else {
+            ClientCellStorage.SomeoneWonEvent -= GameEndAd;
+
+            TTTGameLogic gl = FindObjectOfType<TTTGameLogic>();
+            if (gl != null) gl.SomeoneWonGameEvent -= GameEndAd;
         }
 
-        for (int i = 0; i < hideOnScreens.Length; i++) {
+        /* for (int i = 0; i < hideOnScreens.Length; i++) {
             if (hideOnScreens[i] == to) {
                 Appodeal.hide(Appodeal.BANNER_BOTTOM);
                 return;
             }
         }
 
-        Appodeal.show(Appodeal.BANNER_BOTTOM);
+        Appodeal.show(Appodeal.BANNER_BOTTOM); */
     }
 
     int gameCounter = 0;

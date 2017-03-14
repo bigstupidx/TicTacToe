@@ -151,11 +151,11 @@ public class PopupManager : Singleton<PopupManager> {
         // Add fade out click actions because we removed the listeners
         UnityAction action = () => {
             popupInstanceGroup.DOFade(0f, 0.2f).OnComplete(() => {
-                popupOut = true;
                 popupInstanceGroup.interactable = false;
                 popupInstanceGroup.blocksRaycasts = false;
             });
             popupInstanceImage.rectTransform.DOScale(0f, 0.4f);
+            popupOut = true;
         };
         popupInstanceButtonOne.onClick.AddListener(action);
         popupInstanceButtonTwo[0].onClick.AddListener(action);
@@ -169,8 +169,8 @@ public class PopUpOneButton {
     internal string buttonText;
     internal Color buttonTextColor = new Color(0.14902f, 0.19608f, 0.21961f);
     internal Color buttonColor = new Color(0.87843f, 0.87843f, 0.87843f);
-    internal Color textColor = new Color(0.14902f, 0.19608f, 0.21961f);
-    internal Color backgroundColor = Color.white;
+    internal Color textColor = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.LIGHT ? new Color(0.14902f, 0.19608f, 0.21961f) : Color.white;
+    internal Color backgroundColor = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.LIGHT ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
     internal UnityAction buttonPressed = () => { };
 
     public PopUpOneButton(string text, string buttonText) {
@@ -206,8 +206,8 @@ public class PopUpTwoButton {
     internal string[] buttonText = new string[2];
     internal Color[] buttonTextColor = new Color[] { new Color(0.14902f, 0.19608f, 0.21961f), new Color(0.14902f, 0.19608f, 0.21961f) };
     internal Color[] buttonColor = new Color[] { new Color(0.87843f, 0.87843f, 0.87843f), new Color(0.87843f, 0.87843f, 0.87843f) };
-    internal Color textColor = new Color(0.14902f, 0.19608f, 0.21961f);
-    internal Color backgroundColor = Color.white;
+    internal Color textColor = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.LIGHT ? new Color(0.14902f, 0.19608f, 0.21961f) : Color.white;
+    internal Color backgroundColor = PreferencesScript.Instance.currentMode == PreferencesScript.ColorMode.LIGHT ? Color.white : new Color(0.14902f, 0.19608f, 0.21961f);
     internal UnityAction[] buttonPressed = new UnityAction[] { () => { }, () => { } };
 
     public PopUpTwoButton(string text, string buttonOne, string buttonTwo) {

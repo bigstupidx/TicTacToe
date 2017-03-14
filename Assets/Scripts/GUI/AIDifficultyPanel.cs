@@ -4,15 +4,15 @@ using DG.Tweening;
 
 public class AIDifficultyPanel : MonoBehaviour {
 
-    private float animTime = 0.3f;
+    protected float animTime = 0.3f;
 
-    private AIScript aiScript;
-    private RectTransform[] buttons;
+    protected AIScript aiScript;
+    protected RectTransform[] buttons;
 
-    private bool isShown = false;
-    private int selectedButton = -1;
+    protected bool isShown = false;
+    protected int selectedButton = -1;
     
-	void Start () {
+	public virtual void Start () {
         aiScript = FindObjectOfType<AIScript>();
 
         buttons = new RectTransform[transform.childCount];
@@ -24,7 +24,7 @@ public class AIDifficultyPanel : MonoBehaviour {
                 SetDifficultyTo(diff);
             });
         }
-        SelectButton(2);
+        SelectButton(2, false);
 	}
 
     public void SetDifficultyToEasy() {
@@ -46,26 +46,38 @@ public class AIDifficultyPanel : MonoBehaviour {
         SelectButton(diff);
     }
 
-    private void PopUpThatGameIsInProgress() {
+    protected void PopUpThatGameIsInProgress() {
         PopupManager.Instance.PopUp("Can't change difficulty\nwhile game is in progress!", "OK");
     }
 
-    private void SelectButton(int which, TweenCallback onComplete = null) {
+    /// <summary>
+    /// is user is false then the onComplete method won't be invoked
+    /// </summary>
+    public virtual void SelectButton(int which, bool user = true, TweenCallback onComplete = null) {
         if (which == selectedButton) {
             // Same button is selected as the one we want to select so completion is immedaite
-            if (onComplete != null) onComplete.Invoke();
+            if (onComplete != null && user) onComplete.Invoke();
 
             return;
         }
 
         selectedButton = which;
 
-        for (int i = 1; i <= 3; i++) {
-            if (buttons[i].localScale != new Vector3(1f, 1f, 1f)) {
-                buttons[i].DOScale(1f, 0.1f);
+        // user pressed so do tween and do callback
+        if (user) { 
+            for (int i = 1; i <= 3; i++) {
+                if (buttons[i].localScale != new Vector3(1f, 1f, 1f)) {
+                    buttons[i].DOScale(1f, 0.1f);
+                }
             }
-        }
 
-        buttons[which].DOScale(1.1f, 0.2f).OnComplete(onComplete);
+            buttons[which].DOScale(1.1f, 0.2f).OnComplete(onComplete);
+        } else { // we just called it but the user didn't press so don't do tween and don't call callback
+            for (int i = 1; i <= 3; i++)
+                if (buttons[i].localScale != new Vector3(1f, 1f, 1f))
+                    buttons[i].localScale = new Vector3(1f, 1f, 1f);
+
+            buttons[which].localScale = new Vector3(1.1f, 1.1f, 1.1f);
+        }
     }
 }

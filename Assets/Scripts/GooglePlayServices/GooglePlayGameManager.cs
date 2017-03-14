@@ -82,8 +82,12 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
     /// </summary>
     private void OnSreenChanged(string from, string to) {
         if (to != CLIENT_SCENE && to != SERVER_SCENE && to != "GooglePlayConnectScreen") {
-            Debug.Log("GPGAMEMANGER DESTROYEd");
-            PlayGamesPlatform.Instance.RealTime.LeaveRoom();
+            try { 
+                if (Social.localUser.authenticated && PlayGamesPlatform.Instance.RealTime.IsRoomConnected())
+                    PlayGamesPlatform.Instance.RealTime.LeaveRoom();
+            } catch (System.Exception e) {
+                Debug.LogError("Google play game manager: cannot leave realtime room. " + e.Message + "\n" + e.StackTrace);
+            }
 
             ScaneManager.OnScreenChange -= OnSreenChanged;
 

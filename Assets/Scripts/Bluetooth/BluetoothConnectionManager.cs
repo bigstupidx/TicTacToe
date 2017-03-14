@@ -70,13 +70,18 @@ public class BluetoothConnectionManager : MonoBehaviour {
         readyButton.GetComponent<Image>().color = Color.green;
     }
 
+    private int lobbyBackStackId;
+
     /// <summary>
     /// In case of an error or simply coming back
     /// </summary>
     public void BackFromLobby() {
         lobbyPanel.SetActive(false);
         startPanel.SetActive(true);
+
         Destroy(bluetoothObject);
+
+        ScaneManager.Instance.RemoveFromBackStack(lobbyBackStackId);
     }
 
     /// <summary>
@@ -87,11 +92,20 @@ public class BluetoothConnectionManager : MonoBehaviour {
         serverPanel.SetActive(false);
         clientPanel.SetActive(false);
         lobbyPanel.SetActive(true);
+
+        lobbyBackStackId = ScaneManager.Instance.AddToBackStack(() => {
+            PopupManager.Instance.PopUp(
+                new PopUpTwoButton("Are you sure you want to disconnect?", "Disconnect", "Stay")
+                    .SetButtonPressActions(() => { BackFromLobby(); }, () => { })
+                );
+        });
     }
 
     //----------------------------
     //      Client Stuff
     //----------------------------
+
+    private int clientBackStackId;
 
     /// <summary>
     /// Instantiates client prefab
@@ -113,17 +127,23 @@ public class BluetoothConnectionManager : MonoBehaviour {
         // GUI
         startPanel.SetActive(false);
         clientPanel.SetActive(true);
+
+        clientBackStackId = ScaneManager.Instance.AddToBackStack(() => { BackFromClientPanel(); });
     }
 
     public void BackFromClientPanel() {
         Destroy(bluetoothObject);
         clientPanel.SetActive(false);
         startPanel.SetActive(true);
+
+        ScaneManager.Instance.RemoveFromBackStack(clientBackStackId);
     }
 
     //----------------------------
     //      Server Stuff
     //----------------------------
+
+    private int serverBackStackId;
 
     /// <summary>
     /// Switches from server to start panel, used in click event on back button
@@ -132,6 +152,8 @@ public class BluetoothConnectionManager : MonoBehaviour {
         Destroy(bluetoothObject);
         serverPanel.SetActive(false);
         startPanel.SetActive(true);
+
+        ScaneManager.Instance.RemoveFromBackStack(serverBackStackId);
     }
 
     /// <summary>
@@ -172,6 +194,8 @@ public class BluetoothConnectionManager : MonoBehaviour {
 
         // Start search
         StartSearching();
+
+        serverBackStackId = ScaneManager.Instance.AddToBackStack(() => { BackFromServerPanel(); });
     }
 
     /// <summary>
