@@ -37,8 +37,7 @@ public class Cell : MonoBehaviour {
     public void TriggerDraw() {
         if (animator != null) {
             animator.SetTrigger("Draw" + cellOcc.ToString());
-            audioSource.clip = SignResourceStorage.Instance.GetRandomSoundFor(cellType);
-            audioSource.Play();
+            SignResourceStorage.Instance.PlayRandomSoundFor(audioSource, cellType);
         }
     }
 

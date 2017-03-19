@@ -7,10 +7,8 @@ using System.IO;
 using System.Threading;
 using System.Collections;
 using UnityEngine.Events;
-using UnityEngine.SocialPlatforms;
-using System.Linq;
 
-public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
+public class GooglePlayServicesManager : MonoBehaviour {
 
     private Thread checkThread;
     private string htmlText = string.Empty;
@@ -21,7 +19,7 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
 
             return;
         }
-
+        
         DontDestroyOnLoad(gameObject);
 
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
@@ -38,9 +36,17 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
 
         if (PreferencesScript.Instance.GPCanAutoLogin()) {
             LogInUser();
+        } else {
+            ScaneManager.OnScreenChange += ScreenChanged;
+            ScreenChanged("", "Menu");
         }
+    }
 
-        Invoke("StartCheckingWhetherSignedIn", 15f);
+    private void ScreenChanged(string from, string to) {
+        // On menu screen start the signed in check
+        if (to == "Menu") {
+            Invoke("StartCheckingWhetherSignedIn", 5f);
+        }
     }
 
     public void LogInUser(UnityAction<bool> successful = null) {
@@ -51,6 +57,8 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
     }
 
     private void StartCheckingWhetherSignedIn() {
+        Debug.Log("Started checking for sign in");
+
         checkThread = new Thread(new ThreadStart(() => {
             // We check for internet connection
             htmlText = GetHtmlFromUri("http://google.com");
@@ -63,6 +71,7 @@ public class GooglePlayServicesManager : Singleton<GooglePlayServicesManager> {
     private IEnumerator CheckForGooglePlaySignedIn() {
         yield return new WaitUntil(() => htmlText == string.Empty);
 
+        Debug.Log("Internet connection checked " + htmlText);
         // this phrase is in the beginning of the google page
         if (htmlText.Contains("schema.org/WebPage") && !Social.localUser.authenticated) {
             // the player is not signed in so prompt them to do so

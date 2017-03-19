@@ -8,6 +8,7 @@ using TMPro;
 public class RewardPanelScript : MonoBehaviour {
 
     private CanvasScaler canvasScaler;
+    private AudioSource audioSource;
 
     public Image firstPanel;
     private TextMeshProUGUI firstPanelStaticText;
@@ -23,6 +24,8 @@ public class RewardPanelScript : MonoBehaviour {
 
     Coroutine confettiCoroutine;
     public GameObject[] confettis;
+
+    public RandomSound confettiSounds;
     
 	void Start() {
         firstPanelStaticText = firstPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
@@ -31,8 +34,11 @@ public class RewardPanelScript : MonoBehaviour {
         rewardInstancePrefab = Resources.Load<GameObject>("Prefabs/Rewards/RewardInstance");
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
+        audioSource = GetComponent<AudioSource>();
 
         canvasScaler = transform.parent.GetComponent<CanvasScaler>();
+
+        // LevelUpAnimation();
     }
 
     private float firstPanelAnim = 1f;
@@ -108,6 +114,8 @@ public class RewardPanelScript : MonoBehaviour {
             RectTransform confetti = Instantiate(confettis[UnityEngine.Random.Range(0, confettis.Length)], transform, false).GetComponent<RectTransform>();
             confetti.localPosition = new Vector3(UnityEngine.Random.Range(0f, Camera.main.pixelWidth) - Camera.main.pixelWidth / 2f, UnityEngine.Random.Range(0f, Camera.main.pixelHeight) - Camera.main.pixelHeight / 2f);
             confetti.eulerAngles= new Vector3(UnityEngine.Random.Range(0f, 360f), confetti.eulerAngles.y, confetti.eulerAngles.z);
+
+            confettiSounds.PlayRandomAudio(audioSource);
 
             float widthHeight = Camera.main.pixelHeight * UnityEngine.Random.Range(0.2f, 0.3f);
             confetti.localScale = new Vector3(widthHeight, widthHeight, widthHeight);

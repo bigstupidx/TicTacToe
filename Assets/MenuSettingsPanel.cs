@@ -10,6 +10,7 @@ public class MenuSettingsPanel : MonoBehaviour {
     private Button settingsButton;
     [SerializeField]
     private RectTransform mainUIPanel;
+    private EventTrigger mainUIPanelEventTrigger;
     [SerializeField]
     private Image mainUIPanelImage;
     [SerializeField]
@@ -45,7 +46,7 @@ public class MenuSettingsPanel : MonoBehaviour {
         soundVolumeSlider.value = PreferencesScript.Instance.GetSoundVolume();
         musicVolumeSlider.value = PreferencesScript.Instance.GetMusicVolume();
 
-        soundVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetSoundVolume((int)value); });
+        soundVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetSoundVolume((int) value); });
         musicVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetMusicVolume((int) value); });
 
         ScaneManager.OnScreenChange += OnScreenChanged;
@@ -53,8 +54,7 @@ public class MenuSettingsPanel : MonoBehaviour {
     }
 
     private void OnScreenChanged(string from, string to) {
-        CloseSettingsPanel();
-
+        Debug.Log("Screen changed in menusettingspanel");
 
         // Assign all variables
         mainUIPanel = FindObjectOfType<MainUIPanel>().GetComponent<RectTransform>();
@@ -67,10 +67,12 @@ public class MenuSettingsPanel : MonoBehaviour {
         entry.callback.AddListener((eventData) => {
             CloseSettingsPanel();
         });
-        EventTrigger eventTrigger = mainUIPanel.GetComponent<EventTrigger>();
-        if (eventTrigger == null) // We don't have an eventtrigger on it so add one
-            eventTrigger = mainUIPanel.gameObject.AddComponent<EventTrigger>();
-        eventTrigger.triggers.Add(entry);
+        mainUIPanelEventTrigger = mainUIPanel.GetComponent<EventTrigger>();
+        if (mainUIPanelEventTrigger == null) // We don't have an eventtrigger on it so add one
+            mainUIPanelEventTrigger = mainUIPanel.gameObject.AddComponent<EventTrigger>();
+        mainUIPanelEventTrigger.triggers.Add(entry);
+        mainUIPanelEventTrigger.enabled = false;
+
 
         bool panelInstantiated = false;
         for (int i = 0; i < changePanels.Length; i++) {
@@ -90,12 +92,14 @@ public class MenuSettingsPanel : MonoBehaviour {
         }
 
         SettingsButton sB = FindObjectOfType<SettingsButton>();
-        if (sB == null) return; // We have no button -> no setup of button needed
-
-        settingsButton = sB.GetComponent<Button>();
-        settingsButton.onClick.AddListener(() => {
-            ToggleSettingsPanel();
-        });
+        if (sB != null) { // We have no button -> no setup of button needed
+            settingsButton = sB.GetComponent<Button>();
+            settingsButton.onClick.AddListener(() => {
+                ToggleSettingsPanel();
+            });
+        }
+        
+        CloseSettingsPanel();
     }
 
     private void InstantiateChangePanel(SettingsChangePanel changePanel) {
@@ -135,6 +139,7 @@ public class MenuSettingsPanel : MonoBehaviour {
         rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime);
 
         mainUIPanelImage.raycastTarget = true;
+        mainUIPanelEventTrigger.enabled = true;
 
         // add to backbutton callback
         backButtonActionId = ScaneManager.Instance.AddToBackStack(() => { CloseSettingsPanel(); });
@@ -152,6 +157,7 @@ public class MenuSettingsPanel : MonoBehaviour {
         rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x + rectTransform.rect.width, animTime);
 
         mainUIPanelImage.raycastTarget = false;
+        mainUIPanelEventTrigger.enabled = false;
 
         ScaneManager.Instance.RemoveFromBackStack(backButtonActionId);
     }

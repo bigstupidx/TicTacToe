@@ -91,6 +91,7 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
 
             ScaneManager.OnScreenChange -= OnSreenChanged;
 
+            Debug.Log("Google play game manager destroey");
             Destroy(gameObject);
         }
     }
@@ -99,7 +100,7 @@ public class GooglePlayGameManager : MonoBehaviour, RealTimeMultiplayerListener 
     /// The sign in button was pressed so sign in
     /// </summary>
     public void SignInButtonPressed() {
-        GooglePlayServicesManager.Instance.LogInUser((bool success) => {
+        FindObjectOfType<GooglePlayServicesManager>().LogInUser((bool success) => {
             if (success) {
                 PreferencesScript.Instance.GPFromNowCanAutoLogin();
 

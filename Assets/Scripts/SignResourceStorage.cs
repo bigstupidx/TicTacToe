@@ -5,49 +5,23 @@ public class SignResourceStorage : Singleton<SignResourceStorage> {
     public Color oColor = Color.blue;
     public Color xColor = Color.red;
 
-    private const string soundPath = "Sounds/Drawing/";
-    private AudioClip[] oPlaceSounds;
-    /// <summary>
-    /// Add to this to add a new o place sound
-    /// </summary>
-    private string[] oPlaceSoundNames = new string[] {
-        "oPlaceSound3",
-        "oPlaceSound4"
-    };
-    private AudioClip[] xPlaceSounds;
-    /// <summary>
-    /// Add to this to add a new x place sound
-    /// </summary>
-    private string[] xPlaceSoundNames = new string[] {
-        "xPlaceSound1",
-        "xPlaceSound2",
-        "xPlaceSound3",
-        "xPlaceSound4"
-    };
+    public RandomSound oPlaceSounds;
+    public RandomSound xPlaceSounds;
 
 
-    public AudioClip XRandomPlaceSound {
-        get {
-            return xPlaceSounds[Random.Range(0, xPlaceSounds.Length)];
-        }
+    public void PlayXRandomPlaceSound(AudioSource source) {
+        xPlaceSounds.PlayRandomAudioNonRepeat(source);
     }
 
-    public AudioClip ORandomPlaceSound {
-        get {
-            return oPlaceSounds[Random.Range(0, oPlaceSounds.Length)];
-        }
+    public void PlayORandomPlaceSound(AudioSource source) {
+        oPlaceSounds.PlayRandomAudioNonRepeat(source);
     }
-
-    /// <summary>
-    /// If not given X or O it will return null
-    /// </summary>
-    public AudioClip GetRandomSoundFor(Cell.CellOcc type) {
+    
+    public void PlayRandomSoundFor(AudioSource source, Cell.CellOcc type) {
         switch (type) {
-            case Cell.CellOcc.X: return XRandomPlaceSound;
-            case Cell.CellOcc.O: return ORandomPlaceSound;
+            case Cell.CellOcc.X: PlayXRandomPlaceSound(source); break;
+            case Cell.CellOcc.O: PlayORandomPlaceSound(source); break;
         }
-
-        return null;
     }
 
 
@@ -80,16 +54,8 @@ public class SignResourceStorage : Singleton<SignResourceStorage> {
         oSprite = allSprites[allSprites.Length - 1];
 
         // Load sounds
-        oPlaceSounds = new AudioClip[oPlaceSoundNames.Length];
-        xPlaceSounds = new AudioClip[xPlaceSoundNames.Length];
-
-        for (int i = 0; i < oPlaceSoundNames.Length; i++) {
-            oPlaceSounds[i] = Resources.Load<AudioClip>(soundPath + oPlaceSoundNames[i]);
-        }
-
-        for (int i = 0; i < xPlaceSoundNames.Length; i++) {
-            xPlaceSounds[i] = Resources.Load<AudioClip>(soundPath + xPlaceSoundNames[i]);
-        }
+        oPlaceSounds = Resources.Load<RandomSound>("Sounds/Drawing/RandomOPlaceSound");
+        xPlaceSounds = Resources.Load<RandomSound>("Sounds/Drawing/RandomXPlaceSound");
     }
 
     /// <summary>

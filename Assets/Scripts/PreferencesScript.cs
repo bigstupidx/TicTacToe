@@ -70,6 +70,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         PlayerPrefs.SetInt(EMOJI_SLOT_COUNT, 3);
 
         PlayerPrefs.SetInt(TUTORIAL_COMPLETED, 0);
+        PlayerPrefs.SetInt(GOOGLE_PLAY_AUTO_LOGIN, 0);
 
         PlayerPrefs.SetInt(PLAYER_LEVEL, 1);
         PlayerPrefs.SetInt(PLAYER_EXP, 0);
@@ -116,10 +117,24 @@ public class PreferencesScript : Singleton<PreferencesScript> {
     private const string MUSIC_LEVEL = "MusicLevel";
     private const string SOUND_LEVEL = "SoundLevel";
 
+    /// <summary>
+    /// 0 - 100
+    /// </summary>
+    /// <returns></returns>
     public int GetMusicVolume() { return PlayerPrefs.GetInt(MUSIC_LEVEL); }
+    /// <summary>
+    /// 0 - 100
+    /// </summary>
+    /// <returns></returns>
     public int GetSoundVolume() { return PlayerPrefs.GetInt(SOUND_LEVEL); }
 
-    public void SetMusicVolume(int volume) { PlayerPrefs.SetInt(MUSIC_LEVEL, volume); }
+    public float GetNomalizedMusicVolume() { return GetMusicVolume() / 100f; }
+    public float GetNomalizedSoundVolume() { return GetSoundVolume() / 100f; }
+
+    public void SetMusicVolume(int volume) {
+        PlayerPrefs.SetInt(MUSIC_LEVEL, volume);
+        MusicManager.Instance.SetVolume(volume / 100f);
+    }
     public void SetSoundVolume(int volume) { PlayerPrefs.SetInt(SOUND_LEVEL, volume); }
 
     // ____________________________________UNLOCKS_____________________________________

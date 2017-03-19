@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+
 [RequireComponent(typeof(LineRenderer))]
 public class AnimatedLineRenderer : MonoBehaviour {
     [Tooltip("The minimum distance that must be in between line segments (0 for infinite). Attempts to make lines with distances smaller than this will fail.")]
@@ -18,11 +19,17 @@ public class AnimatedLineRenderer : MonoBehaviour {
     [Tooltip("Particle system that should be displayed on draw")]
     public GameObject DrawParticles;
 
+    public RandomSound drawSounds;
+
     private struct QueueItem {
         public Vector3 Position;
         public float ElapsedSeconds;
         public float TotalSeconds;
         public float TotalSecondsInverse;
+
+        public bool Done {
+            get { return ElapsedSeconds == TotalSeconds; }
+        }
     }
 
     private LineRenderer lineRenderer;
@@ -33,10 +40,12 @@ public class AnimatedLineRenderer : MonoBehaviour {
     private int index = -1;
     private float remainder;
     private GameObject drawParticleObject;
+
     private ParticleSystem drawParticleSystem;
+    private AudioSource audioSource;
 
     private void ProcessCurrent() {
-        if (current.ElapsedSeconds == current.TotalSeconds) {
+        if (current.Done) {
             if (queue.Count == 0) {
                 return;
             } else {
@@ -50,6 +59,8 @@ public class AnimatedLineRenderer : MonoBehaviour {
                     return;
                 } else {
                     lineRenderer.numPositions = index + 1;
+
+                    if (audioSource != null) audioSource.pitch += UnityEngine.Random.Range(0f, 0.15f) - 0.075f;
                 }
             }
         }
@@ -81,11 +92,13 @@ public class AnimatedLineRenderer : MonoBehaviour {
             drawParticleSystem = drawParticleObject.GetComponent<ParticleSystem>();
             drawParticleSystem.Stop();
         }
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update() {
-        if (drawParticleSystem != null)
-            if (queue.Count == 0 && current.ElapsedSeconds >= current.TotalSeconds) {
+        if (drawParticleSystem != null) { 
+            if (queue.Count == 0 && current.Done) {
                 drawParticleSystem.Stop();
             } else {
                 drawParticleSystem.Play();
@@ -97,6 +110,17 @@ public class AnimatedLineRenderer : MonoBehaviour {
                 gradient.SetKeys(new GradientColorKey[] { new GradientColorKey(lineRenderer.startColor, 0.8f), new GradientColorKey(Color.white, 1f) }, new GradientAlphaKey[] { new GradientAlphaKey(1f, .5f), new GradientAlphaKey(0.1f, 1f) });
                 col.color = gradient;
             }
+        }
+
+        // Play audio if we need to after each other
+        if (drawSounds != null) {
+            if (queue.Count > 0) { 
+                if (!audioSource.isPlaying)
+                    drawSounds.PlayRandomAudioNonRepeat(audioSource);
+            } else if (queue.Count == 0 && current.Done) {
+                audioSource.Stop();
+            }
+        }
 
         ProcessCurrent();
     }

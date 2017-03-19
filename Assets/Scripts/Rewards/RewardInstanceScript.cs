@@ -13,6 +13,10 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
     private ParticleSystem brokenParticle;
     private ParticleSystem openParticle;
     private TextMeshProUGUI text;
+    private AudioSource audioSource;
+
+    public RandomSound crackSound;
+    public RandomSound breakSound;
 
     private int clickCount = 0;
 
@@ -24,6 +28,7 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
     void Awake() {
         sunRayImage = transform.GetChild(0).GetComponent<Image>();
         sunRayImage.rectTransform.localScale = new Vector3();
+        audioSource = GetComponent<AudioSource>();
 
         rewardImage = transform.GetChild(1).GetComponent<Image>();
         rewardImage.DOFade(0f, 0f);
@@ -109,8 +114,12 @@ public class RewardInstanceScript : MonoBehaviour, IPointerClickHandler {
 
             rewardImage.DOFade(1f, 0.2f);
             text.DOFade(1f, 0.2f);
+
+            breakSound.PlayRandomAudio(audioSource);
             return;
         }
+        crackSound.PlayRandomAudio(audioSource);
+
         crateImage.sprite = crateCracks[clickCount];
 
         crateImage.rectTransform.DOShakeAnchorPos(shakeTime, 30f, 8, 50f);
