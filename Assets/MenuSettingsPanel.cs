@@ -136,13 +136,13 @@ public class MenuSettingsPanel : MonoBehaviour {
         isOpen = true;
 
         if (mainUIPanel != null) mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x - rectTransform.rect.width, animTime);
-        rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime);
+        rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime).OnComplete(() => {
+            // add to backbutton callback
+            backButtonActionId = ScaneManager.Instance.AddToBackStack(() => { CloseSettingsPanel(); });
+        });
 
         mainUIPanelImage.raycastTarget = true;
         mainUIPanelEventTrigger.enabled = true;
-
-        // add to backbutton callback
-        backButtonActionId = ScaneManager.Instance.AddToBackStack(() => { CloseSettingsPanel(); });
     }
 
     /// <summary>

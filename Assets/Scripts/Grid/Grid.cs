@@ -155,8 +155,8 @@ public class Grid : MonoBehaviour {
     /// Is the given gridpos in the camera's sight
     /// </summary>
     public bool IsInCameraSight(int[] gridPos) {
-        return gridPos[0] >= cameraCurrPosLB[0] && gridPos[0] <= cameraCurrPosTR[0] &&
-            gridPos[1] >= cameraCurrPosLB[1] && gridPos[1] <= cameraCurrPosTR[1];
+        return gridPos[0] >= cameraCurrPosLB[0] + SHOW_BORDER && gridPos[0] <= cameraCurrPosTR[0] - SHOW_BORDER &&
+            gridPos[1] >= cameraCurrPosLB[1] + SHOW_BORDER && gridPos[1] <= cameraCurrPosTR[1] - SHOW_BORDER;
     }
 
     /// <summary>
@@ -348,10 +348,12 @@ public class Grid : MonoBehaviour {
     /// <returns>Whether the user can place at gridPos</returns>
     public bool CanPlaceAt(int[] gridPos) {
         // Game has not started, explained in GameLogic
+        CellHolder ch = GetCellHolderAtGridPos(gridPos);
         if (!gameLogic.GameSarted) {
-            CellHolder ch = GetCellHolderAtGridPos(gridPos);
             return ch == null || !ch.IsDisabled;
         }
+
+        if (ch != null && ch.IsDisabled) return false;
 
         CellHolder[] holders = GetAllNeighbourCellHolders(gridPos);
         foreach (CellHolder holder in holders) {
@@ -431,7 +433,15 @@ public class Grid : MonoBehaviour {
             // Get the partion the cell is in (we surely have this one, because holes are between signs
             int[] partionPos = Partion.GetPartionPosOfCell(pos);
             Partion p;
-            partions.TryGetValue(partionPos, out p);
+
+            // We don't have a partion yet for this pos
+            if (!partions.ContainsKey(partionPos)) {
+                p = new Partion(partionPos);
+
+                partions.Add(partionPos, p);
+            } else { // we already store the partion in the dictionary
+                partions.TryGetValue(partionPos, out p);
+            }
 
             // Place new BLOCKED cell in partion at pos
             p.PlaceSign(Partion.GetLocalPosOfCell(pos), Cell.CellOcc.BLOCKED, true);

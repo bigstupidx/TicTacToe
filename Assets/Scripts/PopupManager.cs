@@ -128,7 +128,7 @@ public class PopupManager : Singleton<PopupManager> {
     private void InstantiatePopUp() {
         // Only instantiate new popup if the old one is destroyed
         if (popupInstance == null) {
-            popupInstance = Instantiate(popupPrefab, GameObject.Find("Canvas").transform, false);
+            popupInstance = Instantiate(popupPrefab, GameObject.Find("DontDestroyCanvas").transform, false);
 
             // Get different parts of popup
             popupInstanceGroup = popupInstance.GetComponent<CanvasGroup>();

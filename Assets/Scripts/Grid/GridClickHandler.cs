@@ -66,7 +66,7 @@ public class GridClickHandler : MonoBehaviour {
             } else if (touch.phase == TouchPhase.Moved && Input.touchCount == 1) {
                 moveAmount += new Vector2(Mathf.Abs(touch.deltaPosition.x), Mathf.Abs(touch.deltaPosition.y));
 
-                if ((moveAmount.x > fingerMoveMin || moveAmount.y > fingerMoveMin) && isMovementEnabled) {
+                if ((moveAmount.x > fingerMoveMin || moveAmount.y > fingerMoveMin) && isMovementEnabled && !currentTouchOverUI) {
                     // Set finger pos in viewport coords
                     Vector3 fingerPos = Camera.main.ScreenToViewportPoint(touch.position);
                     Vector3 fingerDelta = Camera.main.ViewportToWorldPoint(fingerPos) - Camera.main.ViewportToWorldPoint(fingerPrevPos);

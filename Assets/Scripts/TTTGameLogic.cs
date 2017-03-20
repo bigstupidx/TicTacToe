@@ -250,6 +250,8 @@ public class TTTGameLogic : MonoBehaviour {
         /// <returns></returns>
         public List<int[]> GetFillableHoles() {
             // we calculate the min and max position of a filled cell in the rows and cols
+            // by examining it's neighbours. If it has a sign neighbour then it still need to be considered as part
+            // of the game.
             // Then we go through the cells and see if it is between those and there is no mark there
             // if that is true we know that it is a hole so we add it to the list
 
@@ -259,48 +261,64 @@ public class TTTGameLogic : MonoBehaviour {
             int[,] minMaxCols = new int[table.GetLength(0), 2];
             int[,] minMaxRows = new int[table.GetLength(1), 2];
 
-            // Calculate cols
-            for (int i = 0; i < table.GetLength(0); i++) {
-                int min = int.MaxValue;
-                int max = int.MinValue;
-
-                for (int k = 0; k < table.GetLength(1); k++) {
-                    if (table[i, k]) {
-                        if (min > k) min = k;
-                        if (max < k) max = k;
-                    }
-                }
-
-                minMaxCols[i, 0] = min;
-                minMaxCols[i, 1] = max;
+            for (int i = 0; i < minMaxCols.GetLength(0); i++) {
+                minMaxCols[i, 0] = int.MaxValue;
+                minMaxCols[i, 1] = int.MinValue;
             }
 
-            // Calculate rows
-            for (int k = 0; k < table.GetLength(1); k++) {
-                int min = int.MaxValue;
-                int max = int.MinValue;
+            for (int i = 0; i < minMaxRows.GetLength(0); i++) {
+                minMaxRows[i, 0] = int.MaxValue;
+                minMaxRows[i, 1] = int.MinValue;
+            }
+                
 
-                for (int i = 0; i < table.GetLength(0); i++) {
-                    if (table[i, k]) {
-                        if (min > i) min = i;
-                        if (max < i) max = i;
+            for (int i = 0; i < table.GetLength(0); i++) {
+                for (int k = 0; k < table.GetLength(1); k++) {
+                    // does it have a sign next to it?
+                    if (HasSignNextToIt(i, k) || table[i, k]) {
+                        if (minMaxCols[i, 0] > k) minMaxCols[i, 0] = k;
+                        if (minMaxCols[i, 1] < k) minMaxCols[i, 1] = k;
+
+                        if (minMaxRows[k, 0] > i) minMaxRows[k, 0] = i;
+                        if (minMaxRows[k, 1] < i) minMaxRows[k, 1] = i;
                     }
                 }
-
-                minMaxRows[k, 0] = min;
-                minMaxRows[k, 1] = max;
             }
 
             // Go through the table
             for (int i = 0; i < table.GetLength(0); i++) {
                 for (int k = 0; k < table.GetLength(1); k++) {
-                    if (!table[i, k] && k > minMaxCols[i, 0] && k < minMaxCols[i, 1] && i > minMaxRows[k, 0] && i < minMaxRows[k, 1]) {
+                    if (!table[i, k] && k >= minMaxCols[i, 0] && k <= minMaxCols[i, 1] && i >= minMaxRows[k, 0] && i <= minMaxRows[k, 1]) {
                         holes.Add(new int[] { i + startPos[0], k + startPos[1] });
                     }
                 }
             }
 
+            // go though the border cells (outside of table by 1) and see whether we need to disable it or not
+            // (disable it if it has a sign next to it
+            for (int i = -1; i <= table.GetLength(0); i++) {
+                if (HasSignNextToIt(i, -1)) holes.Add(new int[] { i + startPos[0], -1 + startPos[1] });
+                if (HasSignNextToIt(i, table.GetLength(1))) holes.Add(new int[] { i + startPos[0], table.GetLength(1) + startPos[1] });
+            }
+
+            for (int i = 0; i < table.GetLength(1); i++) {
+                if (HasSignNextToIt(-1, i)) holes.Add(new int[] { -1 + startPos[0], i + startPos[1] });
+                if (HasSignNextToIt(table.GetLength(0), i)) holes.Add(new int[] { table.GetLength(0) + startPos[0], i + startPos[1] });
+            }
+
             return holes;
+        }
+
+        /// <summary>
+        /// Returns whether the given cell has a sign next to it (includes diagonal)
+        /// </summary>
+        private bool HasSignNextToIt(int x, int y) {
+            for (int i = -1; i <= 1; i++)
+                for (int k = -1; k <= 1; k++)
+                    if (!(i == 0 && k == 0) && (x + i >= 0 && x + i < table.GetLength(0) && y + k >= 0 && y + k < table.GetLength(1)) && table[x + i, y + k])
+                        return true;
+
+            return false;
         }
 
         public int[,] GetShapePoints() {
