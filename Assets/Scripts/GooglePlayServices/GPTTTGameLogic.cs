@@ -15,7 +15,7 @@ public class GPTTTGameLogic : TTTGameLogic {
     /// <summary>
     /// Which type the server uses
     /// </summary>
-    public Cell.CellOcc serverType;
+    public static Cell.CellOcc serverType;
 
     public override void Start() {
         grid = FindObjectOfType<GPGrid>();
@@ -23,6 +23,14 @@ public class GPTTTGameLogic : TTTGameLogic {
         scoring = FindObjectOfType<ScoringScript>();
         serverType = Cell.CellOcc.X;
         whoseTurn = Cell.CellOcc.X;
+
+        SomeoneWonGameEvent += SomeOneWonGame;
+    }
+
+    private void SomeOneWonGame(Cell.CellOcc type) {
+        // this device won
+        if (type == serverType) PreferencesScript.Instance.PullExpBarThenAdd(BluetoothTTTGameLogic.EXP_FOR_WINNING);
+        else PreferencesScript.Instance.PullExpBarThenAdd(BluetoothTTTGameLogic.EXP_FOR_LOSING);
     }
 
     public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {

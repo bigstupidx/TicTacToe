@@ -56,7 +56,7 @@ public class TTTGameLogic : MonoBehaviour {
 
             return true;
         } else {
-            Debug.Log("Sign couldn't be placed at " + clickPos.x + " " + clickPos.y);
+            Debug.Log("Sign couldn't be placed at " + gridPos[0] + " " + gridPos[1]);
         }
 
         return false;
@@ -275,7 +275,7 @@ public class TTTGameLogic : MonoBehaviour {
             for (int i = 0; i < table.GetLength(0); i++) {
                 for (int k = 0; k < table.GetLength(1); k++) {
                     // does it have a sign next to it?
-                    if (HasSignNextToIt(i, k) || table[i, k]) {
+                    if (HasAtLeastSignNextToIt(i, k, 2) || table[i, k]) {
                         if (minMaxCols[i, 0] > k) minMaxCols[i, 0] = k;
                         if (minMaxCols[i, 1] < k) minMaxCols[i, 1] = k;
 
@@ -296,15 +296,16 @@ public class TTTGameLogic : MonoBehaviour {
 
             // go though the border cells (outside of table by 1) and see whether we need to disable it or not
             // (disable it if it has a sign next to it
-            for (int i = -1; i <= table.GetLength(0); i++) {
-                if (HasSignNextToIt(i, -1)) holes.Add(new int[] { i + startPos[0], -1 + startPos[1] });
-                if (HasSignNextToIt(i, table.GetLength(1))) holes.Add(new int[] { i + startPos[0], table.GetLength(1) + startPos[1] });
+            // I dont think we need this here anymore because we only disable the diagonal line places, which the outside thing doesnt have any of
+            /* for (int i = -1; i <= table.GetLength(0); i++) {
+                if (HasAtLeastSignNextToIt(i, -1, 2)) holes.Add(new int[] { i + startPos[0], -1 + startPos[1] });
+                if (HasAtLeastSignNextToIt(i, table.GetLength(1), 2)) holes.Add(new int[] { i + startPos[0], table.GetLength(1) + startPos[1] });
             }
 
             for (int i = 0; i < table.GetLength(1); i++) {
-                if (HasSignNextToIt(-1, i)) holes.Add(new int[] { -1 + startPos[0], i + startPos[1] });
-                if (HasSignNextToIt(table.GetLength(0), i)) holes.Add(new int[] { table.GetLength(0) + startPos[0], i + startPos[1] });
-            }
+                if (HasAtLeastSignNextToIt(-1, i, 2)) holes.Add(new int[] { -1 + startPos[0], i + startPos[1] });
+                if (HasAtLeastSignNextToIt(table.GetLength(0), i, 2)) holes.Add(new int[] { table.GetLength(0) + startPos[0], i + startPos[1] });
+            } */
 
             return holes;
         }
@@ -312,13 +313,45 @@ public class TTTGameLogic : MonoBehaviour {
         /// <summary>
         /// Returns whether the given cell has a sign next to it (includes diagonal)
         /// </summary>
-        private bool HasSignNextToIt(int x, int y) {
-            for (int i = -1; i <= 1; i++)
-                for (int k = -1; k <= 1; k++)
-                    if (!(i == 0 && k == 0) && (x + i >= 0 && x + i < table.GetLength(0) && y + k >= 0 && y + k < table.GetLength(1)) && table[x + i, y + k])
-                        return true;
+        private bool HasSignNextToItDiagonal(int x, int y) {
+            return HasAtLeastSignNextToItDiagonal(x, y, 1);
+        }
 
-            return false;
+        /// <summary>
+        /// Returns whther the given cell has at least count sign next to it (includes diagonal)
+        /// </summary>
+        private bool HasAtLeastSignNextToItDiagonal(int x, int y, int count) {
+            int sum = 0;
+
+            for (int i = -1; i <= 1 && sum < count; i++)
+                for (int k = -1; k <= 1 && sum < count; k++)
+                    if (!(i == 0 && k == 0) &&
+                        (x + i >= 0 && x + i < table.GetLength(0) && 
+                        y + k >= 0 && y + k < table.GetLength(1)) && 
+                        table[x + i, y + k])
+                            sum++;
+
+            return sum >= count;
+        }
+
+        private readonly int[,] nextToHelper = new int[,] {
+            { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 }
+        };
+
+        /// <summary>
+        /// Returns whether the given cell has at least count sign next to it (does not include diagonal)
+        /// </summary>
+        private bool HasAtLeastSignNextToIt(int x, int y, int count) {
+            int sum = 0;
+
+            for (int i = 0; i < nextToHelper.GetLength(0) && sum < count; i++)
+                if ((x + nextToHelper[i, 0] >= 0 && x + nextToHelper[i, 0] < table.GetLength(0) &&
+                    y + nextToHelper[i, 1] >= 0 && y + nextToHelper[i, 1] < table.GetLength(1)) &&
+                    table[x + nextToHelper[i, 0], y + nextToHelper[i, 1]]) {
+                        sum++;
+                }
+
+            return sum >= count;
         }
 
         public int[,] GetShapePoints() {

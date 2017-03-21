@@ -75,7 +75,8 @@ public class AITTTGameLogic : TTTGameLogic {
         // If it's out of camera's bounds move camera there
         if (!grid.IsInCameraSight(pos)) {
             // Move camera there
-            Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 0.2f);
+            Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 
+                Vector2.Distance(new Vector2(pos[0], pos[1]), Camera.main.transform.position) * 0.3f);
         }
     }
 

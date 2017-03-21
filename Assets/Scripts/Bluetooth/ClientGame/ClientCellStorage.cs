@@ -36,6 +36,10 @@ public class ClientCellStorage : MonoBehaviour {
     // Called when someone wins the game
     public void SomeoneWon(Cell.CellOcc type) {
         if (SomeoneWonEvent != null) SomeoneWonEvent(type);
+
+        // Not this device won
+        if (type == BluetoothTTTGameLogic.serverType) PreferencesScript.Instance.PullExpBarThenAdd(BluetoothTTTGameLogic.EXP_FOR_LOSING);
+        else PreferencesScript.Instance.PullExpBarThenAdd(BluetoothTTTGameLogic.EXP_FOR_WINNING);
     }
 
     private void ShowOnlyVisibleCells() {

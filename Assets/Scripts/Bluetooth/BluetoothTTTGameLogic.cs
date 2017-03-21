@@ -3,6 +3,9 @@ using DG.Tweening;
 
 public class BluetoothTTTGameLogic : TTTGameLogic {
 
+    public const int EXP_FOR_WINNING = 450;
+    public const int EXP_FOR_LOSING = 170;
+
     private int xScore = 0;
     public int XScore { get { return xScore; } }
     private int oScore = 0;
@@ -13,7 +16,7 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
     /// <summary>
     /// Which type the server uses
     /// </summary>
-    public Cell.CellOcc serverType;
+    public static Cell.CellOcc serverType;
 
     /// <summary>
     /// Where last sign was placed
@@ -34,6 +37,14 @@ public class BluetoothTTTGameLogic : TTTGameLogic {
         scoring = FindObjectOfType<ScoringScript>();
         serverType = Cell.CellOcc.X;
         whoseTurn = Cell.CellOcc.X;
+
+        SomeoneWonGameEvent += SomeOneWonGame;
+    }
+
+    private void SomeOneWonGame(Cell.CellOcc type) {
+        // this device won
+        if (type == serverType) PreferencesScript.Instance.PullExpBarThenAdd(EXP_FOR_WINNING);
+        else PreferencesScript.Instance.PullExpBarThenAdd(EXP_FOR_LOSING); 
     }
 
     public override void NextTurn(int[] gridPos, out Cell.CellOcc won) {

@@ -2,9 +2,9 @@ using UnityEngine;
 using DG.Tweening;
 
 public class GridLightDarkMode : MonoBehaviour {
-
-    public Color lightModeColor = new Color(0.88627f, 0.88627f, 0.88627f);
-    public Color darkModeColor = new Color(0.12941f, 0.12941f, 0.12941f);
+    
+    private Color lightModeColor = new Color(0.88627f, 0.88627f, 0.88627f);
+    private Color darkModeColor = new Color(0.23529f, 0.23529f, 0.23529f);
 
     void Start() {
         PreferencesScript.ColorChangeEvent += ToMode;

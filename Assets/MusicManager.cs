@@ -74,8 +74,9 @@ public class MusicManager : Singleton<MusicManager> {
     }
 
     public void SetVolume(float volume) {
-        if (!fading)
+        if (!fading) { 
             audioSource.volume = volume;
+        }
     }
 }
 
