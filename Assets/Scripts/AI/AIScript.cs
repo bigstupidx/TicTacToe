@@ -52,6 +52,15 @@ public class AIScript : MonoBehaviour {
     /// </summary>
     private IntVector2 topRightPosOfField;
 
+    /// <summary>
+    /// Top right position of all the signs so far
+    /// </summary>
+    private IntVector2 topRightAll = new IntVector2();
+    /// <summary>
+    /// Bottom left position of all the signs so far
+    /// </summary>
+    private IntVector2 bottomLeftAll = new IntVector2();
+
     private bool gameInProgress = false;
 
     void Start() {
@@ -171,6 +180,12 @@ public class AIScript : MonoBehaviour {
             SetLocalGridDisabled(new int[] { gridPos[0] - gameField.GetLength(0) / 2, gridPos[1] - gameField.GetLength(1) / 2 });
         }
 
+        // Set the all bounds if needed
+        if (gridPos[0] < bottomLeftAll.x) bottomLeftAll.x = gridPos[0];
+        if (gridPos[1] < bottomLeftAll.y) bottomLeftAll.y = gridPos[1];
+        if (gridPos[0] > topRightAll.x) topRightAll.x = gridPos[0];
+        if (gridPos[1] > topRightAll.y) topRightAll.y = gridPos[1];
+ 
         IntVector2 pos = GridToLocalAIPos(gridPos);
 
         AddPoint(pos, type);
@@ -550,12 +565,11 @@ public class AIScript : MonoBehaviour {
     public int[] PlaceDownRandom() {
         IntVector2 pos; CellHolder ch;
         do {
-            // It allocates a rectangle for the game, so it doesn't place it there (thats innerR) but just for good measures we put it in a dowhile
-            float r = ((topRightPosOfField.x - bottomLeftPosOfField.x) * 3f);
-            float innerR = (topRightPosOfField.x - bottomLeftPosOfField.x) * 2f;
+            // It allocates a rectangle for the game, so it doesn't place it in another game (thats innerR) but just for good measures we put it in a dowhile
+            float r = 20f;
 
-            Vector2 vect = UnityEngine.Random.insideUnitCircle * (r - innerR) + new Vector2(innerR, innerR);
-            pos = topRightPosOfField + new IntVector2((int) vect.x, (int) vect.y);
+            Vector2 vect = UnityEngine.Random.insideUnitCircle * r;
+            pos = topRightAll + new IntVector2((int) vect.x, (int) vect.y);
 
             ch = grid.GetCellHolderAtGridPos(LocalAIToGridPos(pos.x, pos.y));
         } while (!(ch == null || ch.CurrentTemplate.cellOcc == Cell.CellOcc.NONE));

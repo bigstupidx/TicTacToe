@@ -7,8 +7,6 @@ public class AiDifficultyPopupPanel : AIDifficultyPanel {
     private Image wholeScreenPanel;
     private RectTransform smallPanel;
 
-    private float animTime = 0.3f;
-
     public override void Start() {
         base.Start();
 

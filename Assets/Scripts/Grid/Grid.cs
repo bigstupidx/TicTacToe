@@ -55,7 +55,7 @@ public class Grid : MonoBehaviour {
 
         InvokeRepeating("ShowOnlyVisiblePartions", 0.1f, UPDATE_SHOWN_TIME);
         InvokeRepeating("ShowOnlyVisibleBorders", 0.2f, UPDATE_SHOWN_TIME);
-        InvokeRepeating("UpdateCameraPos", 0f, UPDATE_SHOWN_TIME);
+        InvokeRepeating("UpdateCameraPos", 0f, 1f / 40f);
 
         // Parent gameobject of cells
         cellParent = new GameObject("Cells");

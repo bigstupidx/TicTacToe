@@ -3,7 +3,7 @@ using DG.Tweening;
 
 public class BluetoothTTTGameLogic : TTTGameLogic {
 
-    public const int EXP_FOR_WINNING = 450;
+    public const int EXP_FOR_WINNING = 400;
     public const int EXP_FOR_LOSING = 170;
 
     private int xScore = 0;
