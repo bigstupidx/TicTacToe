@@ -23,8 +23,15 @@ public class Grid : MonoBehaviour {
     // LB = LeftBottom    TR = TopRight
     protected int[] cameraLastPosLB = new int[2];
     protected int[] cameraLastPosTR = new int[2];
-    protected int[] cameraCurrPosLB = new int[2];
+    protected int[] cameraCurrPosLB = new int[2]; 
     protected int[] cameraCurrPosTR = new int[2];
+    public Rect CameraPos {
+        get {
+            Vector2 lb = new Vector2(cameraCurrPosLB[0] + SHOW_BORDER, cameraCurrPosLB[1] + SHOW_BORDER);
+            Vector2 tr = new Vector2(cameraCurrPosTR[0] - SHOW_BORDER, cameraCurrPosTR[1] - SHOW_BORDER);
+            return new Rect(lb, tr - lb);
+        }
+    }
 
     // Parent of cell gameobjects
     public static GameObject cellParent;

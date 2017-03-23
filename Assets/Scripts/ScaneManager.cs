@@ -18,6 +18,7 @@ public class ScaneManager : Singleton<ScaneManager> {
 
     public delegate void ScreenChange(string from, string to);
     public static event ScreenChange OnScreenChange;
+    public static event ScreenChange OnScreenAboutToChangeEvent;
 
     private List<BackButtonAction> backButtonStack = new List<BackButtonAction>();
     private int idGenerator = 0;
@@ -84,6 +85,10 @@ public class ScaneManager : Singleton<ScaneManager> {
         string from = SceneManager.GetActiveScene().name;
 
         SceneManager.LoadScene(name, LoadSceneMode.Single);
+
+        if (OnScreenAboutToChangeEvent != null) {
+            OnScreenAboutToChangeEvent(from, name);
+        }
 
         StartCoroutine(SceneLoaded(from, name));
     }

@@ -37,6 +37,7 @@ public class BluetoothEventListener : MonoBehaviour {
         if (to != "ClientBluetoothGame" && to != "ServerBluetoothGame") {
             ScaneManager.OnScreenChange -= ScreenChanged;
 
+            Bluetooth.Instance().DisableBluetooth();
             Destroy(gameObject);
         }
     }

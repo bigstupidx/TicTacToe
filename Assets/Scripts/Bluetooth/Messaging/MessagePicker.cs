@@ -21,6 +21,7 @@ public class MessagePicker : MonoBehaviour {
     Vector3 dragEnd = new Vector3();
 
     private LineRenderer lineRenderer;
+    private RectTransform rectTransform;
     private Image fullPanelImage;
     
     /// <summary>
@@ -37,6 +38,7 @@ public class MessagePicker : MonoBehaviour {
 
     void Start() {
         lineRenderer = GetComponent<LineRenderer>();
+        rectTransform = GetComponent<RectTransform>();
 
         fullPanelImage = GameObject.Find("FullPanel").GetComponent<Image>();
         fullPanelImage.gameObject.SetActive(false);
@@ -105,7 +107,8 @@ public class MessagePicker : MonoBehaviour {
     public void BeginDrag() {
         isDragging = true;
 
-        dragStart = Camera.main.ScreenToWorldPoint(transform.position);
+        Rect rect = RectTransformExt.GetWorldRect(rectTransform, Vector2.one);
+        dragStart = rect.position + new Vector2(0.8f * Camera.main.orthographicSize / 6f, 0.8f * Camera.main.orthographicSize / 6f);
         dragStart.z = -5;
 
         lineRenderer.SetPosition(0, dragStart);
@@ -199,5 +202,26 @@ public class MessagePickerMessage {
 
     public MessagePickerMessage(string message) {
         this.message = message;
+    }
+}
+
+static public class RectTransformExt {
+    /// <summary>
+    /// Converts RectTransform.rect's local coordinates to world space
+    /// Usage example RectTransformExt.GetWorldRect(myRect, Vector2.one);
+    /// </summary>
+    /// <returns>The world rect.</returns>
+    /// <param name="rt">RectangleTransform we want to convert to world coordinates.</param>
+    /// <param name="scale">Optional scale pulled from the CanvasScaler. Default to using Vector2.one.</param>
+    static public Rect GetWorldRect(RectTransform rt, Vector2 scale) {
+        // Convert the rectangle to world corners and grab the top left
+        Vector3[] corners = new Vector3[4];
+        rt.GetWorldCorners(corners);
+        Vector3 topLeft = corners[0];
+
+        // Rescale the size appropriately based on the current Canvas scale
+        Vector2 scaledSize = new Vector2(scale.x * rt.rect.size.x, scale.y * rt.rect.size.y);
+
+        return new Rect(topLeft, scaledSize);
     }
 }

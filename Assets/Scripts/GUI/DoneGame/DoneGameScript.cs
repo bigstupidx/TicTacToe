@@ -12,8 +12,8 @@ public class DoneGameScript : MonoBehaviour {
     private GameObject signParent;
 
     private SpriteRenderer[] childrenSR;
-    
-	void Start () {
+
+    void Start () {
         signParent = transform.FindChild("Signs").gameObject;
         childrenSR = signParent.GetComponentsInChildren<SpriteRenderer>();
 

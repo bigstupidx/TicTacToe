@@ -24,6 +24,7 @@ public class BluetoothMessageManager : MonoBehaviour {
         // Make new message and it goes directly to 0 0
         GameObject go = GameObject.Instantiate(messagePrefab);
         go.transform.SetParent(messageSpawnerObject.transform, false);
+        go.SetActive(false);
 
         // If we don't know the size of the message yet store it
         if (messageHeight == -1) {
@@ -39,7 +40,8 @@ public class BluetoothMessageManager : MonoBehaviour {
             }
         }
 
-        
+
+        go.SetActive(true);
         go.GetComponent<BluetoothMessage>().Appear(ownMessage);
 
         // Set color according to colormode

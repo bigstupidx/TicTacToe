@@ -1,13 +1,29 @@
 using UnityEngine;
 
 public class UpdateColliders : MonoBehaviour {
+
+    private int cameraOrthoCurr;
+
+    private BoxCollider2D bottom, top, left, right;
     
 	void Start () {
         // Get colliders. They should be children of the camera
-        BoxCollider2D bottom = transform.FindChild("BottomCollider").GetComponent<BoxCollider2D>();
-        BoxCollider2D top = transform.FindChild("TopCollider").GetComponent<BoxCollider2D>();
-        BoxCollider2D left = transform.FindChild("LeftCollider").GetComponent<BoxCollider2D>();
-        BoxCollider2D right = transform.FindChild("RightCollider").GetComponent<BoxCollider2D>();
+        bottom = transform.FindChild("BottomCollider").GetComponent<BoxCollider2D>();
+        top = transform.FindChild("TopCollider").GetComponent<BoxCollider2D>();
+        left = transform.FindChild("LeftCollider").GetComponent<BoxCollider2D>();
+        right = transform.FindChild("RightCollider").GetComponent<BoxCollider2D>();
+
+        UpdateCamColliders();
+    }
+
+    void Update() {
+        if (cameraOrthoCurr != (int) Camera.main.orthographicSize) {
+            UpdateCamColliders();
+        }
+    }
+
+    private void UpdateCamColliders() {
+        cameraOrthoCurr = (int) Camera.main.orthographicSize;
 
         // Get world size of camera
         float camHeight = Camera.main.orthographicSize * 2;

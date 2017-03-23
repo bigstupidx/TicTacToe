@@ -76,8 +76,9 @@ public class AITTTGameLogic : TTTGameLogic {
         if (!grid.IsInCameraSight(pos)) {
             // Move camera there
             Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 
-                Vector2.Distance(new Vector2(pos[0], pos[1]), Camera.main.transform.position) * 0.05f);
+                Vector2.Distance(new Vector2(pos[0], pos[1]), Camera.main.transform.position) * 0.1f);
         }
+        Rect r = grid.CameraPos;
     }
 
     private IEnumerator ProcessAIData(float delayTime, int[] pos) {

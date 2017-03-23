@@ -17,6 +17,8 @@ public class MenuCameraMovement : MonoBehaviour {
     private GameObject[] doneGamePrefabs;
 
     private GameObject doneGameParent;
+    private DoneGameDisabler doneGameDisabler;
+    private Vector3 currentCameraGoal;
 
     void Start() {
         myCamera = GetComponent<Camera>();
@@ -31,7 +33,7 @@ public class MenuCameraMovement : MonoBehaviour {
         if (doneGameParent == null)
             PlaceDoneGames();
     }
- 
+
     void OnApplicationPause(bool paused) {
         // If we come back from pause reload resources just in case
         if (!paused) {
@@ -60,7 +62,7 @@ public class MenuCameraMovement : MonoBehaviour {
         dg.gridManagerParent = doneGameParent.transform;
 
         // Add disabler
-        doneGameParent.AddComponent<DoneGameDisabler>();
+        doneGameDisabler = doneGameParent.AddComponent<DoneGameDisabler>();
 
         DontDestroyOnLoad(doneGameParent);
 
@@ -112,13 +114,13 @@ public class MenuCameraMovement : MonoBehaviour {
     /// <summary>
     /// Recursive function makes camera move in a radius
     /// </summary>
-    private void MoveCameraToNewRandPos() {
+    public void MoveCameraToNewRandPos() {
         // Get new position where to go inside radius circle around spawn
-        Vector3 randPos = Random.insideUnitCircle * radius * 2;
-        randPos.z = myCamera.transform.position.z;
+        currentCameraGoal = Random.insideUnitCircle * radius * 2;
+        currentCameraGoal.z = myCamera.transform.position.z;
 
         // Go there and after it is ready do it again
-        myCamera.transform.DOMove(randPos, timePerMoveOneRect * Vector2.Distance(Camera.main.transform.position, randPos)).SetEase(Ease.Linear).OnComplete(new TweenCallback(() => {
+        myCamera.transform.DOMove(currentCameraGoal, timePerMoveOneRect * Vector2.Distance(Camera.main.transform.position, currentCameraGoal)).SetEase(Ease.Linear).OnComplete(new TweenCallback(() => {
             MoveCameraToNewRandPos();
         }));
     }
