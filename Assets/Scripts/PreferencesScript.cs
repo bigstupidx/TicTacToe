@@ -412,7 +412,7 @@ public class PreferencesScript : Singleton<PreferencesScript> {
         if (level <= 7) {
             return 1000 + (level - 2) * 200;
         } else if (level <= maxPlayerLevel) {
-            return 1600 + (int) (Mathf.Pow(level, 3f) * 1.5f);
+            return 1600 + (int) (Mathf.Pow(level, 2.7f) * 1.5f);
         }
 
         return 0;
@@ -571,7 +571,6 @@ public class GPAchievements {
     public const string achievementLevel5 = "CgkIu5mLkuoXEAIQDw"; // Implemented
     public const string achievementLevel15 = "CgkIu5mLkuoXEAIQEA"; // Implemented
     public const string achievementLevel30 = "CgkIu5mLkuoXEAIQEQ"; // Implemented
-    public const string achievementLevel50 = "CgkIu5mLkuoXEAIQEg"; // Implemented
 
     public const string achievementTenGamesAgainstAi = "CgkIu5mLkuoXEAIQBg"; // Implemented
     public const string achievementFiftyGamesAgainstAi = "CgkIu5mLkuoXEAIQBw"; // Implemented
@@ -594,10 +593,6 @@ public class GPAchievements {
     public const string achievementPlay1000Games = "CgkIu5mLkuoXEAIQIA"; // Implemented
     public const string achievementPlay5000Games = "CgkIu5mLkuoXEAIQIQ"; // Implemented
     public const string achievementPlay10000Games = "CgkIu5mLkuoXEAIQIg"; // Implemented
-
-    public const string achievementTheSuperiorColorMode = "CgkIu5mLkuoXEAIQGQ";
-    public const string achievementApprenticeSpammer = "CgkIu5mLkuoXEAIQEw";
-    public const string achievementMasterSpammer = "CgkIu5mLkuoXEAIQFA";
 
     public const string achievementFabulous = "CgkIu5mLkuoXEAIQFQ"; // Implemented
     public const string achievementIsItOnlyAnEggplantwinkwink = "CgkIu5mLkuoXEAIQGg"; // Implemented
@@ -689,7 +684,6 @@ public class GPAchievements {
             case 5: UnlockAchievement(achievementLevel5); break;
             case 15: UnlockAchievement(achievementLevel15); break;
             case 30: UnlockAchievement(achievementLevel30); break;
-            case 50: UnlockAchievement(achievementLevel50); break;
         }
     }
 

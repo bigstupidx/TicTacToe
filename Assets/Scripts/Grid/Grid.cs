@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using DG.Tweening;
+using UnityEngine.Events;
 
 public class Grid : MonoBehaviour {
 
@@ -115,6 +116,8 @@ public class Grid : MonoBehaviour {
             pos[0] = int.Parse(line[0]); pos[1] = int.Parse(line[1]);
             PlaceSign(pos, (Cell.CellOcc) Enum.Parse(typeof(Cell.CellOcc), line[2]), true);
         }
+
+        cameraLastPosLB[0] = int.MaxValue;
     }
 
     /// <summary>
@@ -221,21 +224,35 @@ public class Grid : MonoBehaviour {
     }
 
     /// <summary>
+    /// Used for deterimining whether to check the borders (which to show).
+    /// </summary>
+    private int[] borderLastExamineCamPos = new int[2];
+    /// <summary>
     /// which borders should be visible
     /// Updates quite frequently
     /// </summary>
     void ShowOnlyVisibleBorders() {
-        if (!HasCameraMovedSinceLastFrame()) return;
+        if (!HasCameraMovedSince(borderLastExamineCamPos)) return;
 
+        borderLastExamineCamPos[0] = cameraCurrPosLB[0];
+        borderLastExamineCamPos[1] = cameraCurrPosLB[1];
+        
         Border.UpdateBordersShown(cameraCurrPosLB, cameraCurrPosTR);
     }
 
+    /// <summary>
+    /// Used for deterimining whether to check the partion (which to show).
+    /// </summary>
+    private int[] partionLastExamineCamPos = new int[2];
     /// <summary>
     /// Calculates which partions should not be shown
     /// Updates quite frequently
     /// </summary>
     void ShowOnlyVisiblePartions() {
-        if (!HasCameraMovedSinceLastFrame()) return;
+        if (!HasCameraMovedSince(partionLastExamineCamPos)) return;
+
+        partionLastExamineCamPos[0] = cameraCurrPosLB[0];
+        partionLastExamineCamPos[1] = cameraCurrPosLB[1];
 
         int[] leftBottomPart = Partion.GetPartionPosOfCell(cameraCurrPosLB);
         int[] topRightPart = Partion.GetPartionPosOfCell(cameraCurrPosTR);
@@ -298,10 +315,10 @@ public class Grid : MonoBehaviour {
     }
 
     /// <summary>
-    /// Returns whether camera moved since last frame
+    /// Returns whether the camera has moved compared to lastLBPos
     /// </summary>
-    protected bool HasCameraMovedSinceLastFrame() {
-        return cameraCurrPosLB[0] != cameraLastPosLB[0] || cameraCurrPosLB[1] != cameraLastPosLB[1];
+    protected bool HasCameraMovedSince(int[] lastLBPos) {
+        return cameraCurrPosLB[0] != lastLBPos[0] || cameraCurrPosLB[1] != lastLBPos[1];
     }
 
     /// <summary>

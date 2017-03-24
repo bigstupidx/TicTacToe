@@ -74,9 +74,23 @@ public class AITTTGameLogic : TTTGameLogic {
 
         // If it's out of camera's bounds move camera there
         if (!grid.IsInCameraSight(pos)) {
-            // Move camera there
-            Camera.main.transform.DOMove(new Vector3(pos[0], pos[1], Camera.main.transform.position.z), 
-                Vector2.Distance(new Vector2(pos[0], pos[1]), Camera.main.transform.position) * 0.1f);
+            // some coordinate geometry
+            Vector2 point = new Vector2(pos[0] - Camera.main.transform.position.x, pos[1] - Camera.main.transform.position.y);
+            float o = Camera.main.orthographicSize * 0.8f; // this is how many units away we want the sign to be from the camera middle
+
+            // distance between camera (which for now is the origo) and the point
+            float distance = Mathf.Sqrt(point.x * point.x + point.y * point.y);
+            float realDistance = distance - o; // We want to move the camera so the point is o distance away from the middle of the camera
+
+            // Now we need the lambda of the scaling
+            float lambda = realDistance / distance;
+
+            // now we can scale the two sides of the triangle of distance and point.x and point.y lengths
+            point *= lambda;
+
+            // So now we store in the point how much we have to move with the camera so move it there
+            Camera.main.transform.DOMove(Camera.main.transform.position + new Vector3(point.x, point.y, 0),
+                point.magnitude * 0.08f);
         }
         Rect r = grid.CameraPos;
     }

@@ -33,6 +33,9 @@ public class MenuSettingsPanel : MonoBehaviour {
     private bool isOpen = false;
     private int backButtonActionId;
 
+    private Tweener currentMainUITweener;
+    private Tweener currentRectTransformTweener;
+
     void Awake() {
         if (FindObjectsOfType<MenuSettingsPanel>().Length > 1) return;
         // add ids
@@ -49,13 +52,17 @@ public class MenuSettingsPanel : MonoBehaviour {
         soundVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetSoundVolume((int) value); });
         musicVolumeSlider.onValueChanged.AddListener((float value) => { PreferencesScript.Instance.SetMusicVolume((int) value); });
 
+        ScaneManager.OnScreenAboutToChangeEvent += OnSceneAboutToChange;
         ScaneManager.OnScreenChange += OnScreenChanged;
+        
         OnScreenChanged("", "Menu");
     }
 
-    private void OnScreenChanged(string from, string to) {
-        Debug.Log("Screen changed in menusettingspanel");
+    private void OnSceneAboutToChange(string from, string to) {
+        CloseWithoutTweening();
+    }
 
+    private void OnScreenChanged(string from, string to) {
         // Assign all variables
         mainUIPanel = FindObjectOfType<MainUIPanel>().GetComponent<RectTransform>();
         mainUIPanelImage = mainUIPanel.GetComponent<Image>();
@@ -98,8 +105,6 @@ public class MenuSettingsPanel : MonoBehaviour {
                 ToggleSettingsPanel();
             });
         }
-        
-        CloseSettingsPanel();
     }
 
     private void InstantiateChangePanel(SettingsChangePanel changePanel) {
@@ -135,8 +140,8 @@ public class MenuSettingsPanel : MonoBehaviour {
 
         isOpen = true;
 
-        if (mainUIPanel != null) mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x - rectTransform.rect.width, animTime);
-        rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime).OnComplete(() => {
+        if (mainUIPanel != null) currentMainUITweener = mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x - rectTransform.rect.width, animTime);
+        currentRectTransformTweener = rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x - rectTransform.rect.width, animTime).OnComplete(() => {
             // add to backbutton callback
             backButtonActionId = ScaneManager.Instance.AddToBackStack(() => { CloseSettingsPanel(); });
         });
@@ -153,13 +158,28 @@ public class MenuSettingsPanel : MonoBehaviour {
 
         isOpen = false;
 
-        if (mainUIPanel != null) mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x + rectTransform.rect.width, animTime);
-        rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x + rectTransform.rect.width, animTime);
+        if (mainUIPanel != null) currentMainUITweener = mainUIPanel.DOAnchorPosX(mainUIPanel.anchoredPosition.x + rectTransform.rect.width, animTime);
+        currentRectTransformTweener = rectTransform.DOAnchorPosX(rectTransform.anchoredPosition.x + rectTransform.rect.width, animTime);
 
         mainUIPanelImage.raycastTarget = false;
         mainUIPanelEventTrigger.enabled = false;
 
         ScaneManager.Instance.RemoveFromBackStack(backButtonActionId);
+    }
+
+    /// <summary>
+    /// Close settings panel without tweening. Checks whether it is open or not
+    /// </summary>
+    private void CloseWithoutTweening() {
+        if (!isOpen) return;
+
+        isOpen = false;
+
+        mainUIPanel.anchoredPosition = new Vector2(mainUIPanel.anchoredPosition.x + rectTransform.rect.width, mainUIPanel.anchoredPosition.y);
+        rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x + rectTransform.rect.width, rectTransform.anchoredPosition.y);
+        
+        mainUIPanelImage.raycastTarget = false;
+        mainUIPanelEventTrigger.enabled = false;
     }
 }
 
