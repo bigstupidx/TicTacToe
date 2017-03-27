@@ -45,7 +45,7 @@ public class GooglePlayServicesManager : MonoBehaviour {
     private void ScreenChanged(string from, string to) {
         // On menu screen start the signed in check
         if (to == "Menu") {
-            Invoke("StartCheckingWhetherSignedIn", 5f);
+            Invoke("StartCheckingWhetherSignedIn", 2f);
         }
     }
 
@@ -57,8 +57,6 @@ public class GooglePlayServicesManager : MonoBehaviour {
     }
 
     private void StartCheckingWhetherSignedIn() {
-        Debug.Log("Started checking for sign in");
-
         checkThread = new Thread(new ThreadStart(() => {
             // We check for internet connection
             htmlText = GetHtmlFromUri("http://google.com");
@@ -69,9 +67,8 @@ public class GooglePlayServicesManager : MonoBehaviour {
     }
 
     private IEnumerator CheckForGooglePlaySignedIn() {
-        yield return new WaitUntil(() => htmlText == string.Empty);
-
-        Debug.Log("Internet connection checked " + htmlText);
+        yield return new WaitUntil(() => htmlText != string.Empty);
+        
         // this phrase is in the beginning of the google page
         if (htmlText.Contains("schema.org/WebPage") && !Social.localUser.authenticated) {
             // the player is not signed in so prompt them to do so

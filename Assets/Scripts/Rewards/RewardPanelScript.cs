@@ -37,7 +37,7 @@ public class RewardPanelScript : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
 
         canvasScaler = transform.parent.GetComponent<CanvasScaler>();
-
+        
         // LevelUpAnimation();
     }
 
@@ -100,7 +100,7 @@ public class RewardPanelScript : MonoBehaviour {
             float h, s, v;
             Color.RGBToHSV(firstPanelStaticText.outlineColor, out h, out s, out v);
             firstPanelStaticText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
-            Debug.Log("From hsv " + h + " " + s + " " + v + " to " + firstPanelStaticText.outlineColor);
+            // Debug.Log("From hsv " + (Color32) Color.HSVToRGB(h, s, v) + " to " + firstPanelStaticText.outlineColor);
             
             Color.RGBToHSV(levelUpText.outlineColor, out h, out s, out v);
             levelUpText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
