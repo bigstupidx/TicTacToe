@@ -13,11 +13,6 @@ public class BackButton : MonoBehaviour {
         buttonScript.onClick.AddListener(() => {
             if (disabled) return;
             
-
-            // Do something based on which screen we backed from
-            switch (SceneManager.GetActiveScene().name) {
-                
-            }
         });
     }
 

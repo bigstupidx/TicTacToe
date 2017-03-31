@@ -52,13 +52,13 @@ public class AnimatedLineRenderer : MonoBehaviour {
                 prev = current;
                 current = queue.Dequeue();
                 if (++index == 0) {
-                    lineRenderer.numPositions = 1;
+                    lineRenderer.positionCount = 1;
                     StartPoint = current.Position;
                     current.ElapsedSeconds = current.TotalSeconds = current.TotalSecondsInverse = 0.0f;
                     lineRenderer.SetPosition(0, current.Position);
                     return;
                 } else {
-                    lineRenderer.numPositions = index + 1;
+                    lineRenderer.positionCount = index + 1;
 
                     if (audioSource != null) audioSource.pitch += UnityEngine.Random.Range(0f, 0.15f) - 0.075f;
                 }
@@ -204,14 +204,14 @@ public class AnimatedLineRenderer : MonoBehaviour {
         prev = current = new QueueItem();
         lastQueued = null;
         if (lineRenderer != null) {
-            lineRenderer.numPositions = 0;
+            lineRenderer.positionCount = 0;
         }
         remainder = 0.0f;
         queue.Clear();
         Resetting = false;
         StartPoint = EndPoint = Vector3.zero;
 
-        lineRenderer.numPositions = 0;
+        lineRenderer.positionCount = 0;
     }
 
     /// <summary>

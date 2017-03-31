@@ -182,7 +182,7 @@ public class Border : MonoBehaviour {
         alr.Reset();
 
         // Reset linerenderer
-        go.GetComponent<LineRenderer>().numPositions = 0;
+        go.GetComponent<LineRenderer>().positionCount = 0;
 
         // Reset Win line as well
         alr = go.transform.GetChild(0).gameObject.GetComponent<AnimatedLineRenderer>();
@@ -234,7 +234,7 @@ public class Border : MonoBehaviour {
             for (int i = 0; i < bsl.Points.GetLength(0); i++)
                 lineRenderer.Enqueue(bsl.GetPosAt(i));
         } else {
-            lr.numPositions = bsl.Points.GetLength(0);
+            lr.positionCount = bsl.Points.GetLength(0);
             for (int i = 0; i < bsl.Points.GetLength(0); i++)
                 lr.SetPosition(i, bsl.GetPosAt(i));
         }
