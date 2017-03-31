@@ -37,13 +37,8 @@ public class RewardPanelScript : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
 
         canvasScaler = transform.parent.GetComponent<CanvasScaler>();
-
-        ScaneManager.OnScreenChange += Temp;
+        
         // LevelUpAnimation();
-    }
-
-    private void Temp(string from, string to) {
-        LevelUpAnimation();
     }
 
     private float firstPanelAnim = 1f;
