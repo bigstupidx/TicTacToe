@@ -37,8 +37,13 @@ public class RewardPanelScript : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
 
         canvasScaler = transform.parent.GetComponent<CanvasScaler>();
-        
+
+        ScaneManager.OnScreenChange += Temp;
         // LevelUpAnimation();
+    }
+
+    private void Temp(string from, string to) {
+        LevelUpAnimation();
     }
 
     private float firstPanelAnim = 1f;
@@ -105,6 +110,8 @@ public class RewardPanelScript : MonoBehaviour {
             Color.RGBToHSV(levelUpText.outlineColor, out h, out s, out v);
             levelUpText.outlineColor = Color.HSVToRGB(h + 0.005f, s, v);
 
+            firstPanelStaticText.SetAllDirty();
+            levelUpText.SetAllDirty();
             yield return null;
         }
     }
